@@ -1,6 +1,25 @@
 import firebase from 'firebase'
 import { db, realdb } from '../../utils/firebase'
-import { isOfflineForFirestore, isOfflineForDatabase, isOnlineForDatabase, isOnlineForFirestore } from '../../auth/user'
+
+const isOfflineForDatabase = {
+  state: 'offline',
+  last_changed: firebase.database.ServerValue.TIMESTAMP
+}
+
+const isOnlineForDatabase = {
+  state: 'online',
+  last_changed: firebase.database.ServerValue.TIMESTAMP
+}
+
+const isOfflineForFirestore = {
+  state: 'offline',
+  last_changed: firebase.firestore.FieldValue.serverTimestamp()
+}
+
+const isOnlineForFirestore = {
+  state: 'online',
+  last_changed: firebase.firestore.FieldValue.serverTimestamp()
+}
 
 export function setupPresence (uid: string): void {
   const dbref = db.collection('UserStatus').doc(uid)
