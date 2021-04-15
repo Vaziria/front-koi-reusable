@@ -18,6 +18,7 @@ export interface IkanFilter {
 }
 
 function cleanparams<T> (params: IkanFilter): T {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const data = Object.fromEntries(Object.entries(params).filter(([_, v]) => {
     return !((v === undefined) || (v === null) || (v === 0) || (v === []) || (v === ''))
   }))
