@@ -1,4 +1,4 @@
-import { DispatchOptions, CommitOptions } from 'vuex'
+import { DispatchOptions, CommitOptions, Store as VuexStore } from 'vuex'
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface StateType {
@@ -32,3 +32,9 @@ export type Dispatch<Act extends Actions> = {
 }
 
 export type Context<Mut extends Mutations, St extends StateType> = Commit<Mut> & { state: St }
+
+export type Namespaced<T, N extends string> = {
+    [P in keyof T & string as `${N}/${P}`]: T[P]
+  }
+
+export type Store<S, Mut extends Mutations, Act extends Actions> = Omit<VuexStore<S>, 'getters' | 'commit' | 'dispatch'> & Commit<Mut> & Dispatch<Act>

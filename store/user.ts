@@ -2,7 +2,7 @@
 import { auth } from '@/utils/firebase'
 import firebase from 'firebase'
 import { Module } from 'vuex'
-import { Commit, StateType } from './types'
+import { Commit, Namespaced, StateType, Store } from './types'
 
 export interface IUserState extends StateType {
     token: string
@@ -109,3 +109,4 @@ const user: Module<IUserState, {}> = {
 export default user
 
 export type UserAction = typeof actions
+export type UserStore = Store<{ 'user': IUserState }, Namespaced<UserMutation, 'user'>, Namespaced<UserAction, 'user'>>
