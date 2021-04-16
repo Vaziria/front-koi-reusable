@@ -3,17 +3,20 @@ import client from '@/reusable/api/client'
 import { setupPresence } from '@/reusable/user/presence'
 import { UserStore } from '../store/user'
 import { db, realdb } from '@/utils/firebase'
+import { Access } from '../model/access'
 // import { subChat } from '@/firedb/chat'
 
-// async function getAccess (uid: string) {
-//   const access = await db.collection('Access').doc(uid).get()
+export async function getAccess (uid: string): Promise<Access | null> {
+  const doc = await db.collection('Access').doc(uid).get()
 
-//   if (access.exists) {
-//     return access.data()
-//   }
+  if (doc.exists) {
+    const data = doc.data()
+    const access: Access = data as Access
+    return access
+  }
 
-//   return false
-// }
+  return null
+}
 
 export class AuthUser {
   auth!: firebase.auth.Auth
@@ -34,7 +37,6 @@ export class AuthUser {
       console.log('logining user')
 
       await this.store.dispatch('user/login', user)
-
       setupPresence(user.uid, db, realdb)
       // subChat(user.uid)
     } else {

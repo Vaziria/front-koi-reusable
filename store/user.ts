@@ -2,6 +2,8 @@
 import { auth } from '@/utils/firebase'
 import firebase from 'firebase'
 import { Module } from 'vuex'
+import { getAccess } from '../auth/user'
+import { Access } from '../model/access'
 import { Commit, Namespaced, StateType, Store } from './types'
 
 export interface IUserState extends StateType {
@@ -30,6 +32,9 @@ const state: IUserState = {
 const mutations = {
   set_login (state: IUserState, isLogin: boolean): void {
     state.isLogin = isLogin
+  },
+  set_access (state: IUserState, access: Access): void {
+    state.role = access.role || []
   },
   set_user_data (state: IUserState, user: firebase.User): void {
     state.displayName = user.displayName || 'username'
@@ -64,7 +69,6 @@ type Context = Commit<UserMutation> & { state: IUserState }
 
 const actions = {
   async login (store: Context, user: firebase.User): Promise<void> {
-    const state = store.state
     const commit = store.commit
 
     const token = await user.getIdTokenResult()
@@ -74,8 +78,13 @@ const actions = {
     })
 
     commit('set_user_data', user)
+    commit('set_login', true)
 
-    state.isLogin = true
+    // getting aksess
+    const access = await getAccess(user.uid)
+    if (access) {
+      commit('set_access', access)
+    }
   },
   async reloadToken (store: Context): Promise<void> {
     const user = auth.currentUser

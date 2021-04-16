@@ -9,7 +9,6 @@ async function configSetup (config: AxiosRequestConfig, store: UserStore) {
 
   if (now > exptoken) {
     await store.dispatch('user/reloadToken')
-    console.log('reload token')
   }
 
   const token: string = store.state.user.token
