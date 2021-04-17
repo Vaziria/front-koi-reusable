@@ -7,6 +7,7 @@ import { Access } from '../model/access'
 import { Commit, Namespaced, StateType, Store } from './types'
 
 export interface IUserState extends StateType {
+    uid: string
     token: string
     expiryToken: number
     isLogin: boolean
@@ -18,6 +19,7 @@ export interface IUserState extends StateType {
 }
 
 const state: IUserState = {
+  uid: '',
   token: localStorage.getItem('token') || '',
   expiryToken: parseFloat(localStorage.getItem('expiryToken') || ''),
   isLogin: !!localStorage.getItem('token'),
@@ -37,12 +39,14 @@ const mutations = {
     state.role = access.role || []
   },
   set_user_data (state: IUserState, user: firebase.User): void {
+    state.uid = user.uid || ''
     state.displayName = user.displayName || 'username'
     state.email = user.email || 'no email'
     state.phoneNumber = user.phoneNumber || 'no phone'
     state.photoUrl = user.photoURL || 'https://seller-koi.web.app/img/seller.2915641c.png'
   },
   unset_user_data (state: IUserState): void {
+    state.uid = ''
     state.displayName = ''
     state.email = 'no email'
     state.phoneNumber = 'no phone'

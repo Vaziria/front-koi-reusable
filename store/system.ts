@@ -3,6 +3,7 @@ import { StateType } from './types'
 
 export interface ISystemState extends StateType {
     isMobile: boolean
+    isSeller: boolean
 }
 
 function isMobile (): boolean {
@@ -13,10 +14,14 @@ function isMobile (): boolean {
 }
 
 const state: ISystemState = {
-  isMobile: isMobile()
+  isMobile: isMobile(),
+  isSeller: false
 }
 
 const mutations = {
+  set_system (state: ISystemState, data: Partial<ISystemState>): void {
+    Object.assign(state, data)
+  }
 }
 
 export type SystemMutation = typeof mutations
