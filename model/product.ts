@@ -5,3 +5,8 @@ export interface IkanChart {
     quantity: number
     has_review?: boolean
 }
+
+export interface Ikan {
+    id: string
+    name: string
+}

@@ -26,8 +26,8 @@ export async function chatList (isSeller: boolean): Promise<UserChat[]> {
     url = '/chat/list'
   }
 
-  const data = await client.get(url)
-  return data.data
+  const res = await client.get(url)
+  return res.data.data
 }
 
 export async function chatMessages (id: string, isSeller: boolean): Promise<Chat[]> {
@@ -40,10 +40,19 @@ export async function chatMessages (id: string, isSeller: boolean): Promise<Chat
     }
   }
   const res = await client.get(`/chat/messages/${id}`, params)
-  return res.data
+  return res.data.data
 }
 
 export async function getUserChat (userid: string): Promise<unknown> {
   const data = await client.get(`/chat/user/${userid}`)
   return data.data
+}
+
+export async function sendChat (id: string, isSeller: boolean, chat: Chat): Promise<Chat> {
+  const data = await client.post(`/chat/${id}`, chat, {
+    params: {
+      seller: isSeller
+    }
+  })
+  return data.data.data
 }

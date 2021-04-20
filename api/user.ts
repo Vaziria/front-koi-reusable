@@ -16,3 +16,13 @@ export async function cartList (): Promise<CartRes> {
   const res = await client.get('/chart')
   return res.data
 }
+
+interface EditPayload {
+  kota: string
+  name: string
+}
+export async function editProfile (payload: EditPayload): Promise<{ msg: string }> {
+  const res = await client.post('/edit_profile', payload)
+
+  return res.data
+}

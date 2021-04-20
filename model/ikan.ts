@@ -17,7 +17,6 @@ export interface IIkan {
   kategori: string
   ship_from: string
   deskripsi: string
-  stock: number
   like: number
   city: string
   region: string
