@@ -19,7 +19,6 @@ export async function chatRead (id: string, isSeller: boolean): Promise<unknown>
 
 export async function chatList (isSeller: boolean): Promise<UserChat[]> {
   let url = ''
-
   if (isSeller) {
     url = '/chat/seller/list'
   } else {
