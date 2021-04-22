@@ -5,9 +5,7 @@ export async function chatRead (id: string, isSeller: boolean): Promise<unknown>
   let params = {}
   if (isSeller) {
     params = {
-      params: {
-        seller: true
-      }
+      seller: true
     }
   }
 
@@ -33,12 +31,13 @@ export async function chatMessages (id: string, isSeller: boolean): Promise<Chat
   let params = {}
   if (isSeller) {
     params = {
-      params: {
-        seller: true
-      }
+      seller: true
     }
   }
-  const res = await client.get(`/chat/messages/${id}`, params)
+
+  const res = await client.get(`/chat/messages/${id}`, {
+    params
+  })
   return res.data.data
 }
 

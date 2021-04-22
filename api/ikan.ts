@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 
-import client from "./client"
+import client from './client'
 
 export async function listIkan (params = { kategori: 'Asagi' }) {
   const data = await client.get('/ikan/list', {

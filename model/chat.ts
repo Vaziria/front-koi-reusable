@@ -16,6 +16,8 @@ export interface Chat {
     from_seller?: boolean
     product?: Ikan
     order?: Order
+    send_process?: boolean
+    send_error?: boolean
 }
 
 export interface UserChat {
@@ -26,6 +28,7 @@ export interface UserChat {
     id: string
     name: string
     seller_name: string
+    state: string
 }
 
 export interface ChatOrder {
