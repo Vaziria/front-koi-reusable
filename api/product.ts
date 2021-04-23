@@ -1,5 +1,5 @@
 /* eslint-disable camelcase */
-import { IIkan, IkanKey } from '@/reusable/model/ikan'
+import { IIkan, IkanKey, PublicIkan } from '@/reusable/model/ikan'
 import client from './client'
 
 export interface IkanFilter {
@@ -33,3 +33,32 @@ export async function publicIkan (params?: IkanFilter): Promise<IIkan[]> {
   console.log(res.data)
   return res.data
 }
+
+export async function publicIkanItem(id: string): Promise<PublicIkan> {
+  const res = await client.get(`/ikan/${id}`)
+  return res.data
+}
+
+export async function addWish (id: string): Promise<any> {
+  const res = await client.put(`/addwish/${id}`)
+  return res
+}
+
+export async function removeWish (id: string): Promise<any> {
+  const res = await client.delete(`/removewish/${id}`)
+  return res
+}
+
+export async function addChart (id: string, quantity: number = 1): Promise<any> {
+  const res = await client.put(`/chart/${id}`, {
+    quantity
+  })
+  return res
+}
+
+export async function removeChart (id: string): Promise<any> {
+  const res = await client.delete(`/chart/${id}`)
+  return res
+}
+
+

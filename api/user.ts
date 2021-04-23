@@ -1,4 +1,4 @@
-import { IkanChart } from '../model/product'
+import { IkanChart } from '../model/ikan'
 import { IUser, PublicUser } from '../model/user'
 import client from './client'
 

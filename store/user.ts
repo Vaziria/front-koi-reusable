@@ -16,6 +16,7 @@ export interface IUserState extends StateType {
     email: string
     phoneNumber: string
     photoUrl: string
+    shopid: string
 }
 
 const state: IUserState = {
@@ -27,7 +28,8 @@ const state: IUserState = {
   displayName: '',
   email: '',
   phoneNumber: '',
-  photoUrl: ''
+  photoUrl: '',
+  shopid: ''
 
 }
 
@@ -37,6 +39,7 @@ const mutations = {
   },
   set_access (state: IUserState, access: Access): void {
     state.role = access.role || []
+    state.shopid = access.shopid
   },
   set_user_data (state: IUserState, user: firebase.User): void {
     state.uid = user.uid || ''

@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { Order } from '../model/order'
 import client from './client'
 
 export async function listOrder (query: any) {
@@ -37,7 +38,7 @@ export async function finishOrder (query: any) {
   return data.data
 }
 
-export async function invoice (query: any) {
+export async function invoice (query: { shopid: string, oid: string }): Promise<Order> {
   // console.log(query)
   const data = await client.get('/invoice', { params: query })
   return data.data

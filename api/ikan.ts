@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 
+import { PublicIkan } from '../model/ikan'
 import client from './client'
 
 export async function listIkan (params = { kategori: 'Asagi' }) {
@@ -44,7 +45,7 @@ export async function publicListIkan (query: any) {
   return res
 }
 
-export async function publicGetIkan (id: string) {
+export async function publicGetIkan (id: string): Promise<PublicIkan> {
   const res = await client.get(`/public/ikan/${id}`)
-  return res
+  return res.data
 }

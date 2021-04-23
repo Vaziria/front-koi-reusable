@@ -1,4 +1,4 @@
-import { IkanChart } from './product'
+import { IkanChart } from './ikan'
 
 /* eslint-disable camelcase */
 export interface UserStatus {

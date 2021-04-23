@@ -1,6 +1,3 @@
-import { Order } from './order'
-import { Ikan } from './product'
-
 /* eslint-disable camelcase */
 export interface Chat {
     id: string
@@ -14,8 +11,6 @@ export interface Chat {
     shopid?: string
     cs_id?: string
     from_seller?: boolean
-    product?: Ikan
-    order?: Order
     send_process?: boolean
     send_error?: boolean
 }
