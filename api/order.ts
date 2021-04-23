@@ -40,6 +40,6 @@ export async function finishOrder (query: any) {
 
 export async function invoice (query: { shopid: string, oid: string }): Promise<Order> {
   // console.log(query)
-  const data = await client.get('/invoice', { params: query })
-  return data.data
+  const res = await client.get('/invoice', { params: query })
+  return res.data.data
 }
