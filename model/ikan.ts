@@ -28,7 +28,25 @@ export interface IIkan {
     city: string
     region: string
     created: number
+    sex: 'male' | 'female' | 'uncheck'
   }
+
+export interface IFormIkan {
+  name: string
+  sex: 'male' | 'female' | 'uncheck'
+  ukuran: number
+  'ukuran_range': {
+    min: number
+    max: number
+  }
+  'ship_from': string
+  deskripsi: string
+  kategori: string
+  price: number
+  gambar: (string | File)[]
+  video: string | File
+  thumbnail: string
+}
 
 export interface PublicIkan extends IIkan {
     me?: {

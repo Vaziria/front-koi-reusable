@@ -14,7 +14,9 @@ export interface IkanFilter {
   order?: IkanKey
   order_type?: 'asc' | 'desc',
   limit?: number
-  offset?: number
+  offset?: number,
+  tags?: string,
+  status?: string
 }
 
 function cleanparams<T> (params: IkanFilter): T {
