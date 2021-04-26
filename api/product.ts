@@ -34,7 +34,7 @@ export async function publicIkan (params?: IkanFilter): Promise<IIkan[]> {
   return res.data
 }
 
-export async function publicIkanItem(id: string): Promise<PublicIkan> {
+export async function publicIkanItem (id: string): Promise<PublicIkan> {
   const res = await client.get(`/ikan/${id}`)
   return res.data
 }
@@ -49,7 +49,7 @@ export async function removeWish (id: string): Promise<any> {
   return res
 }
 
-export async function addChart (id: string, quantity: number = 1): Promise<any> {
+export async function addChart (id: string, quantity = 1): Promise<any> {
   const res = await client.put(`/chart/${id}`, {
     quantity
   })
@@ -60,5 +60,3 @@ export async function removeChart (id: string): Promise<any> {
   const res = await client.delete(`/chart/${id}`)
   return res
 }
-
-
