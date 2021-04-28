@@ -38,6 +38,7 @@ const mutations = {
     state.isLogin = isLogin
   },
   set_access (state: IUserState, access: Access): void {
+    console.log('access', access)
     state.role = access.role || []
     state.shopid = access.shopid
   },
@@ -88,7 +89,9 @@ const actions = {
     commit('set_login', true)
 
     // getting aksess
-    const access = await getAccess(user.uid)
+    const uid: string = user.uid
+    const access = await getAccess(uid)
+    // console.log('getaccess', access)
     if (access) {
       commit('set_access', access)
     }

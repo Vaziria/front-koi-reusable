@@ -8,7 +8,7 @@ import { Access } from '../model/access'
 
 export async function getAccess (uid: string): Promise<Access | null> {
   const doc = await db.collection('Access').doc(uid).get()
-
+  // console.log('uid', uid, doc.data())
   if (doc.exists) {
     const data = doc.data()
     const access: Access = data as Access

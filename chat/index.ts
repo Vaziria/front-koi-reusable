@@ -15,9 +15,9 @@ export function subChatSeller (store: UserStore, db: firebase.firestore.Firestor
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  subchat = subchat.where('created', '>=', Date.now()).onSnapshot((snap: any) => {
+  subchat = subchat.where('created', '>=', Date.now()).onSnapshot((snap) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    snap.docChanges().forEach(async (change: any) => {
+    snap.docChanges().forEach(async (change) => {
       if (change.type === 'added') {
         const chat: Chat = change.doc.data() as Chat
         await callback(chat)
