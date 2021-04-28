@@ -32,6 +32,7 @@ export interface ChatOrder {
 
 export interface ChatProduct {
     id: string
+    shopid: string
     name: string
     send_process: boolean
 }

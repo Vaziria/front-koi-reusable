@@ -44,7 +44,7 @@ export async function publicListIkan (query: any) {
   return res
 }
 
-export async function publicGetIkan (id: string): Promise<PublicIkan> {
-  const res = await client.get(`/public/ikan/${id}`)
+export async function publicGetIkan (shopid: string, id: string): Promise<PublicIkan> {
+  const res = await client.get(`/public/ikan/${shopid}/${id}`)
   return res.data
 }
