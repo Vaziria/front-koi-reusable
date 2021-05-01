@@ -18,7 +18,7 @@ export async function getOrder (id: string) {
   return res
 }
 
-export async function updateOrder (id: string, data: any) {
+export async function updateOrder (id: string, data: Partial<Order>) {
   const res = await client.put(`/order/${id}`, data)
   return res
 }
