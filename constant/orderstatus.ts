@@ -1,6 +1,6 @@
 import { StatusOrder } from '../model/order'
 
-interface MapValue {
+export interface MapValue {
     key: StatusOrder
     name: string
     color: string
