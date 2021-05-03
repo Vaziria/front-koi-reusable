@@ -28,7 +28,7 @@ export async function setOngkir (id: string, ongkir: any) {
   return res
 }
 
-export async function cancelOrder (reason: any, query: any) {
+export async function cancelOrder (reason: string, query: { oid: string, shopid: string }) {
   const data = await client.put('/buyer/cancel_order', { reason: reason }, { params: query })
   return data.data
 }

@@ -1,5 +1,4 @@
 import firebase from 'firebase'
-import client from '@/reusable/api/client'
 import { setupPresence } from '@/reusable/user/presence'
 import { UserStore } from '../store/user'
 import { db, realdb } from '@/utils/firebase'
@@ -47,8 +46,4 @@ export class AuthUser {
   registerAuthRouter (): void {
     this.auth.onAuthStateChanged((user) => this.userStateChanged(user))
   }
-}
-
-export async function getUser (userid: string): Promise<void> {
-  return await client.get(`/user/${userid}`)
 }

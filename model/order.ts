@@ -19,6 +19,20 @@ export type PaidStatus = 'unpaid' | 'paid' | 'unverify'
 export const listStatusOrder = ['waitverif', 'submit_cancel', 'pending', 'process', 'dikirim', 'selesai', 'cancel', 'problem'] as const
 export type StatusOrder = typeof listStatusOrder[number];
 
+export interface SellerOrder {
+  id: string;
+  seller_name: string;
+  phone: string;
+  location: string;
+}
+
+export interface BuyerOrder {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+}
+
 export interface Order {
   id: string
   shopid: string
@@ -39,4 +53,6 @@ export interface Order {
   resi?: string
   from_bid?: boolean
   bukti_pembayaran?: string
+  seller: SellerOrder
+  buyer: BuyerOrder
 }
