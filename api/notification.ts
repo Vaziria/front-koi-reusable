@@ -1,4 +1,4 @@
-import { NotifHist, NotifType } from '../model/notif'
+import { Notif, NotifHist, NotifType } from '../model/notif'
 import client from './client'
 
 interface INotifPayload {
@@ -13,11 +13,11 @@ export async function pushIkan (id: string): Promise<unknown> {
   return data.data
 }
 
-export async function listNotification (params: { tipe: NotifType }): Promise<NotifHist[]> {
+export async function listNotification (params: { tipe: NotifType }): Promise<Notif[]> {
   const data = await client.get('/notif/list', {
     params
   })
-  return data.data
+  return data.data.data
 }
 
 export async function addNotification (payload: INotifPayload): Promise<unknown> {

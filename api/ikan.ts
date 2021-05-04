@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-import { PublicIkan } from '../model/ikan'
+import { IIkan, PublicIkan } from '../model/ikan'
 import client from './client'
+import { IkanFilter } from './product'
 
 export async function listIkan (params = { kategori: 'Asagi' }) {
   const data = await client.get('/ikan/list', {
@@ -38,6 +39,11 @@ export async function updateIkan (id: string, data: any) {
 }
 
 // public
+
+export async function publicListIkans (params: IkanFilter): Promise<IIkan[]> {
+  const res = await client.get('/public/ikan', { params })
+  return res.data
+}
 
 export async function publicListIkan (query: any) {
   const res = await client.get('/public/ikan', { params: query })
