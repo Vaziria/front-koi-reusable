@@ -45,9 +45,9 @@ export async function publicListIkans (params: IkanFilter): Promise<IIkan[]> {
   return res.data
 }
 
-export async function publicListIkan (query: any) {
+export async function publicListIkan (query: any): Promise<IIkan[]> {
   const res = await client.get('/public/ikan', { params: query })
-  return res
+  return res.data
 }
 
 export async function publicGetIkan (shopid: string, id: string): Promise<PublicIkan> {

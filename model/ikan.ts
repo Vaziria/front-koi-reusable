@@ -1,5 +1,7 @@
 /* eslint-disable camelcase */
 
+export type StatusIkan = 'ready' | 'booked' | 'process' | 'sold' | 'arsip'
+
 export interface IkanChart {
     id: string
     quantity: number
@@ -7,29 +9,30 @@ export interface IkanChart {
 }
 
 export interface IIkan {
-    id: string
-    user_id: string
-    dilihat: number
-    order_count: number
-    gambar: string[]
-    video: string
-    thumbnail?: string,
-    name: string
-    price: number
-    ukuran: number
-    ukuran_range?: {
-        min: number
-        max: number
-    }
-    kategori: string
-    ship_from: string
-    deskripsi: string
-    like: number
-    city: string
-    region: string
-    created: number
-    sex: 'male' | 'female' | 'uncheck'
+  status: StatusIkan
+  id: string
+  user_id: string
+  dilihat: number
+  order_count: number
+  gambar: string[]
+  video: string
+  thumbnail?: string,
+  name: string
+  price: number
+  ukuran: number
+  ukuran_range?: {
+      min: number
+      max: number
   }
+  kategori: string
+  ship_from: string
+  deskripsi: string
+  like: number
+  city: string
+  region: string
+  created: number
+  sex: 'male' | 'female' | 'uncheck'
+}
 
 export interface IFormIkan {
   name: string
