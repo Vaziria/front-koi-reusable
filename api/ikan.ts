@@ -28,9 +28,13 @@ export async function deleteIkan (id: string, params = {}) {
   return res
 }
 
-export async function getIkan (id: string) {
+export async function getIkan (id: string): Promise<IIkan> {
   const res = await client.get(`/ikan/${id}`)
-  return res
+  return res.data
+}
+
+export async function updateParsialIkan (id: string, data: Partial<IIkan>) : Promise<void> {
+  await client.put(`/ikan/update/${id}`, data)
 }
 
 export async function updateIkan (id: string, data: any) {
