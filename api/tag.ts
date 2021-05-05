@@ -1,8 +1,8 @@
 import client from './client'
 
-export async function listTag (): Promise<string[]> {
+export async function listTag (): Promise<{tag: string, count: number}[]> {
   const res = await client.get('/seller/tags')
-  return res.data.data.data
+  return res.data.data
 }
 
 export async function ikanAddTag (ikanid: string, tag: string): Promise<{ msg: string }> {
