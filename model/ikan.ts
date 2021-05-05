@@ -1,6 +1,7 @@
 /* eslint-disable camelcase */
 
-export type StatusIkan = 'ready' | 'booked' | 'process' | 'sold' | 'arsip'
+export const listStatusIkan = ['ready', 'booked', 'process', 'sold', 'arsip'] as const
+export type StatusIkan = typeof listStatusIkan[number]
 
 export interface IkanChart {
     id: string
