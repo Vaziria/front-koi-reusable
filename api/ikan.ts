@@ -33,13 +33,9 @@ export async function getIkan (id: string): Promise<IIkan> {
   return res.data
 }
 
-export async function updateParsialIkan (id: string, data: Partial<IIkan>) : Promise<void> {
-  await client.put(`/ikan/update/${id}`, data)
-}
-
-export async function updateIkan (id: string, data: any) {
+export async function updateIkan (id: string, data: Partial<IIkan>): Promise<{ msg: string}> {
   const res = await client.put(`/ikan/update/${id}`, data)
-  return res
+  return res.data
 }
 
 // public
