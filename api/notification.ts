@@ -1,4 +1,4 @@
-import { Notif, NotifHist, NotifType } from '../model/notif'
+import { Notif, NotifType } from '../model/notif'
 import client from './client'
 
 interface INotifPayload {
