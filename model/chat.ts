@@ -24,6 +24,7 @@ export interface UserChat {
     name: string
     seller_name: string
     state: string
+    photoUrl: string
 }
 
 export interface ChatOrder {
