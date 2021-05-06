@@ -11,7 +11,7 @@ export interface StandartFilter {
 }
 
 export type StatRes = {
-  [ key in StatusOrder | 'key' ]: key extends 'key' ? string: number
+  [ key in StatusOrder | 'key' | 'value' ]: key extends 'key' ? string: number
 }
 
 export async function generalStat (payload: StandartFilter): Promise<StatRes[]> {
@@ -24,8 +24,10 @@ export async function generalStat (payload: StandartFilter): Promise<StatRes[]> 
       [k in StatusOrder]?: number
     }[] = data.status || []
 
+    const key = Object.keys(data)[0]
     const fix = {
-      key: Object.keys(data)[0]
+      key,
+      value: data[key]
     }
 
     statuses.map(status => {
