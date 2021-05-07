@@ -2,11 +2,29 @@
 import firebase from 'firebase'
 
 import { db } from '@/utils/firebase'
-import { Diskusi, DiskusiKey } from '../model/diskusi'
+import { Diskusi, IDiskusi, DiskusiKey } from '../model/diskusi'
 import client from './client'
 
 export function diskusiCol (shopid: string, ikanid: string): firebase.firestore.CollectionReference<firebase.firestore.DocumentData> {
   return db.collection('Sellers').doc(shopid).collection('ikans').doc(ikanid).collection('diskusi')
+}
+
+export async function getDiskusiIkan (shopid: string, ikanid: string): Promise<IDiskusi[]> {
+  const res = await client.get('/diskusi', {
+    params: {
+      ikanid,
+      shopid
+    }
+  })
+
+  const data = res.data.data
+
+  return data.map((diskusi: IDiskusi) => {
+    if (!diskusi.replies) {
+      diskusi.replies = []
+    }
+    return diskusi
+  })
 }
 
 export async function getDiskusi (shopid: string, has_reply = false): Promise<Diskusi[]> {
