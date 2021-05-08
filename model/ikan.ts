@@ -33,6 +33,7 @@ export interface IIkan {
   region: string
   created: number
   sex: 'male' | 'female' | 'uncheck'
+  tags?: string[]
 }
 
 export interface IFormIkan {
