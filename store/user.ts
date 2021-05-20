@@ -3,7 +3,7 @@ import { auth } from '@/utils/firebase'
 import firebase from 'firebase'
 import { Module } from 'vuex'
 import { getAccess } from '../auth/user'
-import { Access } from '../model/access'
+import { Access, RoleKey } from '../model/access'
 import { Commit, Namespaced, StateType, Store } from './types'
 
 export interface IUserState extends StateType {
@@ -11,7 +11,7 @@ export interface IUserState extends StateType {
     token: string
     expiryToken: number
     isLogin: boolean
-    role: string[],
+    role: RoleKey[],
     displayName: string
     email: string
     phoneNumber: string
