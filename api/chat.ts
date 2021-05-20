@@ -1,6 +1,11 @@
 import { Chat, UserChat } from '../model/chat'
 import client from './client'
 
+interface IChatParams {
+  seller?: boolean
+  'start_after'?: string
+}
+
 export async function chatRead (id: string, isSeller: boolean): Promise<unknown> {
   let params = {}
   if (isSeller) {
@@ -15,7 +20,7 @@ export async function chatRead (id: string, isSeller: boolean): Promise<unknown>
   return data.data
 }
 
-export async function chatList (isSeller: boolean): Promise<UserChat[]> {
+export async function chatList (isSeller: boolean, startAfter?: string): Promise<UserChat[]> {
   let url = ''
   if (isSeller) {
     url = '/chat/seller/list'
@@ -23,16 +28,17 @@ export async function chatList (isSeller: boolean): Promise<UserChat[]> {
     url = '/chat/list'
   }
 
-  const res = await client.get(url)
+  const res = await client.get(url, {
+    params: {
+      start_after: startAfter
+    }
+  })
   return res.data.data
 }
 
-export async function chatMessages (id: string, isSeller: boolean): Promise<Chat[]> {
-  let params = {}
-  if (isSeller) {
-    params = {
-      seller: true
-    }
+export async function chatMessages (id: string, params: IChatParams): Promise<Chat[]> {
+  if (!params.seller) {
+    delete params.seller
   }
 
   const res = await client.get(`/chat/messages/${id}`, {
