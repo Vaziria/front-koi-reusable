@@ -9,14 +9,14 @@ export interface MapValue {
 
 export const orderStatus: MapValue[] = [
   {
-    key: 'pending',
-    name: 'Pending',
+    key: 'waitverif',
+    name: 'Menunggu Konfirmasi',
     color: '#e83e8c',
     class: ' bg-pink tx-white'
   },
   {
-    key: 'waitverif',
-    name: 'Menunggu Konfirmasi',
+    key: 'pending',
+    name: 'Pending',
     color: '#e83e8c',
     class: ' bg-pink tx-white'
   },
