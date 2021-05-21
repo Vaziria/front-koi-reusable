@@ -2,9 +2,13 @@
 import { Chat, UserChat } from '../model/chat'
 import client from './client'
 
-interface IChatParams {
-  seller?: boolean
+interface IContactParams {
   start_after?: string
+  limit?: number
+}
+
+interface IChatparams extends IContactParams {
+  seller?: boolean
 }
 
 export async function chatRead (id: string, isSeller: boolean): Promise<unknown> {
@@ -21,7 +25,7 @@ export async function chatRead (id: string, isSeller: boolean): Promise<unknown>
   return data.data
 }
 
-export async function chatList (isSeller: boolean, startAfter?: string): Promise<UserChat[]> {
+export async function chatList (isSeller: boolean, params: IContactParams): Promise<UserChat[]> {
   let url = ''
   if (isSeller) {
     url = '/chat/seller/list'
@@ -30,14 +34,12 @@ export async function chatList (isSeller: boolean, startAfter?: string): Promise
   }
 
   const res = await client.get(url, {
-    params: {
-      start_after: startAfter
-    }
+    params
   })
   return res.data.data
 }
 
-export async function chatMessages (id: string, params: IChatParams): Promise<Chat[]> {
+export async function chatMessages (id: string, params: IChatparams): Promise<Chat[]> {
   if (!params.seller) {
     delete params.seller
   }

@@ -47,7 +47,6 @@ export async function sendDiskusi (shopid: string, ikanid: string, data: Diskusi
   msg: string
   data: Diskusi
 }> {
-
   const params: {
     shopid: string,
     ikanid: string,
@@ -57,9 +56,9 @@ export async function sendDiskusi (shopid: string, ikanid: string, data: Diskusi
     ikanid,
     seller
   }
-  
+
   const res = await client.post('/diskusi', data, {
-    params,
+    params
   })
   return res.data
 }
