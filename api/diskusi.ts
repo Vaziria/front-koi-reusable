@@ -43,16 +43,23 @@ export async function getDiskusi (shopid: string, has_reply = false): Promise<Di
 }
 
 type DiskusiPayload = Pick<Diskusi, 'image' | 'text' | 'reply_id'>
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function sendDiskusi (shopid: string, ikanid: string, data: DiskusiPayload): Promise<{
+export async function sendDiskusi (shopid: string, ikanid: string, data: DiskusiPayload, seller?: boolean): Promise<{
   msg: string
   data: Diskusi
 }> {
+
+  const params: {
+    shopid: string,
+    ikanid: string,
+    seller?: boolean
+  } = {
+    shopid,
+    ikanid,
+    seller
+  }
+  
   const res = await client.post('/diskusi', data, {
-    params: {
-      shopid,
-      ikanid
-    }
+    params,
   })
   return res.data
 }

@@ -1,9 +1,10 @@
+/* eslint-disable camelcase */
 import { Chat, UserChat } from '../model/chat'
 import client from './client'
 
 interface IChatParams {
   seller?: boolean
-  'start_after'?: string
+  start_after?: string
 }
 
 export async function chatRead (id: string, isSeller: boolean): Promise<unknown> {
