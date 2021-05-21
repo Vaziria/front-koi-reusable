@@ -2,12 +2,12 @@
 import { Chat, UserChat } from '../model/chat'
 import client from './client'
 
-interface IContactParams {
+interface IPaginateParams {
   start_after?: string
   limit?: number
 }
 
-interface IChatparams extends IContactParams {
+interface IChatparams extends IPaginateParams {
   seller?: boolean
 }
 
@@ -25,7 +25,7 @@ export async function chatRead (id: string, isSeller: boolean): Promise<unknown>
   return data.data
 }
 
-export async function chatList (isSeller: boolean, params: IContactParams): Promise<UserChat[]> {
+export async function chatList (isSeller: boolean, params: IPaginateParams): Promise<UserChat[]> {
   let url = ''
   if (isSeller) {
     url = '/chat/seller/list'

@@ -28,6 +28,8 @@ export async function getDiskusiIkan (shopid: string, ikanid: string): Promise<I
 }
 
 export async function getDiskusi (shopid: string, has_reply = false): Promise<Diskusi[]> {
+  console.log('getting diskusi')
+
   const key: DiskusiKey = 'shopid'
   const has_reply_key: DiskusiKey = 'has_reply'
   const orderType: DiskusiKey = 'created'
