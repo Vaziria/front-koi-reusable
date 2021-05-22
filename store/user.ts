@@ -86,7 +86,6 @@ const actions = {
     })
 
     commit('set_user_data', user)
-    commit('set_login', true)
 
     // getting aksess
     const uid: string = user.uid
@@ -95,6 +94,8 @@ const actions = {
     if (access) {
       commit('set_access', access)
     }
+
+    commit('set_login', true)
   },
   async reloadToken (store: Context): Promise<void> {
     const user = auth.currentUser
