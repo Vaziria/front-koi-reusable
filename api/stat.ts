@@ -39,3 +39,12 @@ export async function generalStat (payload: StandartFilter): Promise<StatRes[]> 
 
   return hasil
 }
+
+export type PenjualanRes = {
+  [ key in StatusOrder | 'total' ]?: number
+}
+
+export async function penjualanStat (payload: StandartFilter): Promise<PenjualanRes[]> {
+  const res = await client.get('/seller/stat/penjualan', { params: payload })
+  return res.data.data
+}
