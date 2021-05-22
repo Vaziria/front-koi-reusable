@@ -6,6 +6,7 @@ export interface Diskusi {
   created: number
   userid: string
   has_reply?: boolean
+  replied?: boolean
   reply_id?: string
   id: string
   img_profile: string
