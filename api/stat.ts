@@ -8,6 +8,7 @@ export interface StandartFilter {
     datemin?: number
     datemax?: number
     pay_status?: string
+    csid?: string
 }
 
 export type StatRes = {
