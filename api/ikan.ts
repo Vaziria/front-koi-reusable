@@ -11,9 +11,9 @@ export async function listIkan (params = { kategori: 'Asagi' }) {
   return data.data
 }
 
-export async function createIkan (data: any) {
+export async function createIkan (data: any): Promise<IIkan> {
   const res = await client.post('/ikan/create', data)
-  return res
+  return res.data.data
 }
 
 export async function createLelang (data: any) {
