@@ -7,7 +7,11 @@ declare module 'mdbvue'
   }
   export class mdbModal extends Vue {
   }
+  export class mdbModalHeader extends Vue {
+  }
   export class mdbModalBody extends Vue {
+  }
+  export class mdbModalFooter extends Vue {
   }
   export class mdbDropdown extends Vue {
   }
