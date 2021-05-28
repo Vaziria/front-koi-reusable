@@ -1,10 +1,10 @@
 import { Vue } from 'vue-property-decorator'
-import { Store } from 'vuex/types/index'
 
-export abstract class VueWithStore<StoreType extends Store<any>> extends Vue {
-    get tstore (): StoreType {
-        return this.$store as StoreType
-    }
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export abstract class VueWithStore<StoreType> extends Vue {
+  get tstore (): StoreType {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const store: any = this.$store
+    return store as StoreType
+  }
 }
-
-
