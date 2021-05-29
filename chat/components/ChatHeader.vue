@@ -30,7 +30,7 @@ import { Component } from 'vue-property-decorator'
 import { fromNow } from '../../filters/moment'
 import { ChatAction, ChatMutation, IChatState } from '../../store/chat'
 import { Store, Namespaced } from '../../store/types'
-import { VueWithStore } from '../../store/wrapper'
+import { VueWithStore } from '../../store/wrapper.vue'
 
 type State = {
     'chat': IChatState,

@@ -1,5 +1,5 @@
 import { Module } from 'vuex'
-import { StateType } from './types'
+import { Namespaced, StateType, Store } from './types'
 
 export interface ISystemState extends StateType {
     isMobile: boolean
@@ -39,3 +39,4 @@ const system: Module<ISystemState, {}> = {
 
 export default system
 export type SystemAction = typeof actions
+export type SystemStore = Store<{ 'system': ISystemState }, Namespaced<SystemMutation, 'system'>, Namespaced<SystemAction, 'system'>>

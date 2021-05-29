@@ -26,3 +26,8 @@ export async function editProfile (payload: EditPayload): Promise<{ msg: string 
 
   return res.data
 }
+
+export async function editBuyer (payload: Partial<IUser>): Promise<unknown> {
+  const data = await client.put('/user/edit_info', payload)
+  return data.data
+}

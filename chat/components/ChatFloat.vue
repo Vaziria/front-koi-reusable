@@ -8,7 +8,7 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator'
 import { mdbIcon } from 'mdbvue'
-import { VueWithStore } from '../../store/wrapper'
+import { VueWithStore } from '../../store/wrapper.vue'
 import { Namespaced, Store } from '../../store/types'
 import { ChatAction, ChatMutation, IChatState } from '../../store/chat'
 // import { BaseRoute } from '@/router/base'
@@ -53,9 +53,7 @@ export default class ChatFloat extends VueWithStore<ChatStore> {
     this.tstore.commit('chat/mini_show', !this.show)
     this.tstore.commit('chat/reset_unread')
     if (this.show) {
-      await this.tstore.dispatch('chat/open', {
-        mode: 'seller'
-      })
+      await this.tstore.dispatch('chat/open')
     }
   }
 }

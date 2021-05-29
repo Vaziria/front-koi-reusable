@@ -6,7 +6,6 @@ import { IUserState } from '@/reusable/store/user'
 import { StateChanger } from 'vue-infinite-loading'
 import { Module } from 'vuex'
 
-type ModeType = 'seller' | 'cs' | 'buyer'
 const perpage = 20
 const contactPerpage = 20
 const defaultRef = {
@@ -19,7 +18,6 @@ const defaultRef = {
 export interface IChatState {
   showMini: boolean
   loading: boolean
-  mode: ModeType
   userActive: UserChat
   userid: string
   product: ChatProduct | null
@@ -56,7 +54,6 @@ const state: IChatState = {
   showMini: false,
   loading: false,
   userActive: emptyActive,
-  mode: 'buyer',
   userid: '',
   message: [],
   unsend: [],
@@ -154,9 +151,6 @@ const mutations = {
       return true
     })
   },
-  set_config (state: IChatState, data: { mode: ModeType }): void {
-    state.mode = data.mode
-  },
   reset_msg (state: IChatState): void {
     state.message = []
   },
@@ -204,10 +198,9 @@ type RootState = {
 type Context = Commit<ChatMutation> & { state: IChatState } & { rootState: RootState }
 
 const actions = {
-  async open (store: Context, data: { mode: ModeType }): Promise<void> {
+  async open (store: Context): Promise<void> {
     const { commit, rootState } = store
     commit('mini_show', true)
-    commit('set_config', data)
     commit('set_user_list', [])
     const userlist = await chatList(rootState.system.isSeller, {
       limit: contactPerpage
@@ -222,16 +215,22 @@ const actions = {
   },
 
   async getMessage (store: Context): Promise<void> {
-    const { commit, state } = store
+    const { commit, state, rootState } = store
+    const { isSeller } = rootState.system
+
     commit('set_message', [])
     commit('loading', true)
     store.state.chatRef.reset()
-
-    await chatRead(state.userActive.id, state.mode === 'seller')
-    const msg = await chatMessages(state.userActive.id, {
-      seller: state.mode === 'seller',
-      limit: perpage
-    })
+    let msg: Chat[] = []
+    try {
+      await chatRead(state.userActive.id, isSeller)
+      msg = await chatMessages(state.userActive.id, {
+        seller: isSeller,
+        limit: perpage
+      })
+    } catch (e) {
+      console.error(e)
+    }
 
     const fixmsg: Chat[] = msg.reverse()
     commit('set_user_read', state.userActive.id)
@@ -240,7 +239,9 @@ const actions = {
   },
 
   async pushChat (store: Context, chat: Chat): Promise<void> {
-    const { commit, state } = store
+    const { commit, state, rootState } = store
+    const { isSeller } = rootState.system
+
     if (chat.from_id === state.userActive.id) {
       commit('push_message', chat)
     } else {
@@ -249,7 +250,7 @@ const actions = {
 
     const userids = state.userlist.map(user => user.id)
     if (userids.includes(chat.from_id)) {
-      const userlist = await chatList(state.mode === 'seller', {
+      const userlist = await chatList(isSeller, {
         limit: contactPerpage
       })
       commit('set_user_list', userlist)
@@ -294,8 +295,10 @@ const actions = {
   },
 
   async paginateContact (store: Context): Promise<void> {
-    const { commit, state } = store
-    const userlist = await chatList(state.mode === 'seller', {
+    const { commit, state, rootState } = store
+    const { isSeller } = rootState.system
+
+    const userlist = await chatList(isSeller, {
       start_after: state.userlist[state.userlist.length - 1].id,
       limit: contactPerpage
     })
@@ -304,10 +307,11 @@ const actions = {
   },
 
   async paginate (store: Context): Promise<void> {
-    const { commit, state } = store
+    const { commit, state, rootState } = store
+    const { isSeller } = rootState.system
 
     const msg = await chatMessages(state.userActive.id, {
-      seller: state.mode === 'seller',
+      seller: isSeller,
       start_after: state.message[0].id,
       limit: perpage
     })

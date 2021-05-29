@@ -79,7 +79,7 @@ import ChatDialog from './ChatDialog.vue'
 import ChatReply from './ChatReply.vue'
 import ChatForm from './ChatForm.vue'
 import { Chat, ChatOrder, ChatProduct, UserChat } from '../../model/chat'
-import { VueWithStore } from '../../store/wrapper'
+import { VueWithStore } from '../../store/wrapper.vue'
 import { Namespaced, Store } from '../../store/types'
 import { ChatAction, ChatMutation, IChatState } from '../../store/chat'
 

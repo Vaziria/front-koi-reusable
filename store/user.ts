@@ -80,6 +80,7 @@ const actions = {
     const commit = store.commit
 
     const token = await user.getIdTokenResult()
+    console.log('token', token)
     commit('set_token', {
       token: token.token,
       expiryToken: Date.parse(token.expirationTime)

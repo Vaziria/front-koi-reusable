@@ -106,7 +106,7 @@ import { mdbIcon } from 'mdbvue'
 import { fromNow } from '../../filters/moment'
 
 import { UserChat } from '../../model/chat'
-import { VueWithStore } from '../../store/wrapper'
+import { VueWithStore } from '../../store/wrapper.vue'
 import { Namespaced, Store } from '../../store/types'
 import { ChatAction, ChatMutation, IChatState } from '../../store/chat'
 import { ISystemState } from '../../store/system'
@@ -133,7 +133,7 @@ export default class ChatList extends VueWithStore<ChatStore> {
   defaultImg = require('@/assets/img/avatar/user.png')
 
   get isBuyer (): boolean {
-    return this.tstore.state.chat.mode === 'buyer'
+    return !this.tstore.state.system.isSeller
   }
 
   get isMobile (): boolean {
