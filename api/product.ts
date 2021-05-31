@@ -32,7 +32,7 @@ export async function publicIkan (params?: IkanFilter): Promise<IIkan[]> {
   const res = await client.get('/public/ikan', {
     params
   })
-  console.log(res.data)
+  
   return res.data
 }
 

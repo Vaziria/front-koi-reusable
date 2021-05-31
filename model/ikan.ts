@@ -1,5 +1,7 @@
 /* eslint-disable camelcase */
 
+import { Seller } from "./seller"
+
 export const listStatusIkan = ['ready', 'booked', 'process', 'sold', 'arsip'] as const
 export type StatusIkan = typeof listStatusIkan[number]
 
@@ -54,9 +56,16 @@ export interface IFormIkan {
 }
 
 export interface PublicIkan extends IIkan {
+    bidable?: boolean
+    seller: Seller
     me?: {
         wishlist: boolean
     }
+}
+
+export interface CartIkan extends IIkan {
+  seller: Seller
+  quantity: number
 }
 
 export type IkanKey = keyof IIkan
