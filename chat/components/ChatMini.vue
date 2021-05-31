@@ -62,7 +62,7 @@ import { mdbIcon, mdbModal, mdbModalBody } from 'mdbvue'
 import { Component, Prop } from 'vue-property-decorator'
 import Chat from './ChatBox.vue'
 import ChatList from './ChatList.vue'
-import { VueWithStore } from '../../store/wrapper.vue'
+import VueWithStore from '../../store/wrapper.vue'
 import { Namespaced, Store } from '../../store/types'
 import { ChatAction, ChatMutation, IChatState } from '../../store/chat'
 

@@ -36,7 +36,7 @@ import { Vue, Component, Emit } from 'vue-property-decorator'
 import SwalMixin from '../../mixins/swal.vue'
 import { IChatState, ChatMutation, ChatAction } from '../../store/chat'
 import { Namespaced, Store } from '../../store/types'
-import { VueWithStore } from '../../store/wrapper.vue'
+import VueWithStore from '../../store/wrapper.vue'
 import { IUserState, UserMutation } from '../../store/user'
 
 type State = {

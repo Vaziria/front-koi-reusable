@@ -8,7 +8,7 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator'
 import { mdbIcon } from 'mdbvue'
-import { VueWithStore } from '../../store/wrapper.vue'
+import VueWithStore from '../../store/wrapper.vue'
 import { Namespaced, Store } from '../../store/types'
 import { ChatAction, ChatMutation, IChatState } from '../../store/chat'
 // import { BaseRoute } from '@/router/base'

@@ -106,7 +106,7 @@ import { mdbIcon } from 'mdbvue'
 import { fromNow } from '../../filters/moment'
 
 import { UserChat } from '../../model/chat'
-import { VueWithStore } from '../../store/wrapper.vue'
+import VueWithStore from '../../store/wrapper.vue'
 import { Namespaced, Store } from '../../store/types'
 import { ChatAction, ChatMutation, IChatState } from '../../store/chat'
 import { ISystemState } from '../../store/system'
