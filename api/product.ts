@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable camelcase */
 import { IIkan, IkanKey, PublicIkan } from '@/reusable/model/ikan'
 import client from './client'
@@ -32,7 +33,7 @@ export async function publicIkan (params?: IkanFilter): Promise<IIkan[]> {
   const res = await client.get('/public/ikan', {
     params
   })
-  
+
   return res.data
 }
 

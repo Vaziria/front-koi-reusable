@@ -31,8 +31,8 @@
   }
 </style>
 <script lang="ts">
-// import { Chat } from '../../model/chat'
-import { Vue, Component, Emit } from 'vue-property-decorator'
+import { Chat } from '../../model/chat'
+import { Component, Emit, Mixins } from 'vue-property-decorator'
 import SwalMixin from '../../mixins/swal.vue'
 import { IChatState, ChatMutation, ChatAction } from '../../store/chat'
 import { Namespaced, Store } from '../../store/types'
@@ -52,10 +52,8 @@ type ChatStore = Store<State,
 @Component
 class StoreMix extends VueWithStore<ChatStore> {}
 
-@Component({
-  mixins: [StoreMix, SwalMixin]
-})
-class ChatForm extends Vue {
+@Component
+class ChatForm extends Mixins(StoreMix, SwalMixin) {
   text = ''
 
   get rowsText (): number {
@@ -67,15 +65,11 @@ class ChatForm extends Vue {
   }
 
   get fromId (): string {
-    console.log('asdasdasdasd', this)
-    // console.log('asdasdasdasd', this.tstore)
-    // return this.tstore.state.user.uid
-    return ''
+    return this.tstore.state.user.uid
   }
 
   get toId (): string {
-    return ''
-    // return this.tstore.state.chat.userActive.id
+    return this.tstore.state.chat.userActive.id
   }
 
   mounted (): void {
@@ -85,23 +79,23 @@ class ChatForm extends Vue {
   @Emit('onChat')
   async sendMessage (): Promise<void> {
     if (!this.text) {
-      // this.topedToast('Pesan Anda kosong.', 'OK')
+      this.topedToast('Pesan Anda kosong.', 'OK')
     }
 
-    // const id = Math.random().toString(36).substring(6)
-    // const created = new Date().getTime()
+    const id = Math.random().toString(36).substring(6)
+    const created = new Date().getTime()
 
-    // const chat: Chat = {
-    //   id,
-    //   created,
-    //   from_id: this.fromId,
-    //   text: this.text,
-    //   to_id: this.toId
-    // }
+    const chat: Chat = {
+      id,
+      created,
+      from_id: this.fromId,
+      text: this.text,
+      to_id: this.toId
+    }
 
     this.text = ''
 
-    // await this.tstore.dispatch('chat/sendChat', chat)
+    await this.tstore.dispatch('chat/sendChat', chat)
   }
 }
 

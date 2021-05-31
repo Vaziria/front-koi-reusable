@@ -1,15 +1,15 @@
 <script lang="ts">
-import { Vue } from 'vue-property-decorator'
+import { Vue, Component } from 'vue-property-decorator'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-
+@Component
 export default class VueWithStore<StoreType> extends Vue {
   get tstore (): StoreType {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const wdw = window as any
+    const store = this.$store as any
 
     // console.log('store', store)
-    return wdw.store as StoreType
+    return store as StoreType
   }
 
   getStore (): StoreType {
