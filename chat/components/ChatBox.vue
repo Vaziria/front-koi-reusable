@@ -29,7 +29,7 @@
     </div>
     <ChatReply
       v-if="product"
-      :image="product.gambar[0]"
+      :image="product.gambar"
       :text="product.name"
       :action="removeProduct"
     />

@@ -97,6 +97,9 @@ export default class ProductChat extends Mixins(Loading, StoreMix) {
     if (this.shopid) {
       return this.shopid
     }
+    if (!this.tstore.state.system.isSeller) {
+      return this.tstore.state.chat.userActive.id
+    }
     return this.tstore.state.user.uid
   }
 

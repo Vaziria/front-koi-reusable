@@ -36,4 +36,5 @@ export interface ChatProduct {
     shopid: string
     name: string
     send_process: boolean
+    gambar: string
 }

@@ -27,7 +27,7 @@ export default class CustomSwal extends Vue {
   public topedToast (title: string, confirmText = ''): Promise<SweetAlertResult<any>> {
     const config = {
       position: this.topedPosition,
-      timer: 5000,
+      timer: 70000,
       timerProgressBar: true,
       title: title,
       showConfirmButton: !!confirmText.length,
