@@ -55,3 +55,4 @@ export const categories: string[] = [
   'Shusui Yamaju',
   'Lainnya'
 ]
+categories.sort()

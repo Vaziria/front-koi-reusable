@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
 
-import { Seller } from "./seller"
+import { Seller } from './seller'
 
 export const listStatusIkan = ['ready', 'booked', 'process', 'sold', 'arsip'] as const
 export type StatusIkan = typeof listStatusIkan[number]

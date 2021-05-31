@@ -1,4 +1,4 @@
-import { IkanChart } from '../model/ikan'
+import { IkanChart, PublicIkan } from '../model/ikan'
 import { IUser, PublicUser } from '../model/user'
 import client from './client'
 
@@ -30,4 +30,9 @@ export async function editProfile (payload: EditPayload): Promise<{ msg: string 
 export async function editBuyer (payload: Partial<IUser>): Promise<unknown> {
   const data = await client.put('/user/edit_info', payload)
   return data.data
+}
+
+export async function getWishlist (): Promise<PublicIkan[]> {
+  const req = await client.get('/wishlist')
+  return req.data.data
 }
