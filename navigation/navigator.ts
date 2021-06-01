@@ -11,6 +11,11 @@ export class Navigator<Base> {
       return this.router.currentRoute.name as any
     }
 
+    get query (): { [k: string]: string } {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return this.router.currentRoute.query as any
+    }
+
     current<K extends keyof Base> (): Base[ K ] & { name: K } {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const params = this.router.currentRoute as any

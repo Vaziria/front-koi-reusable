@@ -1,39 +1,55 @@
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { Order } from '../model/order'
+import { Order, PaidStatus, StatusOrder } from '../model/order'
 import client from './client'
 
-export async function listOrder (query: any) {
+interface FilterPageOrder {
+  q: string
+  status: StatusOrder | ''
+  // eslint-disable-next-line camelcase
+  pay_status: PaidStatus | ''
+  datemin: number
+  datemax: number
+  offset: number
+  limit: number
+  // eslint-disable-next-line camelcase
+  order_type: 'desc' | 'asc'
+  order: 'created'
+  csid: string
+  // eslint-disable-next-line camelcase
+  target_kirim_min?: number
+  // eslint-disable-next-line camelcase
+  target_kirim_max?: number
+}
+
+export async function listOrder (query: Partial<FilterPageOrder>): Promise<Order[]> {
   const data = await client.get('/seller/order/list', { params: query })
   return data.data
 }
 
-export async function deleteOrder (id: string) {
-  const res = await client.delete(`/order/${id}`)
-  return res
+export async function deleteOrder (id: string): Promise<void> {
+  await client.delete(`/order/${id}`)
 }
 
-export async function getOrder (id: string) {
+export async function getOrder (id: string): Promise<Order> {
   const res = await client.get(`/order/${id}`)
-  return res
+  return res.data
 }
 
-export async function updateOrder (id: string, data: Partial<Order>) {
+export async function updateOrder (id: string, data: Partial<Order>): Promise<Order> {
   const res = await client.put(`/order/${id}`, data)
-  return res
+  return res.data
 }
 
-export async function setOngkir (id: string, ongkir: any) {
+export async function setOngkir (id: string, ongkir: number): Promise<Order> {
   const res = await client.put('seller/order/set_ongkir', { ongkir: ongkir }, { params: { orderid: id } })
-  return res
+  return res.data
 }
 
-export async function cancelOrder (reason: string, query: { oid: string, shopid: string }) {
+export async function cancelOrder (reason: string, query: { oid: string, shopid: string }): Promise<Order> {
   const data = await client.put('/buyer/cancel_order', { reason: reason }, { params: query })
   return data.data
 }
 
-export async function finishOrder (query: any) {
+export async function finishOrder (query: { oid: string, shopid: string }): Promise<Order> {
   const data = await client.put('/buyer/finish_order', null, { params: query })
   return data.data
 }
