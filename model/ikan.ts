@@ -36,6 +36,7 @@ export interface IIkan {
   created: number
   sex: 'male' | 'female' | 'uncheck'
   tags?: string[]
+  seller: Seller
 }
 
 export interface IFormIkan {
@@ -57,14 +58,12 @@ export interface IFormIkan {
 
 export interface PublicIkan extends IIkan {
     bidable?: boolean
-    seller: Seller
     me?: {
         wishlist: boolean
     }
 }
 
 export interface CartIkan extends IIkan {
-  seller: Seller
   quantity: number
 }
 

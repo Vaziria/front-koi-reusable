@@ -21,7 +21,7 @@
             <span class="d-md-none">{{ parseInt(chat.last_msg.created) | fromNow }}</span>
           </div>
           <div v-if="isBuyer" class="badge badge-info">Penjual</div>
-          <div v-if="chat.last_msg.created" class="tx-gray-500 tx-12 ellipsis">{{ chat.last_msg.text }}</div>
+          <div v-else-if="chat.last_msg.created" class="tx-gray-500 tx-12 ellipsis">{{ chat.last_msg.text }}</div>
         </div>
       </div>
       <InfiniteLoading ref="infiniteLoading" @infinite="infiniteHandler">
