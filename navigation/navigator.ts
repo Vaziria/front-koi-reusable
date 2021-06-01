@@ -6,6 +6,17 @@ export class Navigator<Base> {
       this.router = router
     }
 
+    get currentName (): keyof Base {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return this.router.currentRoute.name as any
+    }
+
+    current<K extends keyof Base> (): Base[ K ] & { name: K } {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const params = this.router.currentRoute as any
+      return params
+    }
+
     push<K extends keyof Base> (key: K, ...[params]: Base[K] extends undefined ? [Location]: [Base[K] & Location]): Promise<Route> {
       const location: Location = {}
       if (key) {
