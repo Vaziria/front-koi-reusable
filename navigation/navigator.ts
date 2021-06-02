@@ -1,5 +1,6 @@
 import VueRouter, { Location, Route } from 'vue-router'
 
+type FixLocation = Omit<Location, 'params'>
 export class Navigator<Base> {
     router: VueRouter
     constructor (router: VueRouter) {
@@ -22,7 +23,7 @@ export class Navigator<Base> {
       return params
     }
 
-    push<K extends keyof Base> (key: K, ...[params]: Base[K] extends undefined ? [Location]: [Base[K] & Location]): Promise<Route> {
+    push<K extends keyof Base> (key: K, ...[params]: Base[K] extends undefined ? [Location]: [Base[K] & FixLocation]): Promise<Route> {
       const location: Location = {}
       if (key) {
         location.name = key as string
@@ -33,7 +34,7 @@ export class Navigator<Base> {
       return this.router.push(location)
     }
 
-    replace<K extends keyof Base> (key: K, ...[params]: Base[K] extends undefined ? [Location]: [Base[K] & Location]): Promise<Route> {
+    replace<K extends keyof Base> (key: K, ...[params]: Base[K] extends undefined ? [Location]: [Base[K] & FixLocation]): Promise<Route> {
       const location: Location = {}
       if (key) {
         location.name = key as string
