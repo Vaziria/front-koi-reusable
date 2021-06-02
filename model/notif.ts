@@ -14,7 +14,7 @@ export interface NotifDiskusi extends NotifHist {
 	ikan_id: string
 	shopid: string
 	userid: string
-} 
+}
 
 export interface NotifIkan extends NotifHist {
 	type: 'ikan' | 'create_produk'
