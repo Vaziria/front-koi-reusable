@@ -1,6 +1,11 @@
 <template>
   <div :class="`input-group wd-${ width }`">
-    <span v-if="text" v-html="text" :class="`input-group-${ direction } input-group-text bg-gray-100`"></span>
+    <a
+      v-if="text"
+      v-html="text"
+      :class="`input-group-${ direction } input-group-text bg-gray-100`"
+      @click="action"
+    ></a>
     <slot></slot>
   </div>
 </template>
@@ -41,5 +46,6 @@ export default class FormGroup extends Vue {
   @Prop({ default: 'auto' }) readonly width!: string
   @Prop({ default: '' }) readonly text!: string
   @Prop({ default: 'prepend' }) readonly direction!: string
+  @Prop({ default: null }) readonly action!: () => void
 }
 </script>
