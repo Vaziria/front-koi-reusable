@@ -21,5 +21,7 @@ declare module 'mdbvue'
   }
   export class mdbDropdownToggle extends Vue {
   }
+  export class mdbModalTitle extends Vue {
+  }
 
 }
