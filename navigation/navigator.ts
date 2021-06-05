@@ -1,6 +1,6 @@
 import VueRouter, { Location, Route } from 'vue-router'
 
-type FixLocation = Omit<Location, 'params'>
+export type FixLocation = Omit<Location, 'params'>
 export class Navigator<Base> {
     router: VueRouter
     constructor (router: VueRouter) {
