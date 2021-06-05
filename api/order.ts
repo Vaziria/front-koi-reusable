@@ -20,6 +20,12 @@ interface FilterPageOrder {
   target_kirim_max?: number
 }
 
+interface IBuktiPembayaran {
+  image: string
+  shopid: string
+  orderid: string
+}
+
 export async function listOrder (query: Partial<FilterPageOrder>): Promise<Order[]> {
   const data = await client.get('/seller/order/list', { params: query })
   return data.data
@@ -58,4 +64,8 @@ export async function invoice (query: { shopid: string, oid: string }): Promise<
   // console.log(query)
   const res = await client.get('/invoice', { params: query })
   return res.data.data
+}
+
+export async function buktiPembayaran(payload: IBuktiPembayaran): Promise<void> {
+  const res = await client.post('/buyer/bukti_pembayaran', payload)
 }
