@@ -26,7 +26,7 @@
       </div>
       <InfiniteLoading ref="infiniteLoading" @infinite="infiniteHandler">
         <div slot="spinner">
-          <div v-for="i in 6" :key="i" class="d-flex my-2">
+          <div v-for="i in 6" :key="i" class="d-flex my-3">
             <div class="mx-3">
               <div class="wd-35 ht-35 bg-loading rounded-circle"></div>
             </div>

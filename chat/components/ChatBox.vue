@@ -17,7 +17,7 @@
       </InfiniteLoading>
 
       <div v-for="(msg, key) in messages" :key="key" :class="{ media: true, 'flex-row-reverse': msg.key !== user.id }">
-        <div class="media-body">
+        <div class="media-body mx-2">
           <ChatDialog
             v-for="message in msg.data"
             :key="message.id"
@@ -69,7 +69,7 @@
   }
 </style>
 <script lang="ts">
-import { Component, Watch } from 'vue-property-decorator'
+import { Component, Prop, Watch } from 'vue-property-decorator'
 import $ from 'jquery'
 import InfiniteLoading from 'vue-infinite-loading'
 
@@ -94,7 +94,7 @@ interface TransformChat {
 }
 
 type State = {
-    'chat': IChatState
+  'chat': IChatState
 }
 
 type ChatStore = Store<State, Namespaced<ChatMutation, 'chat'>, Namespaced<ChatAction, 'chat'>>
@@ -110,12 +110,18 @@ type ChatStore = Store<State, Namespaced<ChatMutation, 'chat'>, Namespaced<ChatA
   }
 })
 export default class ChatBox extends VueWithStore<ChatStore> {
+  @Prop({ default: false }) readonly mobile!: boolean
+
   get loading (): boolean {
     return this.tstore.state.chat.loading
   }
 
   get bodyClass (): string {
-    let defaultClass = 'az-chat-body content-inner py-3 mg-t-60 mg-md-t-0'
+    let defaultClass = 'az-chat-body content-inner py-3'
+
+    if (!this.mobile) {
+      defaultClass += ' mg-t-60 mg-md-t-0'
+    }
 
     if (this.product || this.order) {
       defaultClass += ' with-reply'

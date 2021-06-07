@@ -34,7 +34,7 @@ export interface IChatState {
   endpage: boolean
 }
 
-const emptyActive: UserChat = {
+export const emptyUserActive: UserChat = {
   id: '',
   unread: 0,
   last_chat: 0,
@@ -53,7 +53,7 @@ const emptyActive: UserChat = {
 const state: IChatState = {
   showMini: false,
   loading: false,
-  userActive: emptyActive,
+  userActive: emptyUserActive,
   userid: '',
   message: [],
   unsend: [],
@@ -91,7 +91,7 @@ const mutations = {
       return false
     })
 
-    if (ada.length === 0) {
+    if (ada.length === 0 && user.id) {
       state.userlist.unshift(user)
     }
   },
@@ -322,7 +322,7 @@ const actions = {
 
   close (store: Context): void {
     const { commit } = store
-    commit('set_user', emptyActive)
+    commit('set_user', emptyUserActive)
     commit('mini_show', false)
     commit('set_message', [])
   }

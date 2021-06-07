@@ -3,7 +3,7 @@
     <a v-if="showClose" class="mg-t-10 ml-2 mr-3 d-md-none" @click="close()">
       <i class="fas fa-times tx-18" />
     </a>
-    <a v-else class="mg-t-10 ml-2 mr-3 d-md-none" @click="$router.go(-1)">
+    <a v-else class="mg-t-10 ml-2 mr-3 d-md-none" @click="mobileClose()">
       <i class="fas fa-arrow-left tx-18" />
     </a>
 
@@ -28,13 +28,13 @@ import { UserChat } from '../../model/chat'
 import { ISystemState } from '../../store/system'
 import { Component } from 'vue-property-decorator'
 import { fromNow } from '../../filters/moment'
-import { ChatAction, ChatMutation, IChatState } from '../../store/chat'
+import { ChatAction, ChatMutation, emptyUserActive, IChatState } from '../../store/chat'
 import { Store, Namespaced } from '../../store/types'
 import VueWithStore from '../../store/wrapper.vue'
 
 type State = {
-    'chat': IChatState,
-    'system': ISystemState
+  'chat': IChatState,
+  'system': ISystemState
 }
 
 type ChatStore = Store<State, Namespaced<ChatMutation, 'chat'>, Namespaced<ChatAction, 'chat'>>
@@ -60,6 +60,10 @@ class ChatHeader extends VueWithStore<ChatStore> {
 
   close (): void {
     this.tstore.commit('chat/mini_show', false)
+  }
+
+  mobileClose (): void {
+    this.tstore.commit('chat/set_user', emptyUserActive)
   }
 }
 
