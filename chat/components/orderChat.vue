@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-if="order != null">
     <div class="d-flex" @click="toInvoice()">
       <div
         :class="{ 'wd-50 ht-50 img-ikan mr-3 rounded-10 shadow bd': true, 'wd-md-70 ht-md-70': !mini }"
@@ -30,7 +30,7 @@
 <script lang="ts">
 import { mdbIcon } from 'mdbvue'
 import currency from '../../filters/currency'
-import { Component, Prop } from 'vue-property-decorator'
+import { Component, Mixins, Prop } from 'vue-property-decorator'
 import { Order } from '../../model/order'
 import { invoice } from '../../api/order'
 import VueWithStore from '../../store/wrapper.vue'
@@ -38,6 +38,8 @@ import { Namespaced, Store } from '../../store/types'
 import { ChatAction, ChatMutation, IChatState } from '../../store/chat'
 import { ISystemState } from '../../store/system'
 import { IUserState } from '../../store/user'
+import { BasicRoute } from '@/reusable/navigation/basicroute'
+import WithNav from '@/reusable/navigation/WithNav.vue'
 
 type State = {
     'chat': IChatState
@@ -47,7 +49,11 @@ type State = {
 
 type ChatStore = Store<State, Namespaced<ChatMutation, 'chat'>, Namespaced<ChatAction, 'chat'>>
 
-type OrdChat = Pick<Order, 'id' | 'total' | 'ikans' | 'status'>
+@Component
+class StoreMix extends VueWithStore<ChatStore> {}
+
+@Component
+class NavMix extends WithNav<BasicRoute> {}
 
 @Component({
   components: {
@@ -57,16 +63,11 @@ type OrdChat = Pick<Order, 'id' | 'total' | 'ikans' | 'status'>
     currency
   }
 })
-export default class OrderChat extends VueWithStore<ChatStore> {
+export default class OrderChat extends Mixins(NavMix, StoreMix) {
   @Prop({}) readonly orderid!: string
   @Prop({}) readonly shopid!: string
 
-  order: OrdChat = {
-    id: '',
-    total: 0,
-    ikans: [],
-    status: 'waitverif'
-  }
+  order: Order | null = null
 
   get fromId (): string {
     if (this.tstore.state.system.isSeller) {
@@ -109,28 +110,13 @@ export default class OrderChat extends VueWithStore<ChatStore> {
   }
 
   async toInvoice (): Promise<void> {
-    if (this.isSeller && this.order) {
-      try {
-
-        // not implemented
-
-        // await navigation.push('order_item', {
-        //   params: {
-        //     shopid: this.userid,
-        //     oid: this.order.id
-        //   }
-        // })
-      } catch (e) {
-        if (!(e.name === 'NavigationDuplicated')) {
-          console.error(e)
-        }
+    this.navigation.push('order_single', {
+      params: {
+        shopid: this.shopid,
+        id: this.orderid
       }
-    } else {
-      console.log('navigate untuk buyer')
-    }
+    })
   }
 }
-
-// seller to invoice not implemented
 
 </script>

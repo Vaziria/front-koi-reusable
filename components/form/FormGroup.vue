@@ -4,7 +4,7 @@
       v-if="text"
       v-html="text"
       :class="`input-group-${ direction } input-group-text bg-gray-100`"
-      @click="action"
+      @click="action()"
     ></a>
     <slot></slot>
   </div>
@@ -46,6 +46,11 @@ export default class FormGroup extends Vue {
   @Prop({ default: 'auto' }) readonly width!: string
   @Prop({ default: '' }) readonly text!: string
   @Prop({ default: 'prepend' }) readonly direction!: string
-  @Prop({ default: null }) readonly action!: () => void
+  @Prop({
+    default: () => {
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
+      return () => {}
+    }
+  }) readonly action!: () => void
 }
 </script>

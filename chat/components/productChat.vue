@@ -58,6 +58,8 @@ import { Namespaced, Store } from '../../store/types'
 import { ChatAction, ChatMutation, IChatState } from '../../store/chat'
 import { ISystemState } from '../../store/system'
 import { IUserState } from '../../store/user'
+import WithNav from '@/reusable/navigation/WithNav.vue'
+import { BasicRoute } from '@/reusable/navigation/basicroute'
 
 type State = {
     'chat': IChatState,
@@ -71,6 +73,9 @@ class StoreMix extends VueWithStore<ChatStore> {}
 
 type IkanChat = Pick<PublicIkan, 'id' | 'gambar' | 'name' | 'kategori' | 'price' | 'me'>
 
+@Component
+class NavMix extends WithNav<BasicRoute> {}
+
 @Component({
   components: {
     mdbIcon
@@ -79,10 +84,9 @@ type IkanChat = Pick<PublicIkan, 'id' | 'gambar' | 'name' | 'kategori' | 'price'
     currency
   }
 })
-export default class ProductChat extends Mixins(Loading, StoreMix) {
+export default class ProductChat extends Mixins(Loading, StoreMix, NavMix) {
   @Prop({}) readonly productid!: string
   @Prop({}) readonly shopid!: string
-  @Prop({ default: false }) readonly navigationCallback?: (ikan: IkanChat) => void
   product: IkanChat = {
     id: '',
     name: '',
@@ -135,9 +139,12 @@ export default class ProductChat extends Mixins(Loading, StoreMix) {
   }
 
   toIkan (): void {
-    if (this.navigationCallback) {
-      this.navigationCallback(this.product)
-    }
+    this.navigation.push('product_ikan', {
+      params: {
+        ikanid: this.productid,
+        shopid: this.shopid
+      }
+    })
   }
 
   async wishlist (): Promise<void> {

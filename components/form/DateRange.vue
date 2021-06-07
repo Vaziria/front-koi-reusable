@@ -116,11 +116,13 @@ class DateRange extends Vue {
   @Prop() readonly minDate!: Date
   @Prop() readonly maxDate!: Date
   @Prop({
-    default: {
-      'Hari ini': [startToday, endToday],
-      Kemarin: [startYesterday, endYesterday],
-      'Bulan ini': [startMonth, endMonth],
-      'Tahun ini': [startYear, endYear]
+    default: () => {
+      return {
+        'Hari ini': [startToday, endToday],
+        Kemarin: [startYesterday, endYesterday],
+        'Bulan ini': [startMonth, endMonth],
+        'Tahun ini': [startYear, endYear]
+      }
     }
   }) readonly ranges!: DateRanges
 
