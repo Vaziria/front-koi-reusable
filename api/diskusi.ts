@@ -31,7 +31,7 @@ export async function getDiskusiIkan (shopid: string, ikanid: string): Promise<I
 }
 
 export async function getDiskusi (shopid: string, replied = false): Promise<Diskusi[]> {
-  console.log('getting diskusi')
+  // console.log('getting diskusi')
 
   const key: DiskusiKey = 'shopid'
   const replied_key: DiskusiKey = 'replied'
@@ -47,9 +47,9 @@ export async function getDiskusi (shopid: string, replied = false): Promise<Disk
   return hasil
 }
 
-export async function getHistoryDiskusi(uid: string): Promise<HistoryDiskusiRes[]> {
+export async function getHistoryDiskusi (uid: string): Promise<HistoryDiskusiRes[]> {
   const hists: Diskusi[] = []
-  
+
   const snap = await db
     .collection('Users')
     .doc(uid)
@@ -62,18 +62,19 @@ export async function getHistoryDiskusi(uid: string): Promise<HistoryDiskusiRes[
   })
 
   const hasil: HistoryDiskusiRes[] = []
-  
-  const task: Promise<any>[] = hists.map(async (hist) => {
-      const snap = await db
-        .collection('Sellers')
-        .doc(hist.shopid)
-        .collection('ikans')
-        .doc(hist.ikanid)
-        .get()
 
-      if(snap.exists){
-          hasil.push({...hist, ...snap.data() as IIkan }) 
-      }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const task: Promise<any>[] = hists.map(async (hist) => {
+    const snap = await db
+      .collection('Sellers')
+      .doc(hist.shopid)
+      .collection('ikans')
+      .doc(hist.ikanid)
+      .get()
+
+    if (snap.exists) {
+      hasil.push({ ...hist, ...snap.data() as IIkan })
+    }
   })
 
   await Promise.all(task)
