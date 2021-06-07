@@ -66,6 +66,6 @@ export async function invoice (query: { shopid: string, oid: string }): Promise<
   return res.data.data
 }
 
-export async function buktiPembayaran(payload: IBuktiPembayaran): Promise<void> {
-  const res = await client.post('/buyer/bukti_pembayaran', payload)
+export async function buktiPembayaran (payload: IBuktiPembayaran): Promise<void> {
+  await client.post('/buyer/bukti_pembayaran', payload)
 }

@@ -22,7 +22,7 @@ class Tasker {
   }
 
   get task (): firebase.storage.UploadTask {
-    const storePath = `${ this.path }/${ this.file?.name.replace(/ /g,"_") }`
+    const storePath = `${this.path}/${this.file?.name.replace(/ /g, '_')}`
     return storage.ref(storePath).put(this.file)
   }
 
@@ -33,14 +33,14 @@ class Tasker {
     return new Promise<string>((resolve) => resolve(''))
   }
 
-  state_changed (): Promise<string> {
-    return new Promise(async (resolve, reject) => {
+  stateChanged (): Promise<string> {
+    return new Promise((resolve, reject) => {
       const task = this.task
       task.on(
         'state_changed',
         this.snapshot || null,
         (error) => reject(error),
-        async () => resolve(await this.getDownloadUrl(task)) 
+        async () => resolve(await this.getDownloadUrl(task))
       )
     })
   }
@@ -52,7 +52,7 @@ export function uploadAvatar (file: File, snapshot?: TSnapshot): Promise<string>
     snapshot,
     path: '/profile'
   })
-  return task.state_changed()
+  return task.stateChanged()
 }
 
 export function uploadBuktiPembayaran (file: File, snapshot?: TSnapshot): Promise<string> {
@@ -61,5 +61,5 @@ export function uploadBuktiPembayaran (file: File, snapshot?: TSnapshot): Promis
     snapshot,
     path: '/bukti_pembayaran'
   })
-  return task.state_changed()
+  return task.stateChanged()
 }
