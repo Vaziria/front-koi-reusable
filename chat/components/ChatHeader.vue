@@ -55,7 +55,7 @@ class ChatHeader extends VueWithStore<ChatStore> {
 
   get image (): string {
     const defaultImg = () => require('@/assets/img/avatar/user.png')
-    return this.user.photoUrl || defaultImg()
+    return this.user.photoUrl || this.user.profile_image || defaultImg()
   }
 
   close (): void {

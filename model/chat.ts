@@ -28,6 +28,7 @@ export interface UserChatBasic {
     seller_name: string
     state: string
     photoUrl: string
+    profile_image?: string
 }
 
 type UserChatUser = UserChatBasic & IUser

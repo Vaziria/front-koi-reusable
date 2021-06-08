@@ -69,7 +69,7 @@
   }
 </style>
 <script lang="ts">
-import { Component, Prop, Watch } from 'vue-property-decorator'
+import { Component, Watch } from 'vue-property-decorator'
 import $ from 'jquery'
 import InfiniteLoading from 'vue-infinite-loading'
 
@@ -82,6 +82,7 @@ import { Chat, ChatOrder, ChatProduct, UserChat } from '../../model/chat'
 import VueWithStore from '../../store/wrapper.vue'
 import { Namespaced, Store } from '../../store/types'
 import { ChatAction, ChatMutation, IChatState } from '../../store/chat'
+import { ISystemState } from '@/reusable/store/system'
 
 interface ChatUi extends Chat {
   'show_product'?: boolean
@@ -95,6 +96,7 @@ interface TransformChat {
 
 type State = {
   'chat': IChatState
+  'system': ISystemState
 }
 
 type ChatStore = Store<State, Namespaced<ChatMutation, 'chat'>, Namespaced<ChatAction, 'chat'>>
@@ -110,8 +112,6 @@ type ChatStore = Store<State, Namespaced<ChatMutation, 'chat'>, Namespaced<ChatA
   }
 })
 export default class ChatBox extends VueWithStore<ChatStore> {
-  @Prop({ default: false }) readonly mobile!: boolean
-
   get loading (): boolean {
     return this.tstore.state.chat.loading
   }
@@ -119,7 +119,7 @@ export default class ChatBox extends VueWithStore<ChatStore> {
   get bodyClass (): string {
     let defaultClass = 'az-chat-body content-inner py-3'
 
-    if (!this.mobile) {
+    if (!this.tstore.state.system.isMobile) {
       defaultClass += ' mg-t-60 mg-md-t-0'
     }
 

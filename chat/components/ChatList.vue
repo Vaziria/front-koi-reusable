@@ -12,7 +12,7 @@
     <div id="azChatList" class="az-chat-list mt-2 overflow-auto">
       <div v-for="(chat, key) in userlist" :key="key" :class="{ 'media new py-2': true, selected: user.id === chat.id }" @click="setActive(chat)">
         <div :class="`wd-30 ht-30 az-img-user ${ chat.state }`">
-          <img :src="chat.photoUrl || defaultImg" alt="">
+          <img :src="chat.photoUrl || chat.profile_image || defaultImg" alt="">
           <span v-if="chat.unread">{{ chat.unread }}</span>
         </div>
         <div class="media-body ellipsis">
