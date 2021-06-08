@@ -18,5 +18,13 @@ export default class WithNav<RouteType> extends Vue {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return (this as any).$navigation as any
   }
+
+  get displayName (): string|(keyof RouteType) {
+    const route = this.$route as { meta?: { displayName?: string } }
+    if (route.meta && route.meta.displayName) {
+      return route.meta.displayName
+    }
+    return this.currentName
+  }
 }
 </script>
