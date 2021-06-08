@@ -1,10 +1,11 @@
 import { chatList, chatMessages, chatRead, sendChat } from '@/reusable/api/chat'
-import { Chat, ChatOrder, ChatProduct, UserChat } from '@/reusable/model/chat'
+import { Chat, ChatOrder, ChatProduct, UserChat, UserChatBasic } from '@/reusable/model/chat'
 import { ISystemState } from '@/reusable/store/system'
 import { Commit, Namespaced, Store } from '@/reusable/store/types'
 import { IUserState } from '@/reusable/store/user'
 import { StateChanger } from 'vue-infinite-loading'
 import { Module } from 'vuex'
+import { getShop } from '../api/shop'
 
 const perpage = 20
 const contactPerpage = 20
@@ -18,7 +19,7 @@ const defaultRef = {
 export interface IChatState {
   showMini: boolean
   loading: boolean
-  userActive: UserChat
+  userActive: UserChatBasic
   userid: string
   product: ChatProduct | null
   order: ChatOrder | null
@@ -34,7 +35,7 @@ export interface IChatState {
   endpage: boolean
 }
 
-export const emptyUserActive: UserChat = {
+export const emptyUserActive: UserChatBasic = {
   id: '',
   unread: 0,
   last_chat: 0,
@@ -212,6 +213,16 @@ const actions = {
   async openChat (store: Context, user: UserChat): Promise<void> {
     const { commit } = store
     commit('set_user', user)
+  },
+
+  async openChatUser (store: Context, uid: string): Promise<void> {
+    const { rootState } = store
+    const isSeller = rootState.system.isSeller
+
+    if (isSeller) {
+      const seller = await getShop(uid)
+      console.log(seller)
+    }
   },
 
   async getMessage (store: Context): Promise<void> {

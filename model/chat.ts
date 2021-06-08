@@ -1,3 +1,6 @@
+import { Seller } from './seller'
+import { IUser } from './user'
+
 /* eslint-disable camelcase */
 export interface Chat {
     id: string
@@ -15,7 +18,7 @@ export interface Chat {
     send_error?: boolean
 }
 
-export interface UserChat {
+export interface UserChatBasic {
     unread: number
     last_msg: Chat
     last_chat: number
@@ -26,6 +29,11 @@ export interface UserChat {
     state: string
     photoUrl: string
 }
+
+type UserChatUser = UserChatBasic & IUser
+type UserChatSeller = UserChatBasic & Seller & { is_seller?: boolean }
+
+export type UserChat = UserChatUser | UserChatSeller | UserChatBasic
 
 export interface ChatOrder {
     id: string
