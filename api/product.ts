@@ -39,16 +39,17 @@ export async function publicIkan (params?: IkanFilter): Promise<IIkan[]> {
 
 export async function publicIkanItem (shopid: string, ikanid: string): Promise<PublicIkan> {
   const res = await client.get(`/public/ikan/${shopid}/${ikanid}`)
-  return res.data
+  const product = res.data as PublicIkan
+  return product
 }
 
-export async function addWish (id: string): Promise<any> {
-  const res = await client.put(`/addwish/${id}`)
+export async function addWish (shopid: string, id: string): Promise<any> {
+  const res = await client.put(`/addwish/${shopid}/${id}`)
   return res
 }
 
-export async function removeWish (id: string): Promise<any> {
-  const res = await client.delete(`/removewish/${id}`)
+export async function removeWish (shopid: string, id: string): Promise<any> {
+  const res = await client.delete(`/removewish/${shopid}/${id}`)
   return res
 }
 

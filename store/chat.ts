@@ -85,6 +85,9 @@ const mutations = {
   set_product (state: IChatState, data: null | ChatProduct): void {
     state.product = data
   },
+  reset_user (state: IChatState): void {
+    state.userActive = emptyUserActive
+  },
   set_user (state: IChatState, user: UserChat): void {
     state.userActive = user
     const ada = state.userlist.filter(userchat => {

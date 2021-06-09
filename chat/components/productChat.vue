@@ -20,15 +20,15 @@
       </div>
     </div>
     <div v-if="showAction" class="d-flex tx-dark tx-14 mt-2">
-      <a
+      <span
         class="mg-l-auto px-3 py-1 rounded-5 bg-white tx-bold"
         @click="loadingwait(wishlist(product))"
-      ><mdb-icon :icon="`heart ${ iswish && 'tx-info' }`" /></a>
+      ><mdb-icon :icon="`heart ${ isWish && 'tx-info' }`" /></span>
 
-      <a
+      <!-- <span
         class="mg-l-3 px-3 py-1 rounded-5 bg-white tx-bold"
         @click="loadingwait(addCart(product))"
-      ><mdb-icon icon="cart-plus" /></a>
+      ><mdb-icon icon="cart-plus" /></span> -->
     </div>
   </div>
 </template>
@@ -60,6 +60,7 @@ import { ISystemState } from '../../store/system'
 import { IUserState } from '../../store/user'
 import WithNav from '@/reusable/navigation/WithNav.vue'
 import { BasicRoute } from '@/reusable/navigation/basicroute'
+import { addWish, removeWish } from '@/reusable/api/product'
 
 type State = {
     'chat': IChatState,
@@ -92,7 +93,10 @@ export default class ProductChat extends Mixins(Loading, StoreMix, NavMix) {
     name: '',
     price: 0,
     kategori: '',
-    gambar: []
+    gambar: [],
+    me: {
+      wishlist: false
+    }
   }
 
   notFound = false
@@ -148,15 +152,23 @@ export default class ProductChat extends Mixins(Loading, StoreMix, NavMix) {
   }
 
   async wishlist (): Promise<void> {
-    if (this.isWish) {
-      await client.delete(`/removewish/${this.product?.id}`)
-    } else {
-      await client.put(`/addwish/${this.product?.id}`)
+    const id = this.product?.id
+    if (!id) {
+      return
     }
 
-    this.product.me = {
-      ...this.product.me,
-      wishlist: !this.isWish
+    if (this.isWish) {
+      await removeWish(this.shopid, id)
+      this.product.me = {
+        ...this.product.me,
+        wishlist: false
+      }
+    } else {
+      this.product.me = {
+        ...this.product.me,
+        wishlist: true
+      }
+      await addWish(this.shopid, id)
     }
   }
 
@@ -164,6 +176,7 @@ export default class ProductChat extends Mixins(Loading, StoreMix, NavMix) {
     await client.put(`/chart/${this.product?.id}`, {
       quantity: 1
     })
+    this.$root.$emit('addChart', this.product)
   }
 }
 
