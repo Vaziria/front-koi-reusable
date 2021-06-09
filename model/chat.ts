@@ -32,7 +32,7 @@ export interface UserChatBasic {
 }
 
 type UserChatUser = UserChatBasic & IUser
-type UserChatSeller = UserChatBasic & Seller & { is_seller?: boolean }
+export type UserChatSeller = UserChatBasic & Seller & { is_seller?: boolean }
 
 export type UserChat = UserChatUser | UserChatSeller | UserChatBasic
 

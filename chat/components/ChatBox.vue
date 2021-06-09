@@ -69,7 +69,7 @@
   }
 </style>
 <script lang="ts">
-import { Component, Watch } from 'vue-property-decorator'
+import { Component, Mixins, Watch } from 'vue-property-decorator'
 import $ from 'jquery'
 import InfiniteLoading from 'vue-infinite-loading'
 
@@ -82,7 +82,9 @@ import { Chat, ChatOrder, ChatProduct, UserChat } from '../../model/chat'
 import VueWithStore from '../../store/wrapper.vue'
 import { Namespaced, Store } from '../../store/types'
 import { ChatAction, ChatMutation, IChatState } from '../../store/chat'
-import { ISystemState } from '@/reusable/store/system'
+import { ISystemState } from '../../store/system'
+import WithNav from '../../navigation/WithNav.vue'
+import { BasicRoute } from '../../navigation/basicroute'
 
 interface ChatUi extends Chat {
   'show_product'?: boolean
@@ -101,6 +103,12 @@ type State = {
 
 type ChatStore = Store<State, Namespaced<ChatMutation, 'chat'>, Namespaced<ChatAction, 'chat'>>
 
+@Component
+class StoreMixins extends VueWithStore<ChatStore> {}
+
+@Component
+class NavMixins extends WithNav<BasicRoute> {}
+
 @Component({
   components: {
     InfiniteLoading,
@@ -111,9 +119,13 @@ type ChatStore = Store<State, Namespaced<ChatMutation, 'chat'>, Namespaced<ChatA
     ChatForm
   }
 })
-export default class ChatBox extends VueWithStore<ChatStore> {
+export default class ChatBox extends Mixins(StoreMixins, NavMixins) {
   get loading (): boolean {
     return this.tstore.state.chat.loading
+  }
+
+  get isMobile (): boolean {
+    return this.tstore.state.system.isMobile
   }
 
   get bodyClass (): string {
@@ -182,6 +194,11 @@ export default class ChatBox extends VueWithStore<ChatStore> {
   }
 
   async mounted (): Promise<void> {
+    // if (this.isMobile) {
+    //   if (this.user.id === '') {
+    //     this.navigation.router.back()
+    //   }
+    // }
     this.tstore.commit('chat/set_chat_ref', (this.$refs.infiniteLoading as InfiniteLoading).stateChanger)
     await this.tstore.dispatch('chat/getMessage')
     this.scrollchat()

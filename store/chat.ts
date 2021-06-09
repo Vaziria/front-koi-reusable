@@ -1,5 +1,5 @@
 import { chatList, chatMessages, chatRead, sendChat } from '@/reusable/api/chat'
-import { Chat, ChatOrder, ChatProduct, UserChat, UserChatBasic } from '@/reusable/model/chat'
+import { Chat, ChatOrder, ChatProduct, UserChat, UserChatBasic, UserChatSeller } from '@/reusable/model/chat'
 import { ISystemState } from '@/reusable/store/system'
 import { Commit, Namespaced, Store } from '@/reusable/store/types'
 import { IUserState } from '@/reusable/store/user'
@@ -215,19 +215,39 @@ const actions = {
     commit('set_user', user)
   },
 
-  async openChatUser (store: Context, uid: string): Promise<void> {
-    const { rootState } = store
-    const isSeller = rootState.system.isSeller
+  async openChatSeller (store: Context, uid: string): Promise<void> {
+    const { commit } = store
 
-    if (isSeller) {
-      const seller = await getShop(uid)
-      console.log(seller)
+    const seller = await getShop(uid)
+
+    const userChat: UserChatSeller = {
+      ...seller,
+      is_seller: true,
+      unread: 0,
+      last_chat: Date.now(),
+      last_msg: {
+        id: '',
+        from_id: '',
+        to_id: '',
+        created: Date.now()
+      },
+      id: seller.id,
+      name: '',
+      seller_name: seller.seller_name,
+      state: seller.state,
+      photoUrl: seller.profile_image || seller.photoUrl
     }
+
+    commit('set_user', userChat)
   },
 
   async getMessage (store: Context): Promise<void> {
     const { commit, state, rootState } = store
     const { isSeller } = rootState.system
+    const uid = state.userActive.id
+    if (uid === '') {
+      return
+    }
 
     commit('set_message', [])
     commit('loading', true)
@@ -235,7 +255,7 @@ const actions = {
     let msg: Chat[] = []
     try {
       await chatRead(state.userActive.id, isSeller)
-      msg = await chatMessages(state.userActive.id, {
+      msg = await chatMessages(uid, {
         seller: isSeller,
         limit: perpage
       })
@@ -244,7 +264,7 @@ const actions = {
     }
 
     const fixmsg: Chat[] = msg.reverse()
-    commit('set_user_read', state.userActive.id)
+    commit('set_user_read', uid)
     commit('set_message', fixmsg)
     commit('ref_action', fixmsg.length)
   },

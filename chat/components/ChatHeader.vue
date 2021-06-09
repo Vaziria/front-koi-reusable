@@ -26,11 +26,13 @@
 <script lang="ts">
 import { UserChat } from '../../model/chat'
 import { ISystemState } from '../../store/system'
-import { Component } from 'vue-property-decorator'
+import { Component, Mixins } from 'vue-property-decorator'
 import { fromNow } from '../../filters/moment'
-import { ChatAction, ChatMutation, emptyUserActive, IChatState } from '../../store/chat'
+import { ChatAction, ChatMutation, IChatState } from '../../store/chat'
 import { Store, Namespaced } from '../../store/types'
 import VueWithStore from '../../store/wrapper.vue'
+import WithNav from '../../navigation/WithNav.vue'
+import { BasicRoute } from '../../navigation/basicroute'
 
 type State = {
   'chat': IChatState,
@@ -39,12 +41,18 @@ type State = {
 
 type ChatStore = Store<State, Namespaced<ChatMutation, 'chat'>, Namespaced<ChatAction, 'chat'>>
 
+@Component
+class StoreMixins extends VueWithStore<ChatStore> {}
+
+@Component
+class NavMixins extends WithNav<BasicRoute> {}
+
 @Component({
   filters: {
     fromNow
   }
 })
-class ChatHeader extends VueWithStore<ChatStore> {
+class ChatHeader extends Mixins(NavMixins, StoreMixins) {
   get showClose (): boolean {
     return this.tstore.state.system.isMobile !== true
   }
@@ -63,7 +71,7 @@ class ChatHeader extends VueWithStore<ChatStore> {
   }
 
   mobileClose (): void {
-    this.tstore.commit('chat/set_user', emptyUserActive)
+    this.navigation.router.back()
   }
 }
 

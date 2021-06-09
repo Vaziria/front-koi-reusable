@@ -99,7 +99,7 @@
   }
 </style>
 <script lang="ts">
-import { Component } from 'vue-property-decorator'
+import { Component, Mixins } from 'vue-property-decorator'
 import InfiniteLoading from 'vue-infinite-loading'
 
 import { mdbIcon } from 'mdbvue'
@@ -110,6 +110,8 @@ import VueWithStore from '../../store/wrapper.vue'
 import { Namespaced, Store } from '../../store/types'
 import { ChatAction, ChatMutation, IChatState } from '../../store/chat'
 import { ISystemState } from '../../store/system'
+import WithNav from '@/reusable/navigation/WithNav.vue'
+import { BasicRoute } from '@/reusable/navigation/basicroute'
 
 type State = {
     'chat': IChatState
@@ -117,6 +119,12 @@ type State = {
 }
 
 type ChatStore = Store<State, Namespaced<ChatMutation, 'chat'>, Namespaced<ChatAction, 'chat'>>
+
+@Component
+class NavMixins extends WithNav<BasicRoute> {}
+
+@Component
+class StoreMixins extends VueWithStore<ChatStore> {}
 
 @Component({
   components: {
@@ -127,7 +135,7 @@ type ChatStore = Store<State, Namespaced<ChatMutation, 'chat'>, Namespaced<ChatA
     fromNow
   }
 })
-export default class ChatList extends VueWithStore<ChatStore> {
+export default class ChatList extends Mixins(StoreMixins, NavMixins) {
   filterActive = 'keyword'
   q = ''
   defaultImg = require('@/assets/img/avatar/user.png')
@@ -168,12 +176,12 @@ export default class ChatList extends VueWithStore<ChatStore> {
   }
 
   async setActive (user: UserChat): Promise<void> {
-    this.tstore.commit('chat/clear_order_product')
-    await this.tstore.dispatch('chat/openChat', user)
-
     if (this.isMobile) {
-      // navigation not implemented
-    //   navigation.push('chat', {})
+      await this.tstore.dispatch('chat/openChat', user)
+      this.navigation.push('user_chat', {})
+    } else {
+      this.tstore.commit('chat/clear_order_product')
+      await this.tstore.dispatch('chat/openChat', user)
     }
   }
 }

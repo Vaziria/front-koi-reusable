@@ -72,10 +72,6 @@ class ChatForm extends Mixins(StoreMix, SwalMixin) {
     return this.tstore.state.chat.userActive.id
   }
 
-  mounted (): void {
-    console.log(this)
-  }
-
   @Emit('onChat')
   async sendMessage (): Promise<void> {
     if (!this.text) {
