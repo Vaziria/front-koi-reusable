@@ -26,5 +26,13 @@ export default class WithNav<RouteType> extends Vue {
     }
     return this.currentName
   }
+
+  get hiddenChat (): boolean {
+    const route = this.$route as { meta?: { hiddenChat?: boolean } }
+    if (route.meta && route.meta.hiddenChat) {
+      return route.meta.hiddenChat
+    }
+    return false
+  }
 }
 </script>

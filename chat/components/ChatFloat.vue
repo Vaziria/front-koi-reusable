@@ -6,27 +6,31 @@
   </div>
 </template>
 <script lang="ts">
-import { Component } from 'vue-property-decorator'
+import { Component, Mixins } from 'vue-property-decorator'
 import { mdbIcon } from 'mdbvue'
 import VueWithStore from '../../store/wrapper.vue'
 import { Namespaced, Store } from '../../store/types'
 import { ChatAction, ChatMutation, IChatState } from '../../store/chat'
-// import { BaseRoute } from '@/router/base'
-
-// type allowRoute = keyof BaseRoute
+import WithNav from '@/reusable/navigation/WithNav.vue'
+import { BasicRoute } from '@/reusable/navigation/basicroute'
 
 type State = {
-    'chat': IChatState
+  'chat': IChatState
 }
 
 type ChatStore = Store<State, Namespaced<ChatMutation, 'chat'>, Namespaced<ChatAction, 'chat'>>
+@Component
+class StoreMix extends VueWithStore<ChatStore> {}
+
+@Component
+class NavMix extends WithNav<BasicRoute> {}
 
 @Component({
   components: {
     mdbIcon
   }
 })
-export default class ChatFloat extends VueWithStore<ChatStore> {
+export default class ChatFloat extends Mixins(StoreMix, NavMix) {
   get unreadChat (): number {
     return this.tstore.state.chat.unread
   }
@@ -36,16 +40,9 @@ export default class ChatFloat extends VueWithStore<ChatStore> {
   }
 
   get hidden (): boolean {
-    //   hidden chat float not implemented
-
-    // const currentRoute = this.$route.name + ''
-    // const hiddenRoute: allowRoute[] = ['order_item']
-    // const findHidden = hiddenRoute.find(route => route === currentRoute)
-
-    // if (findHidden) {
-    //   return true
-    // }
-
+    if (this.hiddenChat) {
+      return true
+    }
     return false
   }
 
