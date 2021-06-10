@@ -25,10 +25,10 @@
         @click="loadingwait(wishlist(product))"
       ><mdb-icon :icon="`heart ${ isWish && 'tx-info' }`" /></span>
 
-      <!-- <span
+      <span
         class="mg-l-3 px-3 py-1 rounded-5 bg-white tx-bold"
         @click="loadingwait(addCart(product))"
-      ><mdb-icon icon="cart-plus" /></span> -->
+      ><mdb-icon icon="cart-plus" /></span>
     </div>
   </div>
 </template>
@@ -61,6 +61,8 @@ import { IUserState } from '../../store/user'
 import WithNav from '@/reusable/navigation/WithNav.vue'
 import { BasicRoute } from '@/reusable/navigation/basicroute'
 import { addWish, removeWish } from '@/reusable/api/product'
+import WithRootEmit from '@/reusable/event/WithRootEmit.vue'
+import { BasicRootEvent } from '@/reusable/event/basicRootEvent'
 
 type State = {
     'chat': IChatState,
@@ -77,6 +79,9 @@ type IkanChat = Pick<PublicIkan, 'id' | 'gambar' | 'name' | 'kategori' | 'price'
 @Component
 class NavMix extends WithNav<BasicRoute> {}
 
+@Component
+class RootEmitMix extends WithRootEmit<BasicRootEvent> {}
+
 @Component({
   components: {
     mdbIcon
@@ -85,7 +90,7 @@ class NavMix extends WithNav<BasicRoute> {}
     currency
   }
 })
-export default class ProductChat extends Mixins(Loading, StoreMix, NavMix) {
+export default class ProductChat extends Mixins(Loading, StoreMix, NavMix, RootEmitMix) {
   @Prop({}) readonly productid!: string
   @Prop({}) readonly shopid!: string
   product: IkanChat = {
@@ -176,7 +181,7 @@ export default class ProductChat extends Mixins(Loading, StoreMix, NavMix) {
     await client.put(`/chart/${this.product?.id}`, {
       quantity: 1
     })
-    this.$root.$emit('addChart', this.product)
+    this.rootEmit('addChart', this.product)
   }
 }
 
