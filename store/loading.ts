@@ -3,15 +3,20 @@ import { StateType } from '../store/types'
 
 export interface ILoadingState extends StateType {
   show: boolean
+  text: string
 }
 
 const state: ILoadingState = {
-  show: false
+  show: false,
+  text: ''
 }
 
 const mutations = {
   set_loading: function (state: ILoadingState, data: boolean): void {
     state.show = data
+  },
+  set_text: function (state: ILoadingState, data: string): void {
+    state.text = data
   }
 }
 

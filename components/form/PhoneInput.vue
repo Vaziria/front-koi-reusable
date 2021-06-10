@@ -1,63 +1,75 @@
 <template>
   <div>
     <input
+      ref="phoneInput"
       :value="validValue"
-      class="form-control rounded-5"
       maxlength="22"
-      @input="$e => phoneValidate($e.target)"
+      class="form-control rounded-5"
+      @input="$e => phoneValidating($e.target.value)"
     >
   </div>
 </template>
 <script lang="ts">
-import { Component, Vue, Prop, Emit } from 'vue-property-decorator'
+import { Vue, Component, Prop, Emit } from 'vue-property-decorator'
 
 @Component
 class PhoneInput extends Vue {
   @Prop() readonly value!: string
 
-  get validValue (): string {
-    let phone = this.value
-      .replace('+62', '')
+  phone = this.value
 
-    if (phone[0] === '0') {
-      phone = phone.substring(0)
+  get validValue (): string {
+    let { value } = this
+    if (value[0] === '0') {
+      value = value.substring(1)
     }
 
-    return this.formatedPhone(phone)
+    const checkState = ['+62', '(+62)']
+    if (checkState.find(state => this.value.includes(state))) {
+      value = value
+        .replace('+62', '')
+        .replace('(+62)', '')
+    }
+
+    return this.setPhoneFormat(value)
   }
 
-  formatedPhone (phone: string): string {
-    let formatedNum = '(+62)'
-    const firstNum = phone.slice(0, 3)
-    const middleNum = phone.slice(3, 7)
-    const lastNum = phone.slice(7, 11)
-    const extraNum = phone.slice(11, 14)
+  setPhoneFormat (phone: string): string {
+    let phoneText = '(+62)'
+    const firstNum = phone.substring(0, 3)
+    const middleNum = phone.substring(3, 7)
+    const lastNum = phone.substring(7, 11)
+    const extraNum = phone.substring(11, 14)
     const allNum = [firstNum, middleNum, lastNum, extraNum]
 
     allNum.forEach(num => {
       if (num) {
-        formatedNum += ' ' + num
+        phoneText += ' ' + num
       }
     })
 
-    return formatedNum
+    return phoneText
+  }
+
+  phoneValidating (phone: string): void {
+    const inputRef = this.$refs.phoneInput as HTMLInputElement
+    const splitMatch = phone
+      .replace('(+62', '')
+      .match(/\d/g) || []
+    phone = splitMatch.join('')
+
+    if (phone[0] === '0') {
+      phone = phone.substring(1)
+    }
+
+    inputRef.value = this.setPhoneFormat(phone)
+
+    this.onInput(phone.substring(0, 14))
   }
 
   @Emit('input')
-  phoneValidate (input: HTMLInputElement): string {
-    let phone = input.value
-      .replace('+62', '')
-      .replace('(+62)', '')
-    const numMatch = phone.match(/\d+/) || []
-    phone = numMatch.join('')
-
-    if (phone[0] === '0') {
-      phone = phone.substring(0)
-    }
-
-    input.value = this.formatedPhone(phone)
-
-    return '+62' + phone.slice(0, 14)
+  onInput (text: string): string {
+    return '+62' + text
   }
 }
 

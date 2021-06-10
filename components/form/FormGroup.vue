@@ -26,7 +26,7 @@
     border-top-left-radius: 5px;
   }
 
-  .input-group:focus-within span, .input-group:focus-within input {
+  .input-group:focus-within a, .input-group:focus-within input {
     border-color: #e31f52;
   }
   .input-group-prepend + input {
