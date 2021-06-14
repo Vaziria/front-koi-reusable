@@ -80,9 +80,11 @@ const mutations = {
   },
 
   set_order (state: IChatState, data: null | ChatOrder): void {
+    state.product = null
     state.order = data
   },
   set_product (state: IChatState, data: null | ChatProduct): void {
+    state.order = null
     state.product = data
   },
   reset_user (state: IChatState): void {

@@ -1,7 +1,7 @@
 import { Seller } from '../model/seller'
 import client from './client'
 
-export async function listShop (query: unknown): Promise<unknown> {
+export async function listShop (query: unknown): Promise<Seller> {
   const req = await client.get('/shop/list', { params: query })
   return req.data
 }
