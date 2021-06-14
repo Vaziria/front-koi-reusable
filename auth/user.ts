@@ -3,7 +3,10 @@ import { setupPresence } from '@/reusable/user/presence'
 import { UserStore } from '../store/user'
 import { db, realdb } from '@/utils/firebase'
 import { Access } from '../model/access'
+import { ChatStore } from '../store/chat'
 // import { subChat } from '@/firedb/chat'
+
+type Store = UserStore & ChatStore
 
 export async function getAccess (uid: string): Promise<Access | null> {
   const doc = await db.collection('Access').doc(uid).get()
@@ -19,9 +22,9 @@ export async function getAccess (uid: string): Promise<Access | null> {
 
 export class AuthUser {
   auth!: firebase.auth.Auth
-  store!: UserStore
+  store!: Store
 
-  constructor (auth: firebase.auth.Auth, store: UserStore) {
+  constructor (auth: firebase.auth.Auth, store: Store) {
     this.auth = auth
     this.store = store
   }
@@ -40,6 +43,8 @@ export class AuthUser {
       // subChat(user.uid)
     } else {
       this.store.commit('user/set_logout')
+      this.store.commit('chat/reset_msg')
+      this.store.commit('chat/reset_user')
     }
   }
 
