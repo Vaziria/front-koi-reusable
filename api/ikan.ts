@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-import { IIkan, PublicIkan } from '../model/ikan'
+import { IFormIkan, IIkan, PublicIkan } from '../model/ikan'
 import client from './client'
 import { IkanFilter } from './product'
 
@@ -11,9 +11,15 @@ export async function listIkan (params = { kategori: 'Asagi' }) {
   return data.data
 }
 
-export async function createIkan (data: any): Promise<IIkan> {
-  const res = await client.post('/ikan/create', data)
-  return res.data.data
+interface CreateParams {
+  asdraft?: boolean
+}
+
+export async function createIkan (data: IFormIkan, params?: CreateParams): Promise<IIkan> {
+  const res = await client.post('/ikan/create', data, {
+    params
+  })
+  return res.data
 }
 
 export async function createLelang (data: any) {
@@ -33,8 +39,14 @@ export async function getIkan (id: string): Promise<IIkan> {
   return res.data
 }
 
-export async function updateIkan (id: string, data: Partial<IIkan>): Promise<{ msg: string}> {
-  const res = await client.put(`/ikan/update/${id}`, data)
+interface UpdateParams {
+  asdraft?: boolean
+}
+
+export async function updateIkan (id: string, data: Partial<IIkan>, params?: UpdateParams): Promise<{ msg: string}> {
+  const res = await client.put(`/ikan/update/${id}`, data, {
+    params
+  })
   return res.data
 }
 

@@ -2,7 +2,7 @@
 
 import { Seller } from './seller'
 
-export const listStatusIkan = ['ready', 'booked', 'process', 'sold', 'arsip'] as const
+export const listStatusIkan = ['ready', 'booked', 'process', 'sold', 'arsip', 'draft'] as const
 export type StatusIkan = typeof listStatusIkan[number]
 
 export interface IkanChart {
@@ -40,6 +40,7 @@ export interface IIkan {
 }
 
 export interface IFormIkan {
+  status?: StatusIkan
   name: string
   sex: 'male' | 'female' | 'uncheck'
   ukuran: number
