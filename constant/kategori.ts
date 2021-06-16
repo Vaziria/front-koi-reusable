@@ -21,7 +21,7 @@ export const categIcon: any = {
   hariwake: 'hariwake',
   kikushui: 'kikushui',
   kujaku: 'kujaku',
-  platinum: 'paltinum',
+  platinum: 'platinum',
   shusui: 'shusui',
   asagi: 'asagi',
   'hi utsuri': 'hi_utsuri',

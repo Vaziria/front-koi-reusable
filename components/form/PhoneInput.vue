@@ -36,6 +36,7 @@ class PhoneInput extends Vue {
 
   setPhoneFormat (phone: string): string {
     let phoneText = '(+62)'
+    phone = (phone.match(/\d/g) || []).join('')
     const firstNum = phone.substring(0, 3)
     const middleNum = phone.substring(3, 7)
     const lastNum = phone.substring(7, 11)

@@ -2,21 +2,25 @@
 import { auth } from '@/utils/firebase'
 import firebase from 'firebase'
 import { Module } from 'vuex'
+import { getUser } from '../api/user'
 import { getAccess } from '../auth/user'
 import { Access, RoleKey } from '../model/access'
+import { PublicUser } from '../model/user'
 import { Commit, Namespaced, StateType, Store } from './types'
 
 export interface IUserState extends StateType {
-    uid: string
-    token: string
-    expiryToken: number
-    isLogin: boolean
-    role: RoleKey[],
-    displayName: string
-    email: string
-    phoneNumber: string
-    photoUrl: string
-    shopid: string
+  uid: string
+  token: string
+  expiryToken: number
+  isLogin: boolean
+  role: RoleKey[],
+  displayName: string
+  email: string
+  phoneNumber: string
+  photoUrl: string
+  shopid: string
+  kota: string
+  unsetting: boolean
 }
 
 const state: IUserState = {
@@ -29,8 +33,9 @@ const state: IUserState = {
   email: '',
   phoneNumber: '',
   photoUrl: '',
-  shopid: ''
-
+  shopid: '',
+  kota: '',
+  unsetting: false
 }
 
 const mutations = {
@@ -38,7 +43,7 @@ const mutations = {
     state.isLogin = isLogin
   },
   set_access (state: IUserState, access: Access): void {
-    console.log('access', access)
+    // console.log('access', access)
     state.role = access.role || []
     state.shopid = access.shopid
   },
@@ -47,7 +52,18 @@ const mutations = {
     state.displayName = user.displayName || 'username'
     state.email = user.email || 'no email'
     state.phoneNumber = user.phoneNumber || 'no phone'
-    state.photoUrl = user.photoURL || 'https://seller-koi.web.app/img/seller.2915641c.png'
+    state.photoUrl = user.photoURL || require('@/assets/img/avatar/user.png')
+  },
+  set_user_image (state: IUserState, image: string): void {
+    state.photoUrl = image
+  },
+  reload_user_data (state: IUserState, user: PublicUser): void {
+    // console.log(user)
+    state.displayName = user.name || state.displayName
+    state.email = user.email || state.email
+    state.phoneNumber = user.phone || state.phoneNumber
+    state.kota = user.kota || ''
+    state.unsetting = user.unsetting || false
   },
   unset_user_data (state: IUserState): void {
     state.uid = ''
@@ -55,6 +71,8 @@ const mutations = {
     state.email = 'no email'
     state.phoneNumber = 'no phone'
     state.photoUrl = 'https://seller-koi.web.app/img/seller.2915641c.png'
+    state.kota = ''
+    state.unsetting = false
   },
   set_logout (state: IUserState): void {
     state.token = ''
@@ -91,11 +109,15 @@ const actions = {
     const uid: string = user.uid
     const access = await getAccess(uid)
     // console.log('getaccess', access)
+
     if (access) {
       commit('set_access', access)
     }
 
     commit('set_login', true)
+
+    const reloadUser = await getUser(user.uid)
+    commit('reload_user_data', reloadUser)
   },
   async reloadToken (store: Context): Promise<void> {
     const user = auth.currentUser

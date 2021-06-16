@@ -121,7 +121,7 @@ export default class ProductChat extends Mixins(Loading, StoreMix, NavMix, RootE
   }
 
   get showAction (): boolean {
-    return this.mini && !this.tstore.state.system.isSeller && !this.notFound
+    return !this.mini && !this.tstore.state.system.isSeller && !this.notFound
   }
 
   get isWish (): boolean {

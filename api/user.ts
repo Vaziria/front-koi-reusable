@@ -1,10 +1,12 @@
+import firebase from 'firebase'
 import { IkanChart, PublicIkan } from '../model/ikan'
 import { IUser, PublicUser } from '../model/user'
 import client from './client'
 
 export async function getUser (userid: string): Promise<PublicUser> {
-  const res = await client.get(`/user/${userid}`)
-  return res.data.data
+  const snap = await firebase.firestore().collection('Users').doc(userid).get()
+  const userdata: PublicUser = snap.data() as PublicUser
+  return userdata
 }
 
 interface CartRes {
@@ -18,8 +20,10 @@ export async function cartList (): Promise<CartRes> {
 }
 
 interface EditPayload {
-  kota: string
-  name: string
+  name: string,
+  kota: string,
+  phone: string,
+  email?: string
 }
 export async function editProfile (payload: EditPayload): Promise<{ msg: string }> {
   const res = await client.post('/edit_profile', payload)
