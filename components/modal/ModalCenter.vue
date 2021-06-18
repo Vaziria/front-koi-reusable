@@ -1,13 +1,13 @@
 <template>
   <mdb-modal
     :id="idModal"
-    centered
-    scrollable
+    :centered="true"
+    :scrollable="true"
     :size="size"
     :show="value"
     @close="$emit('input', false)"
   >
-    <mdb-modal-header class="bd-0">
+    <mdb-modal-header class="bd-0" :close="closeIcon">
       <h5 class="tx-bold wd-100p mb-0">{{ headerText }}</h5>
     </mdb-modal-header>
     <mdb-modal-body class="pt-0 pos-relative">
@@ -19,6 +19,21 @@
 <style>
   #eb-modal-center div .modal-content {
     border-radius: 10px;
+  }
+  #eb-halfmodal .modal-dialog {
+    padding: 0 !important;
+    margin: 0 !important;
+    max-width: 768px;
+    height: 100% !important;
+  }
+  #eb-halfmodal div .modal-content {
+    border-top-right-radius: 10px;
+    border-top-left-radius: 10px;
+    position: absolute;
+    bottom: -16px;
+    width: 100%;
+    /*height: 50vh !important;*/
+    max-height: 100% !important;
   }
   @media(max-width: 768px) {
     #eb-modal-center .modal-dialog {
@@ -50,10 +65,16 @@ class ModalCenter extends Vue {
   @Prop({ default: '' }) readonly headerText!: string
   @Prop({ default: 'md' }) readonly size!: string
   @Prop({ default: false }) readonly toBasic!: boolean
+  @Prop({ default: false }) readonly half!: boolean
+  @Prop({ default: true }) readonly closeIcon!: boolean
 
   get idModal (): string {
     if (this.toBasic) {
       return ''
+    }
+
+    if (this.half) {
+      return 'eb-halfmodal'
     }
 
     return 'eb-modal-center'
