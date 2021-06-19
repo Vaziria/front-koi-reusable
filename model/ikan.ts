@@ -52,7 +52,7 @@ export interface IFormIkan {
   deskripsi: string
   kategori: string
   price: number
-  gambar: (string | File)[]
+  gambar: string[]
   video: string | File
   thumbnail: string
 }
