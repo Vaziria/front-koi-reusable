@@ -10,6 +10,8 @@ interface ITaskProps {
   path: string
 }
 
+type StorageError = 'storage/object-not-found'
+
 class Tasker {
   file: File
   snapshot?: TSnapshot
@@ -49,11 +51,22 @@ class Tasker {
 
 export async function deleteFile (url: string): Promise<void> {
   const filePath = url
-    .replace('https://firebasestorage.googleapis.com/v0/b/pdc-koi.appspot.com/o', '')  // remove url
+    .replace('https://firebasestorage.googleapis.com/v0/b/pdc-koi.appspot.com/o', '') // remove url
     .replace(/ /g, '_') // replace space to underscore
     .replace(/%2F/g, '/') // slashing path
     .split('?alt=media')[0]
-  return await storage.ref(filePath).delete()
+
+  try {
+    await storage.ref(filePath).delete()
+  } catch (e) {
+    const code = e.code as StorageError
+
+    if (code === 'storage/object-not-found') {
+      console.log('not found')
+    } else {
+      throw (e)
+    }
+  }
 }
 
 export function uploadAvatar (file: File, snapshot?: TSnapshot): Promise<string> {

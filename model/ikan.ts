@@ -37,6 +37,7 @@ export interface IIkan {
   sex: 'male' | 'female' | 'uncheck'
   tags?: string[]
   seller: Seller
+  youtubeVideo: string
 }
 
 export interface IFormIkan {
@@ -55,6 +56,7 @@ export interface IFormIkan {
   gambar: string[]
   video: string | File
   thumbnail: string
+  youtubeVideo: string
 }
 
 export interface PublicIkan extends IIkan {
