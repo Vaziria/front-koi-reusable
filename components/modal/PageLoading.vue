@@ -7,13 +7,22 @@
   </mdb-modal>
 </template>
 <script lang="ts">
-import { Component } from 'vue-property-decorator'
+import { Component, Mixins } from 'vue-property-decorator'
 import { mdbModal, mdbModalBody } from 'mdbvue'
 import WithRootEmit from '../../event/WithRootEmit.vue'
 import { BasicRootEvent } from '../../event/basicRootEvent'
-import store from '@/store'
+import { ILoadingState, LoadingMutation, LoadingAction } from '../../store/loading'
+import { Store, Namespaced } from '../../store/types'
+import WithStore from '../../store/wrapper.vue'
 
 class RootEmitMix extends WithRootEmit<BasicRootEvent> {}
+
+type State = {
+  'loading': ILoadingState
+}
+
+type LoadingStore = Store<State, Namespaced<LoadingMutation, 'loading'>, Namespaced<LoadingAction, 'loading'>>
+class RootWithStore extends WithStore<LoadingStore> {}
 
 @Component({
   components: {
@@ -21,19 +30,19 @@ class RootEmitMix extends WithRootEmit<BasicRootEvent> {}
     mdbModalBody
   }
 })
-export default class PageLoad extends RootEmitMix {
+export default class PageLoad extends Mixins(RootEmitMix, RootWithStore) {
   get show (): boolean {
-    return store.state.loading.show
+    return this.tstore.state.loading.show
   }
 
   get loadingText (): string {
-    return store.state.loading.text || 'Loading'
+    return this.tstore.state.loading.text || 'Loading'
   }
 
   mounted (): void {
     this.rootOn<'pageloading'>('pageloading', (payload) => {
-      store.commit('loading/set_loading', payload.show)
-      store.commit('loading/set_text', payload.text)
+      this.tstore.commit('loading/set_loading', payload.show)
+      this.tstore.commit('loading/set_text', payload.text)
     })
   }
 }

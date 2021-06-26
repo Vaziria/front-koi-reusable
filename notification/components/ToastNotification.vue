@@ -18,9 +18,11 @@
 </template>
 <script lang="ts">
 import { fromNow } from '../../filters/moment'
-import { Notif } from '@/reusable/model/notif'
-import store from '@/store'
-import { Vue, Component } from 'vue-property-decorator'
+import { Notif } from '../../model/notif'
+import { Component } from 'vue-property-decorator'
+import { INotifState, NotifMutation, NotifAction } from '../../store/notif'
+import { Store, Namespaced } from '../../store/types'
+import WithStore from '../../store/wrapper.vue'
 
 interface IToastNotif {
   id: string
@@ -31,15 +33,22 @@ interface IToastNotif {
   isShow: boolean
 }
 
+type State = {
+  'notif': INotifState
+}
+
+type NotifStore = Store<State, Namespaced<NotifMutation, 'notif'>, Namespaced<NotifAction, 'notif'>>
+class RootWithStore extends WithStore<NotifStore> {}
+
 @Component
-class ToastNotification extends Vue {
+class ToastNotification extends RootWithStore {
   closeId: string[] = []
   haveTimeoutId: string[] = []
   notifTimeout = 30000
   filteredNotif: Notif['type'][] = ['diskusi', 'update_order', 'new_order', 'new_chat', 'ikan']
 
   get newNotif (): IToastNotif[] {
-    const newNotif = [...store.state.notif.newNotif]
+    const newNotif = [...this.tstore.state.notif.newNotif]
       .filter(notif => this.filteredNotif.includes(notif.type))
 
     return newNotif

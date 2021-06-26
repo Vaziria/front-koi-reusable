@@ -2,7 +2,7 @@ import store from '@/store'
 import firebase from 'firebase'
 const storage = firebase.storage()
 
-type TSnapshot = (snapshot: firebase.storage.UploadTaskSnapshot) => void
+export type TSnapshot = (snapshot: firebase.storage.UploadTaskSnapshot) => void
 
 interface ITaskProps {
   file: File
@@ -12,7 +12,7 @@ interface ITaskProps {
 
 type StorageError = 'storage/object-not-found'
 
-class Tasker {
+export class Tasker {
   file: File
   snapshot?: TSnapshot
   path: string
@@ -83,33 +83,6 @@ export function uploadBuktiPembayaran (file: File, snapshot?: TSnapshot): Promis
     file,
     snapshot,
     path: '/bukti_pembayaran'
-  })
-  return task.stateChanged()
-}
-
-export async function uploadProductImage (file: File, snapshot?: TSnapshot): Promise<string> {
-  const task = new Tasker({
-    file,
-    snapshot,
-    path: `/product/image/${store.state.user.shopid}`
-  })
-  return task.stateChanged()
-}
-
-export async function uploadProductVideo (file: File, snapshot?: TSnapshot): Promise<string> {
-  const task = new Tasker({
-    file,
-    snapshot,
-    path: `/product/video/${store.state.user.shopid}`
-  })
-  return task.stateChanged()
-}
-
-export async function uploadProductThumbnail (file: File, snapshot?: TSnapshot): Promise<string> {
-  const task = new Tasker({
-    file,
-    snapshot,
-    path: `/thumbnail/${store.state.user.shopid}`
   })
   return task.stateChanged()
 }
