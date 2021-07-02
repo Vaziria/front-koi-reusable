@@ -10,7 +10,7 @@
     <mdb-modal-header class="bd-0" :close="closeIcon">
       <h5 class="tx-bold wd-100p mb-0">{{ headerText }}</h5>
     </mdb-modal-header>
-    <mdb-modal-body class="pt-0 pos-relative">
+    <mdb-modal-body class="pt-0 px-3 pos-relative">
       <slot></slot>
     </mdb-modal-body>
     <slot name="footer"></slot>
