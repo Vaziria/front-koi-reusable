@@ -23,7 +23,7 @@ export class Navigator<Base> {
       return params
     }
 
-    push<K extends keyof Base> (key: K, ...[params]: Base[K] extends undefined ? [Location]: [Base[K] & FixLocation]): Promise<void|Route> {
+    async push<K extends keyof Base> (key: K, ...[params]: Base[K] extends undefined ? [Location]: [Base[K] & FixLocation]): Promise<boolean|Route> {
       const location: Location = {}
       if (key) {
         location.name = key as string
@@ -31,17 +31,19 @@ export class Navigator<Base> {
 
       Object.assign(location, params)
 
-      return this.router
-        .push(location)
-        .catch(err => {
-          if (typeof err === 'object') {
-            // disable navigation duplicated
-            if (err.name === 'NavigationDuplicated') {
-              return
-            }
+      try {
+        const route = await this.router.push(location)
+        return route
+      } catch (err) {
+        if (typeof err === 'object') {
+          // disable navigation duplicated
+          if (err.name === 'NavigationDuplicated') {
+            return false
           }
-          throw err
-        })
+        }
+        console.error(err)
+        return false
+      }
     }
 
     replace<K extends keyof Base> (key: K, ...[params]: Base[K] extends undefined ? [Location]: [Base[K] & FixLocation]): Promise<Route> {

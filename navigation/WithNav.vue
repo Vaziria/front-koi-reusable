@@ -14,6 +14,10 @@ export default class WithNav<RouteType> extends Vue {
     return this.$route.name as any
   }
 
+  get currentPath (): string {
+    return this.$route.path
+  }
+
   get navigation (): Navigator<RouteType> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return (this as any).$navigation as any
