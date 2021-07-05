@@ -5,6 +5,7 @@
     :scrollable="true"
     :size="size"
     :show="value"
+    :direction="direction"
     @close="$emit('input', false)"
   >
     <mdb-modal-header class="bd-0" :close="closeIcon">
@@ -17,7 +18,7 @@
   </mdb-modal>
 </template>
 <style>
-  #eb-modal-center div .modal-content {
+  #eb-modal-center div .modal-content, #basic-modal div .modal-content {
     border-radius: 10px;
   }
   #eb-halfmodal .modal-dialog {
@@ -67,10 +68,11 @@ class ModalCenter extends Vue {
   @Prop({ default: false }) readonly toBasic!: boolean
   @Prop({ default: false }) readonly half!: boolean
   @Prop({ default: true }) readonly closeIcon!: boolean
+  @Prop({ default: 'bottom' }) readonly direction!: boolean
 
   get idModal (): string {
     if (this.toBasic) {
-      return ''
+      return 'basic-modal'
     }
 
     if (this.half) {
