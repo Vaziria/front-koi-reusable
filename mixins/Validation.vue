@@ -10,7 +10,7 @@ class ValidationMixin extends Vue {
   }
 
   numberValid (number: number): boolean {
-    return number >= 0
+    return number > 0
   }
 
   arrayValid<T> (array: T[], length = 1): boolean {
