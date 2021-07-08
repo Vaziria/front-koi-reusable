@@ -10,4 +10,8 @@ export interface Invite {
     // eslint-disable-next-line camelcase
     to_id: string
     created: number
+    email: string
+    name: string
+    phone: string
+    photoUrl: string
 }
