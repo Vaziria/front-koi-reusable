@@ -50,7 +50,7 @@ export async function chatMessages (id: string, params: IChatparams): Promise<Ch
   return res.data.data
 }
 
-export async function getUserChat (userid: string): Promise<unknown> {
+export async function getUserChat (userid: string): Promise<UserChat> {
   const data = await client.get(`/chat/user/${userid}`)
   return data.data
 }

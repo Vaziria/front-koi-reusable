@@ -40,7 +40,7 @@
       :action="removeOrder"
     />
     <ChatForm @onChat="scrollchat()" />
-    <chart-pop v-if="isMobile" />
+    <!-- <chart-pop v-if="isMobile" /> -->
   </div>
 </template>
 <style scoped>
@@ -79,7 +79,7 @@ import ChatHeader from './ChatHeader.vue'
 import ChatDialog from './ChatDialog.vue'
 import ChatReply from './ChatReply.vue'
 import ChatForm from './ChatForm.vue'
-import ChartPop from '@/components/Chart/ChartPop.vue'
+// import ChartPop from '@/components/Chart/ChartPop.vue'
 import { Chat, ChatOrder, ChatProduct, UserChat } from '../../model/chat'
 import VueWithStore from '../../store/wrapper.vue'
 import { Namespaced, Store } from '../../store/types'
@@ -118,8 +118,8 @@ class NavMixins extends WithNav<BasicRoute> {}
     ChatHeader,
     ChatDialog,
     ChatReply,
-    ChatForm,
-    ChartPop
+    ChatForm
+    // ChartPop
   }
 })
 export default class ChatBox extends Mixins(StoreMixins, NavMixins) {

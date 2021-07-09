@@ -71,7 +71,7 @@ class ChatHeader extends Mixins(NavMixins, StoreMixins) {
   }
 
   mobileClose (): void {
-    this.navigation.router.back()
+    this.$router.go(-1)
   }
 }
 
