@@ -1,12 +1,16 @@
 <template>
   <a
-    v-html="text"
     :class="{
       'badge bd px-3 py-2 mr-2 mb-2 rounded-10 tx-12 tx-normal': true,
       'active': active
     }"
     @click="$emit('click')"
-  />
+  >
+    <span v-html="text"></span>
+    <a v-if="destroy" class="ml-2" @click="$emit('destroy')">
+      <mdb-icon icon="times" class="tx-info" />
+    </a>
+  </a>
 </template>
 <style scoped>
   .active {
@@ -18,11 +22,17 @@
 </style>
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator'
+import { mdbIcon } from 'mdbvue'
 
-@Component
+@Component({
+  components: {
+    mdbIcon
+  }
+})
 class FilterBadge extends Vue {
   @Prop() readonly text!: string
   @Prop({ default: false }) readonly active!: boolean
+  @Prop() readonly destroy!: boolean
 }
 
 export default FilterBadge
