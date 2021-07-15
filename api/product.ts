@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable camelcase */
-import { IIkan, IkanKey, PublicIkan } from '@/reusable/model/ikan'
+import { IIkan, IkanKey, PublicIkan } from '../model/ikan'
 import client from './client'
 
 export interface IkanFilter {

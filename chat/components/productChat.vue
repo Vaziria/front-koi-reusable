@@ -58,11 +58,11 @@ import { Namespaced, Store } from '../../store/types'
 import { ChatAction, ChatMutation, IChatState } from '../../store/chat'
 import { ISystemState } from '../../store/system'
 import { IUserState } from '../../store/user'
-import WithNav from '@/reusable/navigation/WithNav.vue'
-import { BasicRoute } from '@/reusable/navigation/basicroute'
-import { addWish, removeWish } from '@/reusable/api/product'
-import WithRootEmit from '@/reusable/event/WithRootEmit.vue'
-import { BasicRootEvent } from '@/reusable/event/basicRootEvent'
+import WithNav from '../../navigation/WithNav.vue'
+import { BasicRoute } from '../../navigation/basicroute'
+import { addWish, removeWish } from '../../api/product'
+import WithRootEmit from '../../event/WithRootEmit.vue'
+import { BasicRootEvent } from '../../event/basicRootEvent'
 
 type State = {
     'chat': IChatState,

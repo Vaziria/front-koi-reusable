@@ -38,8 +38,8 @@ import { Namespaced, Store } from '../../store/types'
 import { ChatAction, ChatMutation, IChatState } from '../../store/chat'
 import { ISystemState } from '../../store/system'
 import { IUserState } from '../../store/user'
-import { BasicRoute } from '@/reusable/navigation/basicroute'
-import WithNav from '@/reusable/navigation/WithNav.vue'
+import { BasicRoute } from '../../navigation/basicroute'
+import WithNav from '../../navigation/WithNav.vue'
 
 type State = {
     'chat': IChatState

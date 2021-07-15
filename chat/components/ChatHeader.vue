@@ -62,7 +62,7 @@ class ChatHeader extends Mixins(NavMixins, StoreMixins) {
   }
 
   get image (): string {
-    const defaultImg = () => require('@/assets/img/avatar/user.png')
+    const defaultImg = () => require('../../../assets/img/avatar/user.png')
     return this.user.photoUrl || this.user.profile_image || defaultImg()
   }
 

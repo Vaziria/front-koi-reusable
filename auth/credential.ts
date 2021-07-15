@@ -1,5 +1,5 @@
 
-import client from '@/reusable/api/client'
+import client from '../api/client'
 import { AxiosRequestConfig } from 'axios'
 import { UserStore } from '../store/user'
 

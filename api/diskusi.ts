@@ -1,7 +1,7 @@
 /* eslint-disable camelcase */
 import firebase from 'firebase'
 
-import { db } from '@/utils/firebase'
+import { db } from '../../utils/firebase'
 import { Diskusi, IDiskusi, DiskusiKey } from '../model/diskusi'
 import client from './client'
 import { IIkan } from '../model/ikan'
