@@ -1,17 +1,17 @@
 <template>
   <div>
-    <div v-if="!notFound" class="d-flex">
+    <a v-if="!notFound" class="d-flex" @click="toIkan()">
       <div
         :class="{ 'wd-50 ht-50 img-ikan mr-3 rounded-10 shadow bd': true, 'wd-md-70 ht-md-70': !mini }"
         :style="displayImage"
-        @click="toIkan()">
+      >
       </div>
       <div>
       <p class="mb-0 wd-150 ellipsis">{{ product.name }}</p>
       <b>{{ product.price | currency }}</b>
       <p class="mb-0"><mdb-icon icon="tag" /> {{ product.kategori }}</p>
       </div>
-    </div>
+    </a>
     <div v-else class="d-flex mr-3">
       <mdb-icon icon="exclamation-triangle" class="tx-40 mr-3 mb-1" />
       <div>
@@ -148,12 +148,16 @@ export default class ProductChat extends Mixins(Loading, StoreMix, NavMix, RootE
   }
 
   toIkan (): void {
-    this.navigation.push('product_ikan', {
-      params: {
-        ikanid: this.productid,
-        shopid: this.shopid
-      }
-    })
+    if (this.tstore.state.system.isSeller) {
+      open(`${process.env.VUE_APP_FRONT_URL}/product/ikan/${this.shopid}/${this.productid}`)
+    } else {
+      this.navigation.push('product_ikan', {
+        params: {
+          ikanid: this.productid,
+          shopid: this.shopid
+        }
+      })
+    }
   }
 
   async wishlist (): Promise<void> {
