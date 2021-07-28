@@ -6,7 +6,7 @@ export type Category = {
   doc_count: number
 }
 
-export async function listShop (query: unknown): Promise<Seller[]> {
+export async function listShop (query: { name?: string, offset?: number, limit?: number }): Promise<Seller[]> {
   const req = await client.get('/shop/list', { params: query })
   return req.data
 }
