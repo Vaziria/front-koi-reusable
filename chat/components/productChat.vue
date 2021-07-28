@@ -147,11 +147,19 @@ export default class ProductChat extends Mixins(Loading, StoreMix, NavMix, RootE
     }
   }
 
+  permalink (str: string): string {
+    var re = /[^a-z0-9]+/gi
+    var re2 = /^-*|-*$/g
+    str = str.replace(re, '-')
+    return str.replace(re2, '').toLowerCase()
+  }
+
   toIkan (): void {
     this.navigation.push('product_ikan', {
       params: {
         ikanid: this.productid,
-        shopid: this.shopid
+        shopid: this.shopid,
+        permalink: this.permalink(this.product.name)
       }
     })
   }

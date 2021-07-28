@@ -4,6 +4,7 @@ export interface BasicRoute {
     params: {
       ikanid: string
       shopid: string
+      permalink: string
     }
   }
     // eslint-disable-next-line camelcase
