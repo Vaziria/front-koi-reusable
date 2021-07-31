@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import { Seller } from '../model/seller'
 import client from './client'
 
