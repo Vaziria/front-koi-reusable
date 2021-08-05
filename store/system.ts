@@ -6,7 +6,7 @@ export interface ISystemState extends StateType {
     isSeller: boolean
 }
 
-function isMobile (): boolean {
+export function isMobile (): boolean {
   if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
     return true
   }
