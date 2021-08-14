@@ -63,6 +63,7 @@ import { BasicRoute } from '@/reusable/navigation/basicroute'
 import { addWish, removeWish } from '@/reusable/api/product'
 import WithRootEmit from '@/reusable/event/WithRootEmit.vue'
 import { BasicRootEvent } from '@/reusable/event/basicRootEvent'
+import permalink from '@/reusable/utils/permalink'
 
 type State = {
     'chat': IChatState,
@@ -149,12 +150,13 @@ export default class ProductChat extends Mixins(Loading, StoreMix, NavMix, RootE
 
   toIkan (): void {
     if (this.tstore.state.system.isSeller) {
-      open(`${process.env.VUE_APP_FRONT_URL}/product/ikan/${this.shopid}/${this.productid}`)
+      open(`${process.env.VUE_APP_FRONT_URL}/product/${this.shopid}/${this.productid}/${permalink(this.product.name)}`)
     } else {
       this.navigation.push('product_ikan', {
         params: {
           ikanid: this.productid,
-          shopid: this.shopid
+          shopid: this.shopid,
+          permalink: permalink(this.product.name)
         }
       })
     }
