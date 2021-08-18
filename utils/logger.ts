@@ -9,6 +9,13 @@ export function Log (message: any): void {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function specialLog (...args: any[]): void {
+  if (!isProduction) {
+    console.log(...args)
+  }
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function errorLog (error: any): void {
   if (!isProduction) {
     console.error(error)

@@ -14,6 +14,7 @@ export interface IkanChart {
 export interface IIkan {
   status: StatusIkan
   id: string
+  permalink_id: string
   user_id: string
   dilihat: number
   order_count: number

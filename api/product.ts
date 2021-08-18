@@ -43,6 +43,12 @@ export async function publicIkanItem (shopid: string, ikanid: string): Promise<P
   return product
 }
 
+export async function publicIkanPermalink (permaid: string): Promise<PublicIkan> {
+  const res = await client.get(`/ikan/permalink/${permaid}`)
+  const product = res.data as PublicIkan
+  return product
+}
+
 export async function addWish (shopid: string, id: string): Promise<any> {
   const res = await client.put(`/addwish/${shopid}/${id}`)
   return res

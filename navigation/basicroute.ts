@@ -2,9 +2,7 @@ export interface BasicRoute {
     // eslint-disable-next-line camelcase
   product_ikan: {
     params: {
-      ikanid: string
-      shopid: string
-      permalink: string
+      permaid: string
     }
   }
     // eslint-disable-next-line camelcase

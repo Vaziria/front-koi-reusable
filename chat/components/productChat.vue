@@ -74,7 +74,7 @@ type ChatStore = Store<State, Namespaced<ChatMutation, 'chat'>, Namespaced<ChatA
 @Component
 class StoreMix extends VueWithStore<ChatStore> {}
 
-type IkanChat = Pick<PublicIkan, 'id' | 'gambar' | 'name' | 'kategori' | 'price' | 'me'>
+type IkanChat = Pick<PublicIkan, 'id' | 'gambar' | 'name' | 'kategori' | 'price' | 'me' | 'permalink_id'>
 
 @Component
 class NavMix extends WithNav<BasicRoute> {}
@@ -101,7 +101,8 @@ export default class ProductChat extends Mixins(Loading, StoreMix, NavMix, RootE
     gambar: [],
     me: {
       wishlist: false
-    }
+    },
+    permalink_id: ''
   }
 
   notFound = false
@@ -156,12 +157,11 @@ export default class ProductChat extends Mixins(Loading, StoreMix, NavMix, RootE
 
   toIkan (): void {
     if (this.tstore.state.system.isSeller) {
-      open(`${process.env.VUE_APP_FRONT_URL}/product/${this.shopid}/${this.productid}/${permalink(this.product.name)}`)
+      open(`${process.env.VUE_APP_FRONT_URL}/product/ikan/${this.shopid}/${this.productid}`)
     } else {
       this.navigation.push('product_ikan', {
         params: {
-          ikanid: this.productid,
-          shopid: this.shopid
+          permaid: this.product.permalink_id
         }
       })
     }
