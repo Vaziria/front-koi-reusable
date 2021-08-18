@@ -58,7 +58,6 @@ const mutations = {
     state.photoUrl = image
   },
   reload_user_data (state: IUserState, user: PublicUser): void {
-    // console.log(user)
     state.displayName = user.name || state.displayName
     state.email = user.email || state.email
     state.phoneNumber = user.phone || state.phoneNumber

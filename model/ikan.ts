@@ -19,6 +19,7 @@ export interface IIkan {
   order_count: number
   gambar: string[]
   video: string
+  video_code: string
   thumbnail?: string,
   name: string
   price: number
