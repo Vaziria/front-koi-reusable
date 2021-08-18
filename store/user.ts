@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-types */
-import { auth } from '@/utils/firebase'
+import { auth } from '../../utils/firebase'
 import firebase from 'firebase'
 import { Module } from 'vuex'
 import { getUser } from '../api/user'
@@ -52,7 +52,7 @@ const mutations = {
     state.displayName = user.displayName || 'username'
     state.email = user.email || 'no email'
     state.phoneNumber = user.phoneNumber || 'no phone'
-    state.photoUrl = user.photoURL || require('@/assets/img/avatar/user.png')
+    state.photoUrl = user.photoURL || require('../../assets/img/avatar/user.png')
   },
   set_user_image (state: IUserState, image: string): void {
     state.photoUrl = image

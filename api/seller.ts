@@ -1,4 +1,4 @@
-import { Seller } from '@/reusable/model/seller'
+import { Seller } from '../model/seller'
 import client, { StdRes } from './client'
 
 export interface AddSellerPayload {

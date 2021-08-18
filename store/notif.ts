@@ -1,6 +1,6 @@
-import { readAll } from '@/reusable/api/notification'
-import { Notif } from '@/reusable/model/notif'
-import { Commit, Namespaced, Store } from '@/reusable/store/types'
+import { readAll } from '../api/notification'
+import { Notif } from '../model/notif'
+import { Commit, Namespaced, Store } from '../store/types'
 import { Module } from 'vuex'
 
 export interface INotifState {
@@ -47,14 +47,14 @@ const actions = {
 }
 
 // eslint-disable-next-line @typescript-eslint/ban-types
-const Notif: Module<INotifState, {}> = {
+const Notification: Module<INotifState, {}> = {
   namespaced: true,
   state,
   mutations,
   actions
 }
 
-export default Notif
+export default Notification
 
 export type NotifAction = typeof actions
 export type NotifStore = Store<{ 'notif': INotifState }, Namespaced<NotifMutation, 'Notif'>, Namespaced<NotifAction, 'Notif'>>

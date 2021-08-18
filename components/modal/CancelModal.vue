@@ -33,9 +33,9 @@
 </style>
 <script lang="ts">
 import { Component, Mixins, Prop, Emit } from 'vue-property-decorator'
-import swal from '@/reusable/mixins/swal.vue'
+import swal from '../../mixins/swal.vue'
 import ModalCenter from './ModalCenter.vue'
-import { Order } from '@/reusable/model/order'
+import { Order } from '../../model/order'
 
 @Component({
   components: {

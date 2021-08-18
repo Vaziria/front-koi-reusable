@@ -58,12 +58,11 @@ import { Namespaced, Store } from '../../store/types'
 import { ChatAction, ChatMutation, IChatState } from '../../store/chat'
 import { ISystemState } from '../../store/system'
 import { IUserState } from '../../store/user'
-import WithNav from '@/reusable/navigation/WithNav.vue'
-import { BasicRoute } from '@/reusable/navigation/basicroute'
-import { addWish, removeWish } from '@/reusable/api/product'
-import WithRootEmit from '@/reusable/event/WithRootEmit.vue'
-import { BasicRootEvent } from '@/reusable/event/basicRootEvent'
-import permalink from '@/reusable/utils/permalink'
+import WithNav from '../../navigation/WithNav.vue'
+import { BasicRoute } from '../../navigation/basicroute'
+import { addWish, removeWish } from '../../api/product'
+import WithRootEmit from '../../event/WithRootEmit.vue'
+import { BasicRootEvent } from '../../event/basicRootEvent'
 
 type State = {
     'chat': IChatState,
@@ -148,6 +147,13 @@ export default class ProductChat extends Mixins(Loading, StoreMix, NavMix, RootE
     }
   }
 
+  permalink (str: string): string {
+    var re = /[^a-z0-9]+/gi
+    var re2 = /^-*|-*$/g
+    str = str.replace(re, '-')
+    return str.replace(re2, '').toLowerCase()
+  }
+
   toIkan (): void {
     if (this.tstore.state.system.isSeller) {
       open(`${process.env.VUE_APP_FRONT_URL}/product/${this.shopid}/${this.productid}/${permalink(this.product.name)}`)
@@ -155,8 +161,7 @@ export default class ProductChat extends Mixins(Loading, StoreMix, NavMix, RootE
       this.navigation.push('product_ikan', {
         params: {
           ikanid: this.productid,
-          shopid: this.shopid,
-          permalink: permalink(this.product.name)
+          shopid: this.shopid
         }
       })
     }

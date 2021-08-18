@@ -110,8 +110,8 @@ import VueWithStore from '../../store/wrapper.vue'
 import { Namespaced, Store } from '../../store/types'
 import { ChatAction, ChatMutation, IChatState } from '../../store/chat'
 import { ISystemState } from '../../store/system'
-import WithNav from '@/reusable/navigation/WithNav.vue'
-import { BasicRoute } from '@/reusable/navigation/basicroute'
+import WithNav from '../../navigation/WithNav.vue'
+import { BasicRoute } from '../../navigation/basicroute'
 
 type State = {
     'chat': IChatState
@@ -138,7 +138,7 @@ class StoreMixins extends VueWithStore<ChatStore> {}
 export default class ChatList extends Mixins(StoreMixins, NavMixins) {
   filterActive = 'keyword'
   q = ''
-  defaultImg = require('@/assets/img/avatar/user.png')
+  defaultImg = require('../../../assets/img/avatar/user.png')
 
   get isBuyer (): boolean {
     return !this.tstore.state.system.isSeller
