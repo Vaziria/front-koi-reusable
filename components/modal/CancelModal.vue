@@ -58,27 +58,13 @@ export default class CancelModal extends Mixins(swal) {
   text = ''
   anotherText = ''
   async cancel (): Promise<void> {
-    this.updateLoading = true
-
     const order = this.order
     if (!order) {
       return order
     }
 
     const reason = this.text || this.anotherText
-
-    try {
-      await this.oncancel(reason)
-
-      this.updateLoading = false
-      this.topedToast('Pesanan berhasil dibatalkan', 'OK')
-
-      this.close()
-    } catch {
-      this.updateLoading = false
-      this.topedToast('Pesanan gagal dibatalkan', 'OK')
-      this.close()
-    }
+    await this.oncancel(reason)
   }
 }
 </script>
