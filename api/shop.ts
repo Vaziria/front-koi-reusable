@@ -21,7 +21,7 @@ export async function getShopCat (seller_id: string): Promise<Category[]> {
   const params = { seller_id }
   const req = await client.get('public/shop/category', { params })
 
-  return req.data.map((item) => {
+  return req.data.map((item: { key: string }) => {
     return {
       key: item.key,
       name: item.key.charAt(0).toUpperCase() + item.key.slice(1)
