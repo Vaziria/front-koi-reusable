@@ -38,6 +38,8 @@ import { IChatState, ChatMutation, ChatAction } from '../../store/chat'
 import { Namespaced, Store } from '../../store/types'
 import VueWithStore from '../../store/wrapper.vue'
 import { IUserState, UserMutation } from '../../store/user'
+import WithRootEmit from '../../event/WithRootEmit.vue'
+import { BasicRootEvent } from '../../event/basicRootEvent'
 
 type State = {
     'chat': IChatState,
@@ -53,7 +55,10 @@ type ChatStore = Store<State,
 class StoreMix extends VueWithStore<ChatStore> {}
 
 @Component
-class ChatForm extends Mixins(StoreMix, SwalMixin) {
+class RootEmitMix extends WithRootEmit<BasicRootEvent> {}
+
+@Component
+class ChatForm extends Mixins(StoreMix, SwalMixin, RootEmitMix) {
   text = ''
 
   get rowsText (): number {
@@ -77,6 +82,8 @@ class ChatForm extends Mixins(StoreMix, SwalMixin) {
     if (!this.text) {
       this.topedToast('Pesan Anda kosong.', 'OK')
     }
+
+    this.rootEmit('onChat', undefined)
 
     const id = Math.random().toString(36).substring(6)
     const created = new Date().getTime()

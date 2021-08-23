@@ -7,5 +7,6 @@ export interface BasicRootEvent {
   pageloading: {
     show: boolean,
     text: string
-  }
+  },
+  onChat: undefined
 }
