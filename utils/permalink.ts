@@ -6,4 +6,3 @@ function doDashes (str: string): string {
 }
 
 export default doDashes
-  
