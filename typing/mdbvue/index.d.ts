@@ -16,6 +16,13 @@ declare module 'mdbvue'
   export class mdbDropdown extends Vue {
   }
   export class mdbDropdownItem extends Vue {
+    props: {
+      class?: string
+      href?: string
+      disabled?: boolean
+      active?: boolean
+      newTab?: boolean
+    }
   }
   export class mdbDropdownMenu extends Vue {
   }
