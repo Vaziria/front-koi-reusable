@@ -1,4 +1,4 @@
-import { Seller } from '@/reusable/model/seller'
+import { Seller } from '../model/seller'
 
 export function lokasiSeller (seller: Seller): string {
   const { region, city } = seller
