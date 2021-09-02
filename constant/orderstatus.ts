@@ -16,7 +16,7 @@ export const orderStatus: MapValue[] = [
   },
   {
     key: 'pending',
-    name: 'Pending',
+    name: 'Belum Bayar',
     color: '#e83e8c',
     class: ' bg-pink tx-white'
   },
@@ -34,7 +34,7 @@ export const orderStatus: MapValue[] = [
   },
   {
     key: 'selesai',
-    name: 'Pesanan Tiba',
+    name: 'Selesai',
     color: '#28a745',
     class: 'success'
   },

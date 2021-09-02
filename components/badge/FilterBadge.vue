@@ -1,7 +1,7 @@
 <template>
   <a
     :class="{
-      'badge bd px-3 py-2 mr-2 mb-2 rounded-10 tx-12 tx-normal': true,
+      'badge bd px-3 py-2 mr-2 mb-2 rounded-10 tx-12 tx-md-14 tx-normal': true,
       'active': active
     }"
     @click="$emit('click')"

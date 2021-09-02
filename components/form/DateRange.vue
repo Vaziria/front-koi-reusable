@@ -10,11 +10,11 @@
   >
     <template #input="picker">
       <div class="pd-t-2">
-        <span v-if="dateText" class="mr-2">{{ dateText }}</span>
+        <span class="mr-2"><i class="far fa-calendar"></i> {{ dateText }}</span>
         <span v-if="picker.startDate">
           {{ picker.startDate | moment('DD MMM YYYY') }}
         </span>
-        <span class="mx-2">-</span>
+        <span class="mx-1">-</span>
         <span v-if="picker.endDate">
           {{ picker.endDate | moment('DD MMM YYYY') }}
         </span>
@@ -38,6 +38,9 @@
   .daterangepicker {
     top: 40px !important;
     position: absolute !important;
+  }
+  .vue-daterange-picker .form-control {
+    border-radius: 5px;
   }
 </style>
 <script lang="ts">
