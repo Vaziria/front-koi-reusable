@@ -157,7 +157,7 @@ export default class ProductChat extends Mixins(Loading, StoreMix, NavMix, RootE
 
   toIkan (): void {
     if (this.tstore.state.system.isSeller) {
-      open(`${process.env.VUE_APP_FRONT_URL}/product/ikan/${this.shopid}/${this.productid}`)
+      open(`${process.env.VUE_APP_FRONT_URL}/product/${this.product.permalink_id}`)
     } else {
       this.navigation.push('product_ikan', {
         params: {
