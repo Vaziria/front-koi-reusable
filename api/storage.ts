@@ -11,6 +11,8 @@ interface ITaskProps {
 
 type StorageError = 'storage/object-not-found'
 
+const isProduction = process.env.NODE_ENV === 'production'
+
 export class Tasker {
   file: File
   snapshot?: TSnapshot
@@ -48,6 +50,15 @@ export class Tasker {
   }
 }
 
+export function checkTaskProduction (task: () => Promise<string>, defaultResult = 'https://via.placeholder.com/500'): Promise<string> {
+  if (!isProduction) {
+    return new Promise((resolve) => {
+      resolve(defaultResult)
+    })
+  }
+  return task()
+}
+
 export async function deleteFile (url: string): Promise<void> {
   const filePath = url
     .replace('https://firebasestorage.googleapis.com/v0/b/pdc-koi.appspot.com/o', '') // remove url
@@ -58,9 +69,9 @@ export async function deleteFile (url: string): Promise<void> {
   try {
     await storage.ref(filePath).delete()
   } catch (e) {
-    const code = e.code as StorageError
+    const error = e as { code: StorageError }
 
-    if (code === 'storage/object-not-found') {
+    if (error.code === 'storage/object-not-found') {
       console.log('not found')
     } else {
       throw (e)
