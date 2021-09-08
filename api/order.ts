@@ -1,22 +1,21 @@
+/* eslint-disable camelcase */
 import { Order, PaidStatus, StatusOrder } from '../model/order'
 import client from './client'
+import { getAllStatus } from '../mock/order'
+import { isMock, delay } from '../mock'
 
 interface FilterPageOrder {
   q: string
   status: StatusOrder | ''
-  // eslint-disable-next-line camelcase
   pay_status: PaidStatus | ''
   datemin: number
   datemax: number
   offset: number
   limit: number
-  // eslint-disable-next-line camelcase
   order_type: 'desc' | 'asc'
   order: 'created'
   csid: string
-  // eslint-disable-next-line camelcase
   target_kirim_min?: number
-  // eslint-disable-next-line camelcase
   target_kirim_max?: number
 }
 
@@ -26,7 +25,22 @@ interface IBuktiPembayaran {
   orderid: string
 }
 
+export const kurirType = ['bis', 'pesawat', 'travel'] as const
+export type IKurirType = typeof kurirType[number]
+export interface IShippingData {
+  type: IKurirType
+  resi?: string
+  resi_media?: string[]
+  kurir_contact?: string
+}
+
 export async function listOrder (query: Partial<FilterPageOrder>): Promise<Order[]> {
+  if (isMock()) {
+    const { status, pay_status } = query
+    await delay(2000)
+    return getAllStatus(status, pay_status)
+  }
+
   const data = await client.get('/seller/order/list', { params: query })
   return data.data
 }
@@ -40,14 +54,19 @@ export async function getOrder (id: string): Promise<Order> {
   return res.data
 }
 
-export async function updateOrder (id: string, data: Partial<Order>): Promise<Order> {
-  const res = await client.put(`/order/${id}`, data)
+export async function updateOrder (orderid: string, data: Partial<Order>): Promise<Order> {
+  const res = await client.post('/seller/update_order', data, { params: { orderid } })
   return res.data
 }
 
 export async function setOngkir (id: string, ongkir: number): Promise<Order> {
   const res = await client.put('seller/order/set_ongkir', { ongkir: ongkir }, { params: { orderid: id } })
   return res.data
+}
+
+export async function acceptOrder (orderid: string, ongkir: number): Promise<Order> {
+  const data = await client.put('/seller/accept_order', { ongkir }, { params: { orderid } })
+  return data.data
 }
 
 export async function cancelOrder (reason: string, query: { oid: string, shopid: string }): Promise<Order> {
@@ -68,4 +87,8 @@ export async function invoice (query: { shopid: string, oid: string }): Promise<
 
 export async function buktiPembayaran (payload: IBuktiPembayaran): Promise<void> {
   await client.post('/buyer/bukti_pembayaran', payload)
+}
+
+export async function setShipping (orderid: string, payload: IShippingData): Promise<void> {
+  await client.put('/order/update_shipping', payload, { params: { orderid } })
 }

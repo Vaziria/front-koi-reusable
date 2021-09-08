@@ -6,7 +6,7 @@
     :size="size"
     :show="value"
     :direction="direction"
-    @close="$emit('input', false)"
+    @close="$emit('input', false); $emit('close')"
   >
     <mdb-modal-header class="bd-0 px-3" :close="closeIcon">
       <h5 class="tx-bold wd-100p mb-0">{{ headerText }}</h5>

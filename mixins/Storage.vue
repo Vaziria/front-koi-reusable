@@ -12,7 +12,7 @@ type State = {
 type StorageStore = Store<State, Namespaced<UserMutation, 'user'>, Namespaced<UserAction, 'user'>>
 
 @Component
-export default class VueWithStore extends WithStore<StorageStore> {
+export default class StorageMixin extends WithStore<StorageStore> {
   get shopid (): string {
     return this.tstore.state.user.shopid
   }
@@ -40,6 +40,15 @@ export default class VueWithStore extends WithStore<StorageStore> {
       file,
       snapshot,
       path: `/thumbnail/${this.shopid}`
+    })
+    return task.stateChanged()
+  }
+
+  async uploadResiMedia (orderid: string, file: File, snapshot?: TSnapshot): Promise<string> {
+    const task = new Tasker({
+      file,
+      snapshot,
+      path: `/resi/${this.shopid}/${orderid}`
     })
     return task.stateChanged()
   }

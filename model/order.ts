@@ -16,7 +16,7 @@ export interface Address {
 export type PayMethod = 'transfer'
 export type PaidStatus = 'unpaid' | 'paid' | 'unverify'
 
-export const listStatusOrder = ['waitverif', 'submit_cancel', 'pending', 'process', 'dikirim', 'selesai', 'cancel', 'problem'] as const
+export const listStatusOrder = ['waitverif', 'submit_cancel', 'pending', 'process', 'titip', 'dikirim', 'selesai', 'cancel', 'problem'] as const
 export type StatusOrder = typeof listStatusOrder[number];
 
 export interface SellerOrder {
@@ -44,6 +44,7 @@ export interface Order {
   total: number
   diskon: number
   pay_method:PayMethod
+  pay_channel: string
   address: Address
   cancel_reason:string
   created: number

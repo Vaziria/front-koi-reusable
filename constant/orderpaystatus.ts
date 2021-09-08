@@ -12,13 +12,13 @@ export const orderPayStatus: MapValue[] = [
     key: 'unpaid',
     name: 'Menunggu Pembayaran',
     color: '#7987a1',
-    class: 'secondary'
+    class: 'light'
   },
   {
     key: 'unverify',
     name: 'Menunggu Verifikasi',
     color: '#20c997',
-    class: ' bg-teal tx-white'
+    class: 'secondary'
   },
   {
     key: 'paid',
