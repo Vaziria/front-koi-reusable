@@ -11,7 +11,7 @@ export const orderStatus: MapValue[] = [
   {
     key: 'waitverif',
     name: 'Menunggu Konfirmasi',
-    color: '#e83e8c',
+    color: '#ffc107',
     class: 'warning'
   },
   {
@@ -23,13 +23,13 @@ export const orderStatus: MapValue[] = [
   {
     key: 'process',
     name: 'Diproses',
-    color: '#20c997',
+    color: '#00cccc',
     class: ' bg-teal tx-white'
   },
   {
     key: 'titip',
     name: 'Dititipkan',
-    color: '',
+    color: '#3366ff',
     class: 'primary'
   },
   {
@@ -41,7 +41,7 @@ export const orderStatus: MapValue[] = [
   {
     key: 'selesai',
     name: 'Selesai',
-    color: '#28a745',
+    color: '#3bb001',
     class: 'success'
   },
   {
@@ -53,13 +53,13 @@ export const orderStatus: MapValue[] = [
   {
     key: 'submit_cancel',
     name: 'Pengajuan Cancel',
-    color: '#6610f2',
+    color: '#f10075',
     class: ' bg-pink tx-white'
   },
   {
     key: 'problem',
     name: 'Pesanan Bermasalah',
-    color: '#6f42c1',
+    color: '#3b4863',
     class: 'dark'
   }
 ]

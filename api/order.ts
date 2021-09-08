@@ -1,7 +1,7 @@
 /* eslint-disable camelcase */
 import { Order, PaidStatus, StatusOrder } from '../model/order'
 import client from './client'
-import { getAllStatus } from '../mock/order'
+import { getAllStatus, single } from '../mock/order'
 import { isMock, delay } from '../mock'
 
 interface FilterPageOrder {
@@ -80,7 +80,10 @@ export async function finishOrder (query: { oid: string, shopid: string }): Prom
 }
 
 export async function invoice (query: { shopid: string, oid: string }): Promise<Order> {
-  // console.log(query)
+  if (isMock()) {
+    await delay(2000)
+    return single()
+  }
   const res = await client.get('/invoice', { params: query })
   return res.data.data
 }

@@ -10,19 +10,19 @@ export interface MapValue {
 export const orderPayStatus: MapValue[] = [
   {
     key: 'unpaid',
-    name: 'Menunggu Pembayaran',
-    color: '#7987a1',
+    name: 'Belum Bayar',
+    color: '#cdd4e0',
     class: 'light'
   },
   {
     key: 'unverify',
     name: 'Menunggu Verifikasi',
-    color: '#20c997',
+    color: '#7987a1',
     class: 'secondary'
   },
   {
     key: 'paid',
-    name: 'Sudah Bayar',
+    name: 'Lunas',
     color: '#007bff',
     class: 'primary'
   }
