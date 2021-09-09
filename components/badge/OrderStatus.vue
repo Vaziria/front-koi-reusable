@@ -8,6 +8,7 @@ import { Order } from '../../model/order'
 import { Component, Vue, Prop } from 'vue-property-decorator'
 import { orderStatus, MapValue } from '../../constant/orderstatus'
 import { orderPayStatus, MapValue as MapPayValue } from '../../constant/orderpaystatus'
+import { threatTipe, MapValue as MapThreatValue } from '../../constant/threattype'
 
 @Component
 class OrderStatus extends Vue {
@@ -29,16 +30,23 @@ class OrderStatus extends Vue {
     return orderPayStatus[0]
   }
 
+  get threatTipe (): MapThreatValue {
+    const findThreatTipe = threatTipe.find(ttipe => ttipe.key === this.order.threat_tipe)
+    if (findThreatTipe) {
+      return findThreatTipe
+    }
+    return threatTipe[0]
+  }
+
   get statusName (): string {
     const status = this.status.key
-    const payStatus = this.payStatus.key
 
     if (status === 'pending') {
-      if (payStatus === 'unpaid') {
-        return this.payStatus.name
-      } else if (payStatus === 'unverify') {
-        return this.payStatus.name
-      }
+      return this.payStatus.name
+    }
+
+    if (status === 'process') {
+      return this.threatTipe.name
     }
 
     return this.status.name
@@ -46,14 +54,13 @@ class OrderStatus extends Vue {
 
   get statusClass (): string {
     const status = this.status.key
-    const payStatus = this.payStatus.key
 
     if (status === 'pending') {
-      if (payStatus === 'unpaid') {
-        return this.payStatus.class
-      } else if (payStatus === 'unverify') {
-        return this.payStatus.class
-      }
+      return this.payStatus.class
+    }
+
+    if (status === 'process') {
+      return this.threatTipe.class
     }
 
     return this.status.class

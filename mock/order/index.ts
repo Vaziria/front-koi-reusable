@@ -2,6 +2,7 @@ import { BuyerOrder, listStatusOrder, Order } from '../../model/order'
 import { single as singleAddress } from '../address'
 import { single as singleIkan } from '../ikan'
 import { single as singleSeller } from '../seller'
+import { single as sinngleShipping } from './shipping'
 import { getRandomValue, getRandomNum, getPhone, getId } from '../mock'
 
 export function getBuyer (): BuyerOrder {
@@ -17,15 +18,29 @@ export function getBuyer (): BuyerOrder {
   }
 }
 
-export function single (orderStatus?: Order['status'], orderPayStatus?: Order['pay_status']): Order {
+export function single (orderStatus?: Order['status'], orderPayStatus?: Order['pay_status'], threatTipe?: Order['threat_tipe']): Order {
   const statuses: Order['status'][] = [...listStatusOrder]
-  const payStatuses: Order['pay_status'][] = ['unpaid', 'paid', 'unverify']
   const payChannel = getRandomValue(['BCA', 'BRI', 'BNI', 'MANDIRI'])
 
   const status = orderStatus || getRandomValue<Order['status']>(statuses)
-  const payStatus = orderPayStatus || getRandomValue(payStatuses)
+
+  let payStatus: Order['pay_status'] = orderPayStatus || 'unpaid'
+  if (!orderPayStatus && status !== 'waitverif') {
+    if (status === 'pending') {
+      payStatus = getRandomValue<Order['pay_status']>(['unpaid', 'unverify'])
+    } else {
+      payStatus = 'paid'
+    }
+  }
+
+  let threatType: Order['threat_tipe'] = threatTipe || 'ready'
+  if (!threatTipe && status === 'process') {
+    threatType = getRandomValue<Order['threat_tipe']>(['ready', 'karantina', 'titip'])
+  }
+
   let buktiPembayaran = ''
-  const ikans = [singleIkan()]
+  let shipping: Order['shipping']
+  const ikans = [singleIkan(), singleIkan()]
   const subTotal = ikans.reduce((res, item) => {
     res += item.price
     return res
@@ -33,6 +48,10 @@ export function single (orderStatus?: Order['status'], orderPayStatus?: Order['p
 
   if (status !== 'waitverif' && payStatus !== 'unpaid') {
     buktiPembayaran = 'https://mybillbook.in/blog/wp-content/uploads/2021/04/sample-thermal-printer-bill-format.png'
+  }
+
+  if (['dikirim', 'selesai'].includes(status)) {
+    shipping = sinngleShipping()
   }
 
   return {
@@ -55,13 +74,15 @@ export function single (orderStatus?: Order['status'], orderPayStatus?: Order['p
     status,
     sub_total: subTotal,
     target_kirim: 0,
-    total: subTotal
+    total: subTotal,
+    shipping,
+    threat_tipe: threatType
   }
 }
 
-export function getAllStatus (defStatus?: (Order['status'] | ''), defPayStatus?: (Order['pay_status'] | '')): Order[] {
+export function getAllStatus (defStatus?: (Order['status'] | ''), defPayStatus?: (Order['pay_status'] | ''), defThreatTipe?: (Order['threat_tipe'] | '')): Order[] {
   return Array.from(Array(10))
     .map(() => {
-      return single(defStatus || undefined, defPayStatus || undefined)
+      return single(defStatus || undefined, defPayStatus || undefined, defThreatTipe || undefined)
     })
 }

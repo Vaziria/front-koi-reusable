@@ -1,5 +1,6 @@
 /* eslint-disable camelcase */
 import { IIkan } from './ikan'
+import { IShippingData } from './shipping'
 
 export interface Address {
   id?: string
@@ -16,8 +17,11 @@ export interface Address {
 export type PayMethod = 'transfer'
 export type PaidStatus = 'unpaid' | 'paid' | 'unverify'
 
-export const listStatusOrder = ['waitverif', 'submit_cancel', 'pending', 'process', 'titip', 'dikirim', 'selesai', 'cancel', 'problem'] as const
-export type StatusOrder = typeof listStatusOrder[number];
+export const listStatusOrder = ['waitverif', 'submit_cancel', 'pending', 'process', 'dikirim', 'selesai', 'cancel', 'problem'] as const
+export type StatusOrder = typeof listStatusOrder[number]
+
+export const threatTipe = ['titip', 'karantina', 'ready'] as const
+export type ThreatTipe = typeof threatTipe[number]
 
 export interface SellerOrder {
   id: string;
@@ -56,4 +60,6 @@ export interface Order {
   bukti_pembayaran?: string
   seller: SellerOrder
   buyer: BuyerOrder
+  shipping?: IShippingData
+  threat_tipe: ThreatTipe
 }

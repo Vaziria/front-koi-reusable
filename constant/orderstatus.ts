@@ -27,12 +27,6 @@ export const orderStatus: MapValue[] = [
     class: ' bg-teal tx-white'
   },
   {
-    key: 'titip',
-    name: 'Dititipkan',
-    color: '#3366ff',
-    class: 'primary'
-  },
-  {
     key: 'dikirim',
     name: 'Dikirim',
     color: '#17a2b8',
