@@ -11,16 +11,19 @@ import { mdbIcon } from 'mdbvue'
 import VueWithStore from '../../store/wrapper.vue'
 import { Namespaced, Store } from '../../store/types'
 import { ChatAction, ChatMutation, IChatState } from '../../store/chat'
+import { NotifAction, NotifMutation, INotifState } from '../../store/notif'
 import WithNav from '../../navigation/WithNav.vue'
 import { BasicRoute } from '../../navigation/basicroute'
 
 type State = {
-  'chat': IChatState
+  chat: IChatState
+  notif: INotifState
 }
 
 type ChatStore = Store<State, Namespaced<ChatMutation, 'chat'>, Namespaced<ChatAction, 'chat'>>
+type NotifStore = Store<State, Namespaced<NotifMutation, 'notif'>, Namespaced<NotifAction, 'notif'>>
 @Component
-class StoreMix extends VueWithStore<ChatStore> {}
+class StoreMix extends VueWithStore<ChatStore & NotifStore> {}
 
 @Component
 class NavMix extends WithNav<BasicRoute> {}
@@ -32,7 +35,7 @@ class NavMix extends WithNav<BasicRoute> {}
 })
 export default class ChatFloat extends Mixins(StoreMix, NavMix) {
   get unreadChat (): number {
-    return this.tstore.state.chat.unread
+    return this.tstore.state.notif.chatNotifCount
   }
 
   get show (): boolean {

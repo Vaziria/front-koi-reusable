@@ -86,5 +86,5 @@ export async function buktiPembayaran (payload: IBuktiPembayaran): Promise<void>
 }
 
 export async function setShipping (orderid: string, payload: IShippingData): Promise<void> {
-  await client.put('/order/update_shipping', payload, { params: { orderid } })
+  await client.put('/seller/order/update_shipping', payload, { params: { orderid } })
 }

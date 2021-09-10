@@ -1,4 +1,5 @@
 import { Notif, NotifType } from '../model/notif'
+import { BasicNotifType, INotif } from '../model/notifs'
 import client from './client'
 
 interface INotifPayload {
@@ -47,4 +48,11 @@ export async function readAll (): Promise<void> {
 export async function pushNotification (id: string): Promise<unknown> {
   const data = await client.get(`notif/send/${id}`)
   return data.data
+}
+
+export async function publicNotification (params: { tipe: BasicNotifType }): Promise<INotif[]> {
+  const data = await client.get('/notif/list', {
+    params
+  })
+  return data.data.data
 }

@@ -2,32 +2,34 @@ import { readAll } from '../api/notification'
 import { Notif } from '../model/notif'
 import { Commit, Namespaced, Store } from '../store/types'
 import { Module } from 'vuex'
+import { INotif } from '../model/notifs'
 
 export interface INotifState {
-  unread: Notif[]
   unreadCount: number
-  newNotif: Notif[]
+  chatNotifCount: number
+  newNotif: INotif[]
 }
 const state: INotifState = {
-  unread: [],
   unreadCount: 0,
+  chatNotifCount: 0,
   newNotif: []
 }
 
 const mutations = {
   reset_notif (state: INotifState): void {
-    state.unread = []
     state.unreadCount = 0
+    state.chatNotifCount = 0
     state.newNotif = []
   },
-  set_unread (state: INotifState, data: Notif[]): void {
-    state.unread = data
-    state.unreadCount = data.length
+  set_unread (state: INotifState, data: number): void {
+    state.unreadCount = data
   },
-  push_new_notif (state: INotifState, notif: Notif): void {
+  push_new_notif (state: INotifState, notif: INotif): void {
     state.newNotif = [...state.newNotif, notif]
     if (notif.type !== 'new_chat') {
       state.unreadCount += 1
+    } else {
+      state.chatNotifCount += 1
     }
   }
 }
@@ -36,9 +38,9 @@ export type NotifMutation = typeof mutations
 type Context = Commit<NotifMutation> & { state: INotifState }
 
 const actions = {
-  async getUnread (state: Context): Promise<void> {
-    const notif:Notif[] = []
-    state.commit('set_unread', notif)
+  async getUnread (state: Context, getUnread: () => Promise<number>): Promise<void> {
+    const unread = await getUnread()
+    state.commit('set_unread', unread)
   },
   async readAll (state: Context): Promise<void> {
     await readAll()
@@ -47,14 +49,14 @@ const actions = {
 }
 
 // eslint-disable-next-line @typescript-eslint/ban-types
-const Notification: Module<INotifState, {}> = {
+const Notif: Module<INotifState, {}> = {
   namespaced: true,
   state,
   mutations,
   actions
 }
 
-export default Notification
+export default Notif
 
 export type NotifAction = typeof actions
-export type NotifStore = Store<{ 'notif': INotifState }, Namespaced<NotifMutation, 'Notif'>, Namespaced<NotifAction, 'Notif'>>
+export type NotifStore = Store<{ 'notif': INotifState }, Namespaced<NotifMutation, 'notif'>, Namespaced<NotifAction, 'notif'>>

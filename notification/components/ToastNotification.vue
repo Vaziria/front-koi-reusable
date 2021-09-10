@@ -3,34 +3,45 @@
 
     <div v-for="notif in newNotif" :key="notif.id" class="toast">
       <div class="toast-header">
-        <h6 class="tx-inverse tx-14 mg-b-0 mg-r-auto">{{ notif.title }}</h6>
+        <h6 class="tx-inverse tx-bold tx-12 mg-b-0 mg-r-auto">
+          <mdb-icon v-if="notif.icon" :icon="notif.icon" class="mr-1" />
+          {{ notif.title }}
+        </h6>
         <small class="ml-5">{{ notif.created }}</small>
         <button type="button" class="ml-2 mb-1 close tx-normal" @click="() => closeId = [...closeId, notif.id]">
           <span aria-hidden="true">×</span>
         </button>
       </div>
-      <div class="toast-body">
-        {{ notif.body }}
+      <div class="toast-body d-flex">
+        <div v-if="notif.image" class="mr-2 align-self-center">
+          <img :src="notif.image" class="wd-40 ht-40 img-fit-cover rounded-5" />
+        </div>
+        <div class="flex-fill tx-12 tx-gray-700 align-self-center">
+          {{ notif.body }}
+        </div>
       </div>
     </div>
 
   </div>
 </template>
 <script lang="ts">
+import { mdbIcon } from 'mdbvue'
 import { fromNow } from '../../filters/moment'
-import { Notif } from '../../model/notif'
 import { Component } from 'vue-property-decorator'
 import { INotifState, NotifMutation, NotifAction } from '../../store/notif'
 import { Store, Namespaced } from '../../store/types'
 import WithStore from '../../store/wrapper.vue'
+import { INotif } from '../../model/notifs'
+import currency from '../../filters/currency'
 
 interface IToastNotif {
   id: string
+  icon?: string
   title: string
   body: string
   image?: string
   created: string
-  isShow: boolean
+  show: boolean
 }
 
 type State = {
@@ -40,65 +51,85 @@ type State = {
 type NotifStore = Store<State, Namespaced<NotifMutation, 'notif'>, Namespaced<NotifAction, 'notif'>>
 class RootWithStore extends WithStore<NotifStore> {}
 
-@Component
+const notifTimeout = 100000
+
+@Component({
+  components: {
+    mdbIcon
+  }
+})
 class ToastNotification extends RootWithStore {
   closeId: string[] = []
   haveTimeoutId: string[] = []
-  notifTimeout = 30000
-  filteredNotif: Notif['type'][] = ['diskusi', 'update_order', 'new_order', 'new_chat', 'ikan']
 
   get newNotif (): IToastNotif[] {
-    const newNotif = [...this.tstore.state.notif.newNotif]
-      .filter(notif => this.filteredNotif.includes(notif.type))
+    const newNotif = this.tstore.state.notif.newNotif
 
     return newNotif
       .reverse()
       .map(this.setNotifData)
-      .filter(notif => notif.isShow && !this.closeId.includes(notif.id))
+      .filter(notif => notif.show && !this.closeId.includes(notif.id))
   }
 
   generateRandId (): string {
     return Math.random().toString(36).substring(7)
   }
 
-  setNotifData (notif: Notif, index: number): IToastNotif {
-    let { title, body } = notif
-    let image
-    body = body || ''
+  setNotifData (notif: INotif, index: number): IToastNotif {
+    let [title, body] = ['', '']
+    let image, icon
 
-    const id = notif.id || this.generateRandId()
-    const created = fromNow(parseInt(notif.created + ''))
-    const isShow = index < 3
+    const { id, created } = notif
+    const show = index < 3
 
-    if (isShow && !this.haveTimeoutId.includes(id)) {
+    if (show && !this.haveTimeoutId.includes(id)) {
       this.haveTimeoutId = [...this.haveTimeoutId, id]
       setTimeout(() => {
         this.closeId = [...this.closeId, id]
-      }, this.notifTimeout)
+      }, notifTimeout)
     }
 
-    if (notif.type === 'new_chat') {
+    if (
+      notif.type === 'cancel_order' ||
+      notif.type === 'auto_cancel_order' ||
+      notif.type === 'submit_cancel_order' ||
+      notif.type === 'new_order' ||
+      notif.type === 'unverify_paid' ||
+      notif.type === 'selesai' ||
+      notif.type === 'confirm_order' ||
+      notif.type === 'titip_order' ||
+      notif.type === 'process_order' ||
+      notif.type === 'karantina_order' ||
+      notif.type === 'dikirim'
+    ) {
+      title = notif.title
+      body = notif.body
+      image = notif.image
+      icon = 'shopping-bag'
+    } else if (notif.type === 'new_chat') {
       title = 'Chat'
       body = 'Ada chat baru'
     } else if (notif.type === 'diskusi') {
       title = 'Diskusi'
-      body = notif.title
+      body = 'Ada diskusi baru, cek sekarang juga!'
     } else if (notif.type === 'ikan') {
-      title = 'Ikan'
-      body = notif.name
-      image = notif.gambar
-    } else if (notif.type === 'update_order') {
-      title = 'order'
-      body = notif.title
+      title = notif.ikan_name
+      body = `Ikan koi ${notif.category} berkualitas dijual oleh ${notif.seller_name} dengan harga ${currency(notif.price)}`
+      image = notif.image
+    } else if (notif.type === 'system') {
+      title = notif.title
+      body = notif.body
+      image = notif.image
     }
 
     return {
-      id,
+      id: id || created.toString(),
       title,
       body,
       image,
-      created,
-      isShow
+      icon,
+      created: fromNow(parseInt(created + '')),
+      show
     }
   }
 }
