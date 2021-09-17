@@ -13,7 +13,10 @@
     >
     </textarea>
     <a class="az-msg-send"></a>
-    <a class="az-msg-send pos-absolute b-5 r-20" @click="sendMessage()">
+    <a class="az-msg-send pos-absolute b-5 r-20" @click="openRecommendProduct()">
+      recommend
+    </a>
+    <a href="#"  class="az-msg-send pos-absolute b-5 r-20" @click="sendMessage()">
       <i class="fas fa-paper-plane tx-info"></i>
     </a>
   </div>
@@ -99,6 +102,11 @@ class ChatForm extends Mixins(StoreMix, SwalMixin, RootEmitMix) {
     this.text = ''
 
     await this.tstore.dispatch('chat/sendChat', chat)
+  }
+
+  openRecommendProduct (): void {
+    this.tstore.commit('chat/toogleShowRecomend', true)
+    this.tstore.commit('chat/mini_show', false)
   }
 }
 

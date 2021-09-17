@@ -18,6 +18,7 @@ const defaultRef = {
 
 export interface IChatState {
   showMini: boolean
+  showRecomend: boolean
   loading: boolean
   userActive: UserChatBasic
   userid: string
@@ -53,6 +54,7 @@ export const emptyUserActive: UserChatBasic = {
 
 const state: IChatState = {
   showMini: false,
+  showRecomend: false,
   loading: false,
   userActive: emptyUserActive,
   userid: '',
@@ -79,6 +81,10 @@ const mutations = {
     state.loading = data
   },
 
+  toogleShowRecomend (state: IChatState, payload: boolean): void {
+    state.showRecomend = payload
+  },
+
   set_order (state: IChatState, data: null | ChatOrder): void {
     state.product = null
     state.order = data
@@ -86,6 +92,7 @@ const mutations = {
   set_product (state: IChatState, data: null | ChatProduct): void {
     state.order = null
     state.product = data
+    state.showRecomend = false
   },
   reset_user (state: IChatState): void {
     state.userActive = emptyUserActive
