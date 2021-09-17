@@ -67,6 +67,11 @@ export async function cancelOrder (reason: string, query: { oid: string, shopid:
   return data.data
 }
 
+export async function cancelSeller (reason: string, query: { oid: string }): Promise<void> {
+  const data = await client.put('/seller/cancel_order', { reason: reason }, { params: query })
+  return data.data
+}
+
 export async function finishOrder (query: { oid: string, shopid: string }): Promise<Order> {
   const data = await client.put('/buyer/finish_order', null, { params: query })
   return data.data
