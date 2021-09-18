@@ -4,7 +4,7 @@
       <div class="card-body p-1 d-flex">
         <div class="wd-40 ht-40 img-layering mr-3 rounded-10 shadow bd" :style="imgLayer"></div>
         <b class="mg-t-10 mg-l-5 ellipsis wd-100">{{ text }}</b>
-        <a class="p-1" @click="action()"><i class="fas fa-times"></i></a>
+        <a class="p-1 align-self-center" @click="action()"><i class="fas fa-times"></i></a>
       </div>
     </div>
   </div>
@@ -20,10 +20,6 @@ class ChatReply extends Vue {
 
   get imgLayer (): { 'background-image': string } {
     return { 'background-image': `url(${this.image})` }
-  }
-
-  mounted (): void {
-    console.log('test')
   }
 }
 

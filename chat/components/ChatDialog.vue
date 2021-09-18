@@ -2,7 +2,7 @@
   <div :class="{ 'az-msg-wrapper rounded-5 p-2': true, 'op-5': message.send_process }">
     <ProductChat v-if="message.show_product" :productid="message.productid" :shopid="message.shopid"/>
     <OrderChat v-if="message.show_order" :orderid="message.orderid" :shopid="message.shopid" />
-    <div class="d-flex">
+    <div class="d-flex tx-12">
       <span class="wrap mr-2">{{ message.text }}</span>
       <small class="d-block tx-right ml-auto align-self-end op-5">
         <span>{{ parseInt(message.created) | moment('LT') }}</span>

@@ -13,9 +13,6 @@
     >
     </textarea>
     <a class="az-msg-send"></a>
-    <a class="az-msg-send pos-absolute b-5 r-20" @click="openRecommendProduct()">
-      recommend
-    </a>
     <a href="#"  class="az-msg-send pos-absolute b-5 r-20" @click="sendMessage()">
       <i class="fas fa-paper-plane tx-info"></i>
     </a>
@@ -45,14 +42,14 @@ import WithRootEmit from '../../event/WithRootEmit.vue'
 import { BasicRootEvent } from '../../event/basicRootEvent'
 
 type State = {
-    'chat': IChatState,
-    'user': IUserState
+  'chat': IChatState,
+  'user': IUserState
 }
 
 type ChatStore = Store<State,
-    Namespaced<UserMutation, 'user'> &
-    Namespaced<ChatMutation, 'chat'>,
-    Namespaced<ChatAction, 'chat'>>
+  Namespaced<UserMutation, 'user'> &
+  Namespaced<ChatMutation, 'chat'>,
+  Namespaced<ChatAction, 'chat'>>
 
 @Component
 class StoreMix extends VueWithStore<ChatStore> {}
@@ -102,11 +99,6 @@ class ChatForm extends Mixins(StoreMix, SwalMixin, RootEmitMix) {
     this.text = ''
 
     await this.tstore.dispatch('chat/sendChat', chat)
-  }
-
-  openRecommendProduct (): void {
-    this.tstore.commit('chat/toogleShowRecomend', true)
-    this.tstore.commit('chat/mini_show', false)
   }
 }
 

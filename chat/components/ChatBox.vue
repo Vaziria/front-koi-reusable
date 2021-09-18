@@ -169,7 +169,7 @@ export default class ChatBox extends Mixins(StoreMixins, NavMixins) {
       return { ...chat, send_error: true }
     })
     const msgs = [...this.tstore.state.chat.message, ...error, ...unsend]
-    const fixmsgs = msgs.map((chat: ChatUi) => {
+    const fixmsgs = msgs.filter(chat => chat).map((chat: ChatUi) => {
       if (chat.productid) {
         if (!productids.includes(chat.productid)) {
           productids.push(chat.productid)

@@ -10,20 +10,30 @@
     <div :class="`az-img-user ${ user.state } mr-2`">
       <img :src="image">
     </div>
-    <div class="mt-1">
+    <div class="mt-1 flex-fill">
       <h6 class="tx-bold mb-0">{{ user.seller_name || user.name || user.displayName }}<br>
-      <small v-if="user.state === 'online'" class="tx-gray-400">online</small>
-      <small v-else-if="user.last_chat" class="tx-gray-400">Terakhir online {{ parseInt(user.last_chat) | fromNow }}</small>
+        <small v-if="user.state === 'online'" class="tx-gray-400">online</small>
+        <small v-else-if="user.last_chat" class="tx-gray-400">Terakhir online {{ parseInt(user.last_chat) | fromNow }}</small>
       </h6>
     </div>
 
-    <a class="mg-t-10 mg-l-auto mr-2"><i class="fas fa-ellipsis-v tx-18" /></a>
+    <mdb-dropdown v-if="headersActions.length" class="mg-t-10 mr-2">
+      <a slot="toggle"><i class="fas fa-ellipsis-v tx-18" /></a>
+      <mdb-dropdown-menu class="bd-1 rounded-5">
+        <mdb-dropdown-item
+          v-for="(haction, index) in headersActions"
+          :key="index"
+          @click="haction.action()"
+        >{{ haction.name }}</mdb-dropdown-item>
+      </mdb-dropdown-menu>
+    </mdb-dropdown>
     <a v-if="showClose" class="mg-t-10 ml-2 mr-3 d-none d-md-block" @click="close()">
       <i class="fas fa-times tx-18" />
     </a>
   </div>
 </template>
 <script lang="ts">
+import { mdbDropdown, mdbDropdownItem, mdbDropdownMenu } from 'mdbvue'
 import { UserChat } from '../../model/chat'
 import { ISystemState } from '../../store/system'
 import { Component, Mixins } from 'vue-property-decorator'
@@ -41,6 +51,11 @@ type State = {
 
 type ChatStore = Store<State, Namespaced<ChatMutation, 'chat'>, Namespaced<ChatAction, 'chat'>>
 
+interface HeaderAction {
+  name: string
+  action: () => void
+}
+
 @Component
 class StoreMixins extends VueWithStore<ChatStore> {}
 
@@ -48,6 +63,11 @@ class StoreMixins extends VueWithStore<ChatStore> {}
 class NavMixins extends WithNav<BasicRoute> {}
 
 @Component({
+  components: {
+    mdbDropdown,
+    mdbDropdownItem,
+    mdbDropdownMenu
+  },
   filters: {
     fromNow
   }
@@ -55,6 +75,22 @@ class NavMixins extends WithNav<BasicRoute> {}
 class ChatHeader extends Mixins(NavMixins, StoreMixins) {
   get showClose (): boolean {
     return this.tstore.state.system.isMobile !== true
+  }
+
+  get headersActions (): HeaderAction[] {
+    const headersActions: HeaderAction[] = []
+
+    if (this.tstore.state.system.isSeller) {
+      headersActions.push({
+        name: 'Beri Rekomendasi',
+        action: () => {
+          this.tstore.commit('chat/toogleShowRecomend', true)
+          this.tstore.commit('chat/mini_show', false)
+        }
+      })
+    }
+
+    return headersActions
   }
 
   get user (): UserChat {

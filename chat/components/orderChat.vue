@@ -1,14 +1,14 @@
 <template>
-  <div v-if="order != null">
+  <div v-if="order != null" class="mb-2 lh-1">
     <div class="d-flex" @click="toInvoice()">
       <div
         :class="{ 'wd-50 ht-50 img-ikan mr-3 rounded-10 shadow bd': true, 'wd-md-70 ht-md-70': !mini }"
         :style="displayImage"
       ></div>
-      <div>
-        <p class="mb-0 wd-150 ellipsis">{{ order.id }}</p>
-        <b>{{ order.total | currency }}</b>
-        <p class="mb-0"><mdb-icon icon="tag" /> {{ order.status }}</p>
+      <div class="align-self-center">
+        <p class="mb-1 wd-150 ellipsis">{{ order.id }}</p>
+        <b class="mb-1 d-block tx-12">{{ order.total | currency }}</b>
+        <p class="mb-0 tx-12"><mdb-icon icon="tag" /> {{ order.status }}</p>
       </div>
     </div>
   </div>

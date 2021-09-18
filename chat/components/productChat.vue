@@ -1,17 +1,17 @@
 <template>
-  <div>
-    <a v-if="!notFound" class="d-flex" @click="toIkan()">
+  <div class="lh-1">
+    <div v-if="!notFound" class="d-flex mb-2" @click="toIkan()">
       <div
         :class="{ 'wd-50 ht-50 img-ikan mr-3 rounded-10 shadow bd': true, 'wd-md-70 ht-md-70': !mini }"
         :style="displayImage"
       >
       </div>
-      <div>
-      <p class="mb-0 wd-150 ellipsis">{{ product.name }}</p>
-      <b>{{ product.price | currency }}</b>
-      <p class="mb-0"><mdb-icon icon="tag" /> {{ product.kategori }}</p>
+      <div class="align-self-center">
+        <p class="mb-1 wd-150 ellipsis">{{ product.name }}</p>
+        <b class="tx-12 mb-1 d-block">{{ product.price | currency }}</b>
+        <p class="mb-0 tx-12"><mdb-icon icon="tag" /> {{ product.kategori }}</p>
       </div>
-    </a>
+    </div>
     <div v-else class="d-flex mr-3">
       <mdb-icon icon="exclamation-triangle" class="tx-40 mr-3 mb-1" />
       <div>
@@ -33,6 +33,9 @@
   </div>
 </template>
 <style scoped>
+.d-flex {
+  cursor: pointer;
+}
 .img-ikan {
   background-size: cover !important;
   background-position: 50% !important;
