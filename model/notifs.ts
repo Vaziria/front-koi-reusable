@@ -1,5 +1,5 @@
 /* eslint-disable camelcase */
-import { Chat } from './Chat'
+import { Chat } from './chat'
 
 const orderNotifType = ['auto_cancel_order', 'cancel_order', 'new_order', 'unverify_paid', 'selesai', 'submit_cancel_order', 'titip_order', 'confirm_order', 'process_order', 'karantina_order', 'dikirim'] as const
 
