@@ -5,7 +5,8 @@
     <div class="d-flex tx-12">
       <span class="wrap mr-2">{{ message.text }}</span>
       <small class="d-block tx-right ml-auto align-self-end op-5">
-        <span>{{ parseInt(message.created) | moment('LT') }}</span>
+        <br>
+        <span>{{ parseInt(message.created) | moment('DD MMMM YYYY, HH:mm:ss') }}</span>
         <a href="#"><i class="icon ion-android-more-horizontal"></i></a>
         <i v-if="message.error" class="fas fa-exclamation-triangle" />
       </small>
