@@ -3,6 +3,7 @@
     :header-text="headerText"
     class="tx-center tx-13"
     :value="show"
+    :toBasic="true"
     @input="close()"
   >
     <p class="mb-1">Beri alasan untuk membatalkan pesanan</p>

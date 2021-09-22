@@ -9,7 +9,7 @@
     @update="setDateValue"
   >
     <template #input="picker">
-      <div class="pd-t-2">
+      <div class="pd-t-3 tx-12">
         <span class="mr-2"><i class="far fa-calendar"></i> {{ dateText }}</span>
         <span v-if="picker.startDate">
           {{ picker.startDate | moment('DD MMM YYYY') }}
