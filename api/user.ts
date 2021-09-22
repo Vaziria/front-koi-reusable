@@ -1,5 +1,5 @@
 import firebase from 'firebase'
-import { IkanChart, PublicIkan } from '../model/ikan'
+import { CartIkan, IkanChart, PublicIkan } from '../model/ikan'
 import { IUser, PublicUser } from '../model/user'
 import client from './client'
 
@@ -39,4 +39,9 @@ export async function editBuyer (payload: Partial<IUser>): Promise<unknown> {
 export async function getWishlist (): Promise<PublicIkan[]> {
   const req = await client.get('/wishlist')
   return req.data.data
+}
+
+export async function getCarts (): Promise<CartIkan[]> {
+  const req = await client.get('/chart')
+  return req.data.charts
 }
