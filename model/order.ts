@@ -62,4 +62,5 @@ export interface Order {
   buyer: BuyerOrder
   shipping?: IShippingData
   threat_tipe: ThreatTipe
+  is_review?: boolean
 }

@@ -34,7 +34,7 @@
     bottom: -16px;
     width: 100%;
     /*height: 50vh !important;*/
-    max-height: 100% !important;
+    max-height: calc(100% - 120px) !important;
   }
   @media(max-width: 768px) {
     #eb-modal-center .modal-dialog {

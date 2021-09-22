@@ -1,8 +1,8 @@
 import firebase from 'firebase'
 import api from '../api/client'
-import { Notif } from '../model/notif'
+import { INotif } from '../model/notifs'
 
-export type Callback = (notif: Notif) => void
+export type Callback = (notif: INotif) => void
 
 export async function setupNotification (callback: Callback): Promise<void> {
   try {

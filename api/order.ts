@@ -27,6 +27,15 @@ interface IBuktiPembayaran {
   orderid: string
 }
 
+export interface ReviewPayload {
+  msg: string
+  rating: number
+  media: string[]
+  shopid: string
+  orderid: string
+  userid: string
+}
+
 export async function listOrder (query: Partial<FilterPageOrder>): Promise<Order[]> {
   if (isMock()) {
     const { status, pay_status, threat_tipe } = query
@@ -92,4 +101,8 @@ export async function buktiPembayaran (payload: IBuktiPembayaran): Promise<void>
 
 export async function setShipping (orderid: string, payload: IShippingData): Promise<void> {
   await client.put('/seller/order/update_shipping', payload, { params: { orderid } })
+}
+
+export async function addReview (payload: ReviewPayload): Promise<void> {
+  await client.post('/buyer/add_review', payload)
 }

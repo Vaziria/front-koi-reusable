@@ -1,5 +1,5 @@
 <template>
-  <div :class="`badge badge-pill badge-${statusClass} tx-12 tx-bold px-3`">
+  <div :class="`badge badge-${statusClass} tx-12 tx-bold px-3`">
     {{ statusName }}
   </div>
 </template>

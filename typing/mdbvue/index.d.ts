@@ -30,5 +30,7 @@ declare module 'mdbvue'
   }
   export class mdbModalTitle extends Vue {
   }
+  export class mdbRating extends Vue {
+  }
 
 }
