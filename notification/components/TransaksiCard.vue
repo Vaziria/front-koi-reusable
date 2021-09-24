@@ -1,7 +1,7 @@
 <template>
   <a
     :class="{
-      'list-group-item px-3 bd-0 d-flex': true,
+      'list-group-item px-3 bd-x-0 bd-gray-200 d-flex': true,
       'bg-gray-100': notif.unread
     }"
     @click="onAction()"
@@ -10,7 +10,7 @@
       <div class="d-flex mb-2">
         <div class="flex-fill">
           <h6 class="tx-bold flex-fill mb-1"><mdb-icon icon="shopping-bag mr-2" />{{ notif.title }}</h6>
-          <p class="tx-uppercase tx-gray-400 mb-0 tx-10">{{ notif.created | fromNow }}</p>
+          <p class="tx-gray-400 mb-0 tx-10">{{ notif.created | fromNow }}</p>
           <p class="tx-uppercase tx-gray-400 mb-0 tx-10">invoice#{{ notif.orderid }}</p>
         </div>
         <div class="mr-l align-self-center">

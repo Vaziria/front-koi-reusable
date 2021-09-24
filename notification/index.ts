@@ -8,16 +8,16 @@ export async function setupNotification (callback: Callback): Promise<void> {
   try {
     const messaging = firebase.messaging()
     const token = await messaging.getToken({
-      vapidKey: 'BPkJ7JjX4xqRTTaXqcGHGdY5JTMQvxkyl16N2gI05hLHkcBFCf7d8lt_kEh_vfpJAgpOvx7gPE1FkScSeKWmY18'
+      vapidKey: 'BKN-qP7Y0rpJAc4VYmzAurKgEy2rw5PF8FgzTjZtWTRiQQSn5eawwhhQzCHc4BKKjIENIJOjuW9Q9sG_qWlhsdI'
     })
 
     try {
       await api.post('/reg-notif', { token })
       messaging.onMessage((notif) => callback(notif.data))
     } catch (e) {
-      console.log(e)
+      console.error(e)
     }
   } catch (e) {
-    console.log(e)
+    console.error(e)
   }
 }
