@@ -1,5 +1,4 @@
 import { readAll } from '../api/notification'
-import { Notif } from '../model/notif'
 import { Commit, Namespaced, Store } from '../store/types'
 import { Module } from 'vuex'
 import { INotif } from '../model/notifs'

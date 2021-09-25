@@ -17,4 +17,5 @@ export interface Seller {
     created: number
     state: string
     photoUrl: string
+    avg_rating?: number
 }

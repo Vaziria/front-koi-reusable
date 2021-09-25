@@ -8,7 +8,7 @@ export async function setupNotification (callback: Callback): Promise<void> {
   try {
     const messaging = firebase.messaging()
     const token = await messaging.getToken({
-      vapidKey: 'BKN-qP7Y0rpJAc4VYmzAurKgEy2rw5PF8FgzTjZtWTRiQQSn5eawwhhQzCHc4BKKjIENIJOjuW9Q9sG_qWlhsdI'
+      vapidKey: process.env.VUE_APP_VAPID_KEY
     })
 
     try {
