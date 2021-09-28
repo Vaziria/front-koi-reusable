@@ -31,7 +31,7 @@ export interface INotifIkan {
   seller_name: string
   unread: boolean
   created: number
-
+  permalink_id: string
 }
 
 export interface INotifOrder {
@@ -62,6 +62,8 @@ export interface INotifDiskusi {
   userid: string
   unread: boolean
   created: number
+  title: string
+  permalink_id: string
 }
 
 export interface INotifSystem {

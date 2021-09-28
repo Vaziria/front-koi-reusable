@@ -1,6 +1,6 @@
 <template>
   <div class="">
-    <ChatHeader />
+    <ChatHeader :no-close="noClose" />
 
     <div
       id="azChatBody"
@@ -70,7 +70,7 @@
   }
 </style>
 <script lang="ts">
-import { Component, Mixins, Watch } from 'vue-property-decorator'
+import { Component, Mixins, Watch, Prop } from 'vue-property-decorator'
 import $ from 'jquery'
 import InfiniteLoading from 'vue-infinite-loading'
 
@@ -123,6 +123,8 @@ class NavMixins extends WithNav<BasicRoute> {}
   }
 })
 export default class ChatBox extends Mixins(StoreMixins, NavMixins) {
+  @Prop() readonly noClose!: boolean
+
   get loading (): boolean {
     return this.tstore.state.chat.loading
   }

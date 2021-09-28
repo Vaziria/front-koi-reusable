@@ -23,6 +23,7 @@
     position: absolute;
     bottom: 0;
     width: 100%;
+    border-bottom-right-radius: 10px;
   }
   textarea {
     resize:none;

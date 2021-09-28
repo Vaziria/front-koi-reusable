@@ -32,11 +32,16 @@
     </a>
   </div>
 </template>
+<style scoped>
+  .pos-head-fixed {
+    border-top-right-radius: 10px;
+  }
+</style>
 <script lang="ts">
 import { mdbDropdown, mdbDropdownItem, mdbDropdownMenu } from 'mdbvue'
 import { UserChat } from '../../model/chat'
 import { ISystemState } from '../../store/system'
-import { Component, Mixins } from 'vue-property-decorator'
+import { Component, Mixins, Prop } from 'vue-property-decorator'
 import { fromNow } from '../../filters/moment'
 import { ChatAction, ChatMutation, IChatState } from '../../store/chat'
 import { Store, Namespaced } from '../../store/types'
@@ -73,8 +78,14 @@ class NavMixins extends WithNav<BasicRoute> {}
   }
 })
 class ChatHeader extends Mixins(NavMixins, StoreMixins) {
+  @Prop() readonly noClose !: boolean
+
+  get isMobile (): boolean {
+    return this.tstore.state.system.isMobile
+  }
+
   get showClose (): boolean {
-    return this.tstore.state.system.isMobile !== true
+    return !this.noClose && !this.isMobile
   }
 
   get headersActions (): HeaderAction[] {
