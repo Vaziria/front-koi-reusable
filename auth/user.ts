@@ -60,7 +60,10 @@ export class AuthUser {
     }
   }
 
-  registerAuthRouter (): void {
-    this.auth.onAuthStateChanged((user) => this.userStateChanged(user))
+  registerAuthRouter (callback?: (user: firebase.User|null) => void|Promise<void>): void {
+    this.auth.onAuthStateChanged((user) => {
+      callback && callback(user)
+      this.userStateChanged(user)
+    })
   }
 }
