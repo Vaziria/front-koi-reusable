@@ -8,9 +8,11 @@
     :direction="direction"
     @close="$emit('input', false); $emit('close')"
   >
-    <mdb-modal-header class="bd-0 px-3" :close="closeIcon">
-      <h5 class="tx-bold wd-100p mb-0">{{ headerText }}</h5>
-    </mdb-modal-header>
+    <slot name="header">
+      <mdb-modal-header class="bd-0 px-3" :close="closeIcon">
+        <h5 class="tx-bold wd-100p mb-0">{{ headerText }}</h5>
+      </mdb-modal-header>
+    </slot>
     <mdb-modal-body class="pt-0 px-3 pos-relative">
       <slot></slot>
     </mdb-modal-body>
