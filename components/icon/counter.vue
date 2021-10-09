@@ -7,12 +7,13 @@
 <style scoped>
 .counter {
   position: absolute;
-  top: -10px;
+  top: -5px;
   right: -10px;
   align-items: center;
   font-size: 9px;
   font-weight: 500;
   box-shadow: 0 0 0 2px #fff;
+  z-index: 2;
 }
 </style>
 <script lang="ts">

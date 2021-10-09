@@ -9,6 +9,7 @@ import { NotifStore } from '../store/notif'
 import { specialLog } from '../utils/logger'
 
 type Store = UserStore & ChatStore & NotifStore
+const notifids: string[] = []
 
 export async function getAccess (uid: string): Promise<Access | null> {
   const doc = await db.collection('Access').doc(uid).get()
@@ -35,14 +36,12 @@ export class AuthUser {
   }
 
   async setupNotification (userid: string): Promise<void> {
+    specialLog('setup notif', userid)
     await setupNotification((notif) => {
-      const selfChat = notif.type === 'new_chat' && notif.from_id === userid
-      const selfDiskusi = notif.type === 'diskusi' && notif.userid === userid
-      if (selfChat || selfDiskusi) {
-        return
+      if (!notifids.includes(notif.id)) {
+        notifids.push(notif.id)
+        this.store.commit('notif/push_new_notif', notif)
       }
-
-      this.store.commit('notif/push_new_notif', notif)
     })
   }
 
@@ -55,7 +54,7 @@ export class AuthUser {
       setupPresence(user.uid, db, realdb)
     } else {
       this.store.commit('user/set_logout')
-      this.store.commit('chat/reset_msg')
+      this.store.commit('chat/reset_message')
       this.store.commit('chat/reset_user')
     }
   }

@@ -20,9 +20,27 @@ const mutations = {
     state.chatNotifCount = 0
     state.newNotif = []
   },
+
+  reset_chat_notif (state: INotifState): void {
+    state.chatNotifCount = 0
+  },
+
   set_unread (state: INotifState, data: number): void {
     state.unreadCount = data
   },
+
+  set_chat_unread (state: INotifState, data: number): void {
+    state.chatNotifCount = data
+  },
+
+  add_notif_unread (state: INotifState, add: number): void {
+    state.unreadCount += add
+  },
+
+  add_chat_unread (state: INotifState, add: number): void {
+    state.chatNotifCount += add
+  },
+
   push_new_notif (state: INotifState, notif: INotif): void {
     state.newNotif = [...state.newNotif, notif]
     if (notif.type !== 'new_chat') {
@@ -41,6 +59,12 @@ const actions = {
     const unread = await getUnread()
     state.commit('set_unread', unread)
   },
+
+  async geChattUnread (state: Context, getUnread: () => Promise<number>): Promise<void> {
+    const unread = await getUnread()
+    state.commit('set_chat_unread', unread)
+  },
+
   async readAll (state: Context): Promise<void> {
     await readAll()
     state.commit('reset_notif')

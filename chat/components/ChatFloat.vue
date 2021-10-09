@@ -51,7 +51,6 @@ export default class ChatFloat extends Mixins(StoreMix, NavMix) {
 
   async toggleShow (): Promise<void> {
     this.tstore.commit('chat/mini_show', !this.show)
-    this.tstore.commit('chat/reset_unread')
     if (this.show) {
       await this.tstore.dispatch('chat/open')
     }

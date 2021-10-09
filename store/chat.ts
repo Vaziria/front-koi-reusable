@@ -3,37 +3,37 @@ import { Chat, ChatOrder, ChatProduct, UserChat, UserChatBasic, UserChatSeller }
 import { ISystemState } from '../store/system'
 import { Commit, Namespaced, Store } from '../store/types'
 import { IUserState } from '../store/user'
-import { StateChanger } from 'vue-infinite-loading'
 import { Module } from 'vuex'
 import { getShop } from '../api/shop'
+import { getUser } from '../api/user'
 
 const perpage = 20
 const contactPerpage = 20
-const defaultRef = {
-  complete: function (): void { 'test' },
-  reset: function (): void { 'test' },
-  loaded: function (): void { 'test' },
-  error: function (): void { 'test' }
-}
 
 export interface IChatState {
+  // chat action
   showMini: boolean
   showRecomend: boolean
-  loading: boolean
   userActive: UserChatBasic
-  userid: string
-  product: ChatProduct | null
-  order: ChatOrder | null
-  message: Chat[],
-  unsend: Chat[],
-  errorchat: Chat[],
-  userlist: UserChat[],
-  productids: string[],
+
+  // extra
+  productids: string[]
   orderids: string[]
   unread: number
-  contactRef: StateChanger
-  chatRef: StateChanger
+
+  // messages
+  product: ChatProduct | null
+  order: ChatOrder | null
+  message: Chat[]
+  unsend: Chat[]
+  errorchat: Chat[]
+  loading: boolean
   endpage: boolean
+
+  // contact
+  userlist: UserChat[]
+  contactEndpage: boolean
+  contactLoading: boolean
 }
 
 export const emptyUserActive: UserChatBasic = {
@@ -57,7 +57,6 @@ const state: IChatState = {
   showRecomend: false,
   loading: false,
   userActive: emptyUserActive,
-  userid: '',
   message: [],
   unsend: [],
   errorchat: [],
@@ -67,18 +66,14 @@ const state: IChatState = {
   productids: [],
   orderids: [],
   unread: 0,
-  contactRef: defaultRef,
-  chatRef: defaultRef,
-  endpage: false
+  endpage: false,
+  contactEndpage: false,
+  contactLoading: false
 }
 
 const mutations = {
   mini_show (state: IChatState, data: boolean): void {
     state.showMini = data
-  },
-
-  loading (state: IChatState, data: boolean): void {
-    state.loading = data
   },
 
   toogleShowRecomend (state: IChatState, payload: boolean): void {
@@ -89,14 +84,17 @@ const mutations = {
     state.product = null
     state.order = data
   },
+
   set_product (state: IChatState, data: null | ChatProduct): void {
     state.order = null
     state.product = data
     state.showRecomend = false
   },
+
   reset_user (state: IChatState): void {
     state.userActive = emptyUserActive
   },
+
   set_user (state: IChatState, user: UserChat): void {
     state.userActive = user
     const ada = state.userlist.filter(userchat => {
@@ -108,12 +106,54 @@ const mutations = {
       state.userlist.unshift(user)
     }
   },
+
   set_user_list (state: IChatState, data: UserChat[]): void {
-    state.userlist = data
-  },
-  push_user_list (state: IChatState, data: UserChat[]): void {
     state.userlist = [...state.userlist, ...data]
+    state.contactLoading = false
+    state.contactEndpage = data.length < contactPerpage
   },
+
+  reset_user_list (): void {
+    state.userlist = []
+    state.contactEndpage = false
+  },
+
+  set_message (state: IChatState, data: Chat[]): void {
+    state.message = [...data, ...state.message]
+    state.loading = false
+    state.endpage = data.length < perpage
+    state.unsend = []
+    state.errorchat = []
+    state.orderids = []
+    state.productids = []
+  },
+
+  reset_message (state: IChatState): void {
+    state.message = []
+    state.endpage = false
+  },
+
+  push_message (state: IChatState, data: Chat): void {
+    state.message.push(data)
+  },
+
+  push_message_error (state: IChatState, data: Chat): void {
+    state.errorchat.push(data)
+  },
+
+  push_message_unsend (state: IChatState, data: Chat): void {
+    state.unsend.push(data)
+  },
+
+  remove_message_unsend (state: IChatState, data: Chat): void {
+    state.unsend = state.unsend.filter(chat => {
+      if (chat.id === data.id) {
+        return false
+      }
+      return true
+    })
+  },
+
   set_user_read (state: IChatState, id: string): void {
     state.userlist = state.userlist.map(user => {
       let unread = user.unread
@@ -123,6 +163,7 @@ const mutations = {
       return { ...user, unread }
     })
   },
+
   set_user_unread (state: IChatState, id: string): void {
     state.userlist = state.userlist.map(user => {
       let unread = user.unread
@@ -132,74 +173,18 @@ const mutations = {
       return { ...user, unread }
     })
   },
+
   clear_order_product (state: IChatState): void {
     state.order = null
     state.product = null
   },
-  set_message (state: IChatState, msg: Chat[]): void {
-    state.loading = false
-    state.message = msg
-    state.unsend = []
-    state.errorchat = []
-    state.orderids = []
-    state.productids = []
-  },
-  unshift_message (state: IChatState, data: Chat[]): void {
-    state.message = [...data, ...state.message]
-  },
-  push_message (state: IChatState, data: Chat): void {
-    state.message.push(data)
-  },
-  push_message_error (state: IChatState, data: Chat): void {
-    state.errorchat.push(data)
-  },
-  push_message_unsend (state: IChatState, data: Chat): void {
-    state.unsend.push(data)
-  },
-  remove_message_unsend (state: IChatState, data: Chat): void {
-    state.unsend = state.unsend.filter(chat => {
-      if (chat.id === data.id) {
-        return false
-      }
-      return true
-    })
-  },
-  reset_msg (state: IChatState): void {
-    state.message = []
-  },
+
   add_unread (state: IChatState, num: number): void {
     state.unread += num
   },
+
   reset_unread (state: IChatState): void {
     state.unread = 0
-  },
-  set_contact_ref (state: IChatState, data: StateChanger): void {
-    state.contactRef = data
-  },
-  set_chat_ref (state: IChatState, data: StateChanger): void {
-    state.chatRef = data
-  },
-  ref_contact_action (state: IChatState, length: number): void {
-    if (length === 0 || length < contactPerpage) {
-      state.endpage = true
-      state.contactRef.complete()
-    } else {
-      state.endpage = false
-      setTimeout(() => {
-        state.contactRef.loaded()
-      }, 3000)
-    }
-  },
-  ref_action (state: IChatState, length: number): void {
-    if (length === 0 || length < perpage) {
-      state.endpage = true
-      state.chatRef.complete()
-    } else {
-      state.endpage = false
-      setTimeout(() => {
-        state.chatRef.loaded()
-      }, 3000)
-    }
   }
 }
 
@@ -212,45 +197,65 @@ type Context = Commit<ChatMutation> & { state: IChatState } & { rootState: RootS
 
 const actions = {
   async open (store: Context): Promise<void> {
-    const { commit, rootState } = store
-    commit('mini_show', true)
-    commit('set_user_list', [])
+    const { state } = store
+    state.userlist = []
+    state.message = []
+    state.showMini = true
+  },
+
+  async openContact (store: Context): Promise<void> {
+    const { commit, rootState, state } = store
+    state.userlist = []
+    state.contactLoading = true
     const userlist = await chatList(rootState.system.isSeller, {
       limit: contactPerpage
     })
     commit('set_user_list', userlist)
-    commit('ref_contact_action', userlist.length)
   },
 
-  async openChat (store: Context, user: UserChat): Promise<void> {
-    const { commit } = store
-    commit('set_user', user)
+  async paginateContact (store: Context): Promise<void> {
+    const { commit, state, rootState } = store
+    const { isSeller } = rootState.system
+
+    const userlist = await chatList(isSeller, {
+      start_after: state.userlist[state.userlist.length - 1].id,
+      limit: contactPerpage
+    })
+
+    commit('set_user_list', userlist)
   },
 
-  async openChatSeller (store: Context, uid: string): Promise<void> {
-    const { commit } = store
+  async openChat (store: Context, user: UserChat|string): Promise<void> {
+    const { commit, rootState } = store
+    state.message = []
+    state.loading = true
+    commit('set_user', emptyUserActive)
 
-    const seller = await getShop(uid)
-
-    const userChat: UserChatSeller = {
-      ...seller,
-      is_seller: true,
-      unread: 0,
-      last_chat: Date.now(),
-      last_msg: {
-        id: '',
-        from_id: '',
-        to_id: '',
-        created: Date.now()
-      },
-      id: seller.id,
-      name: '',
-      seller_name: seller.seller_name,
-      state: seller.state,
-      photoUrl: seller.profile_image || seller.photoUrl
+    if (typeof user === 'string') {
+      if (rootState.system.isSeller) {
+      // seller
+        const userActive = await getUser(user)
+        const userChat: UserChat = {
+          ...emptyUserActive,
+          id: userActive.id,
+          name: userActive.name,
+          photoUrl: userActive.photoUrl || ''
+        }
+        commit('set_user', userChat)
+      } else {
+      // user
+        const seller = await getShop(user)
+        const userChat: UserChatSeller = {
+          ...emptyUserActive,
+          ...seller,
+          is_seller: true
+        }
+        commit('set_user', userChat)
+      }
+    } else {
+      // is user
+      commit('set_user', user)
     }
-
-    commit('set_user', userChat)
   },
 
   async getMessage (store: Context): Promise<void> {
@@ -261,9 +266,12 @@ const actions = {
       return
     }
 
-    commit('set_message', [])
-    commit('loading', true)
-    store.state.chatRef.reset()
+    store.state = {
+      ...state,
+      message: [],
+      loading: true
+    }
+
     let msg: Chat[] = []
     try {
       await chatRead(state.userActive.id, isSeller)
@@ -278,25 +286,28 @@ const actions = {
     const fixmsg: Chat[] = msg.reverse()
     commit('set_user_read', uid)
     commit('set_message', fixmsg)
-    commit('ref_action', fixmsg.length)
+  },
+
+  async paginateChat (store: Context): Promise<void> {
+    const { commit, state, rootState } = store
+    const { isSeller } = rootState.system
+
+    const msg = await chatMessages(state.userActive.id, {
+      seller: isSeller,
+      start_after: state.message[0].id,
+      limit: perpage
+    })
+
+    commit('set_message', msg.reverse())
   },
 
   async pushChat (store: Context, chat: Chat): Promise<void> {
-    const { commit, state, rootState } = store
-    const { isSeller } = rootState.system
+    const { commit, state } = store
 
     if (chat.from_id === state.userActive.id) {
       commit('push_message', chat)
     } else {
       commit('set_user_unread', chat.from_id)
-    }
-
-    const userids = state.userlist.map(user => user.id)
-    if (userids.includes(chat.from_id)) {
-      const userlist = await chatList(isSeller, {
-        limit: contactPerpage
-      })
-      commit('set_user_list', userlist)
     }
   },
 
@@ -335,32 +346,6 @@ const actions = {
     }
 
     commit('clear_order_product')
-  },
-
-  async paginateContact (store: Context): Promise<void> {
-    const { commit, state, rootState } = store
-    const { isSeller } = rootState.system
-
-    const userlist = await chatList(isSeller, {
-      start_after: state.userlist[state.userlist.length - 1].id,
-      limit: contactPerpage
-    })
-    commit('push_user_list', userlist)
-    commit('ref_contact_action', userlist.length)
-  },
-
-  async paginate (store: Context): Promise<void> {
-    const { commit, state, rootState } = store
-    const { isSeller } = rootState.system
-
-    const msg = await chatMessages(state.userActive.id, {
-      seller: isSeller,
-      start_after: state.message[0].id,
-      limit: perpage
-    })
-
-    commit('unshift_message', msg.reverse())
-    commit('ref_action', msg.length)
   },
 
   close (store: Context): void {

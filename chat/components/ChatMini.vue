@@ -90,10 +90,6 @@ export default class ChatMini extends VueWithStore<ChatStore> {
     return this.tstore.state.chat.showMini
   }
 
-  get userid (): string {
-    return this.tstore.state.chat.userid
-  }
-
   get showChatbox (): boolean {
     const show = this.tstore.state.chat.userActive.id !== ''
     return show

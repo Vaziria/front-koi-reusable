@@ -72,7 +72,7 @@
 <script lang="ts">
 import { Component, Mixins, Watch, Prop } from 'vue-property-decorator'
 import $ from 'jquery'
-import InfiniteLoading from 'vue-infinite-loading'
+import InfiniteLoading, { StateChanger } from 'vue-infinite-loading'
 
 import ChatLoading from './ChatLoading.vue'
 import ChatHeader from './ChatHeader.vue'
@@ -194,24 +194,24 @@ export default class ChatBox extends Mixins(StoreMixins, NavMixins) {
 
   @Watch('user')
   async updateUser (): Promise<void> {
-    await this.tstore.dispatch('chat/getMessage')
-    this.scrollchat()
+    const infiniteLoading = this.$refs.infiniteLoading as InfiniteLoading
+    infiniteLoading.stateChanger.reset()
+    this.tstore.commit('chat/reset_message')
   }
 
-  async mounted (): Promise<void> {
-    // if (this.isMobile) {
-    //   if (this.user.id === '') {
-    //     this.navigation.router.back()
-    //   }
-    // }
-    this.tstore.commit('chat/set_chat_ref', (this.$refs.infiniteLoading as InfiniteLoading).stateChanger)
-    await this.tstore.dispatch('chat/getMessage')
-    this.scrollchat()
-  }
+  async infiniteHandler ($state: StateChanger): Promise<void> {
+    const { message, endpage } = this.tstore.state.chat
+    if (message.length) {
+      await this.tstore.dispatch('chat/paginateChat')
+    } else {
+      await this.tstore.dispatch('chat/getMessage')
+      this.scrollchat()
+    }
 
-  async infiniteHandler (): Promise<void> {
-    if (this.tstore.state.chat.message.length) {
-      await this.tstore.dispatch('chat/paginate')
+    if (endpage) {
+      $state.complete()
+    } else {
+      $state.loaded()
     }
   }
 
