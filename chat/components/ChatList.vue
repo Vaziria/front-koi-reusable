@@ -18,16 +18,16 @@
     </div>
     <div
       id="azChatList"
-      class="az-chat-list mt-2 overflow-auto"
+      class="az-chat-list mt-2 overflow-auto bg-white"
     >
       <div
         v-for="(chat, key) in userlist"
         :key="key"
         :class="{
           'media new py-2': true,
-          selected: user.id === chat.id
+          selected: !isMobile && user.id === chat.id
         }"
-        @click="setActive(chat)"
+        @click="contactAction(chat)"
       >
         <div :class="`wd-30 ht-30 az-img-user ${ chat.state }`">
           <img :src="chat.photoUrl || chat.profile_image || defaultImg" alt="">
@@ -53,25 +53,41 @@
         </div>
       </div>
       <InfiniteLoading ref="infiniteLoading" @infinite="infiniteHandler">
-        <div slot="spinner">
-          <div v-for="i in 6" :key="i" class="d-flex my-3">
-            <div class="mx-3">
-              <div class="wd-35 ht-35 bg-loading rounded-circle"></div>
-            </div>
-            <div class="wd-100p mr-3">
-              <div class="wd-100p ht-15 bg-loading mb-1"></div>
-              <div class="wd-100p ht-10 bg-loading mb-2"></div>
-            </div>
-          </div>
-        </div>
+        <div slot="spinner"></div>
         <div slot="no-more"></div>
         <div slot="no-results"></div>
       </InfiniteLoading>
 
+      <div v-if="showLoading">
+        <div v-for="i in 6" :key="i" class="d-flex my-3">
+          <div class="mx-3">
+            <div class="wd-35 ht-35 bg-loading rounded-circle"></div>
+          </div>
+          <div class="wd-100p mr-3">
+            <div class="wd-100p ht-15 bg-loading mb-1"></div>
+            <div class="wd-100p ht-10 bg-loading mb-2"></div>
+          </div>
+        </div>
+      </div>
+
+      <slot
+        v-if="noResult"
+        name="noresults"
+      >
+        <div class="p-2 tx-center">
+           <mdb-icon far icon="comments tx-gray-400 pos-relative" size=3x />
+          <p class="tx-12 tx-gray-400">tidak ada kontak ditemukan</p>
+        </div>
+      </slot>
     </div>
   </div>
 </template>
 <style scoped>
+  #azChatList {
+    position: absolute;
+    width: 100%;
+    height: calc(100% - 81px) !important;
+  }
   .form-control::placeholder {
     font-size: 12px;
   }
@@ -90,13 +106,14 @@
   {
     background-color: #97a3b9;
   }
+
+  @media (max-width: 768px) {
+    #azChatList {
+      height: calc(100% - 100px) !important;
+    }
+  }
 </style>
 <style>
-  #azChatList {
-    position: absolute;
-    width: 100%;
-    height: calc(100% - 81px) !important;
-  }
   .chatlist div div .vs__selected {
     color:  rgba(0,0,0,.4);
     border-radius: 5px !important;
@@ -116,7 +133,7 @@
   }
 </style>
 <script lang="ts">
-import { Component, Mixins } from 'vue-property-decorator'
+import { Component, Prop, Mixins } from 'vue-property-decorator'
 import InfiniteLoading, { StateChanger } from 'vue-infinite-loading'
 
 import { mdbIcon } from 'mdbvue'
@@ -153,6 +170,8 @@ class StoreMixins extends VueWithStore<ChatStore> {}
   }
 })
 export default class ChatList extends Mixins(StoreMixins, NavMixins) {
+  @Prop() readonly action!: (user: UserChat) => void|Promise<void>
+
   filterActive = 'keyword'
   q = ''
   defaultImg = require('../../../assets/img/avatar/user.png')
@@ -169,15 +188,33 @@ export default class ChatList extends Mixins(StoreMixins, NavMixins) {
     return this.tstore.state.chat.userActive
   }
 
+  get showLoading (): boolean {
+    const { contactLoading, userlist } = this.tstore.state.chat
+    return userlist.length === 0 && contactLoading
+  }
+
+  get noResult (): boolean {
+    const { contactLoading, userlist } = this.tstore.state.chat
+    return userlist.length === 0 && !contactLoading
+  }
+
   get userlist (): UserChat[] {
     const userlist = this.tstore.state.chat.userlist
-    const data = userlist.filter(user => {
-      if (this.q === '') {
-        return true
-      } else {
-        return user.name.toLowerCase().search(this.q.toLowerCase()) !== -1
-      }
-    })
+    const data = userlist
+      .filter(user => {
+        if (this.q === '') {
+          return true
+        } else {
+          return user.name.toLowerCase().search(this.q.toLowerCase()) !== -1
+        }
+      })
+      .sort((currentUser, nextUser) => {
+        if (currentUser.last_chat < nextUser.last_chat) {
+          return 1
+        }
+
+        return -1
+      })
 
     return data
   }
@@ -185,7 +222,7 @@ export default class ChatList extends Mixins(StoreMixins, NavMixins) {
   async infiniteHandler ($state: StateChanger): Promise<void> {
     const { userlist, contactEndpage } = this.tstore.state.chat
 
-    if (userlist.length) {
+    if (!contactEndpage && userlist.length) {
       await this.tstore.dispatch('chat/paginateContact')
     } else {
       await this.tstore.dispatch('chat/openContact')
@@ -198,13 +235,16 @@ export default class ChatList extends Mixins(StoreMixins, NavMixins) {
     }
   }
 
-  async setActive (user: UserChat): Promise<void> {
-    if (this.isMobile) {
-      await this.tstore.dispatch('chat/openChat', user)
-      this.navigation.push('user_chat', {})
-    } else {
-      this.tstore.commit('chat/clear_order_product')
-      await this.tstore.dispatch('chat/openChat', user)
+  async contactAction (user: UserChat): Promise<void> {
+    if (this.user.id !== user.id) {
+      if (this.action) {
+        // await this.tstore.dispatch('chat/openChat', user)
+        // this.navigation.push('user_chat', {})
+        this.action(user)
+      } else {
+        this.tstore.commit('chat/clear_order_product')
+        await this.tstore.dispatch('chat/openChat', user)
+      }
     }
   }
 }

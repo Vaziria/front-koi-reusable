@@ -31,10 +31,24 @@ export interface UserChatBasic {
     profile_image?: string
 }
 
+export interface ChatInfoBuyer {
+    last_chat: number
+    cs_id: string
+    last_msg: Chat
+    unread: number
+}
+
+export interface ChatInfoSeller {
+    last_chat: number
+    last_msg: Chat
+    unread: number
+}
+
 type UserChatUser = UserChatBasic & IUser
 export type UserChatSeller = UserChatBasic & Seller & { is_seller?: boolean }
 
 export type UserChat = UserChatUser | UserChatSeller | UserChatBasic
+export type ChatInfo = ChatInfoBuyer | ChatInfoSeller
 
 export interface ChatOrder {
     id: string

@@ -40,7 +40,11 @@ export class AuthUser {
     await setupNotification((notif) => {
       if (!notifids.includes(notif.id)) {
         notifids.push(notif.id)
-        this.store.commit('notif/push_new_notif', notif)
+        if (notif.type === 'new_chat') {
+          this.store.commit('chat/add_unread', 1)
+        } else {
+          this.store.commit('notif/push_new_notif', notif)
+        }
       }
     })
   }

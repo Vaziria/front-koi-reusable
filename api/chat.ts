@@ -1,5 +1,6 @@
 /* eslint-disable camelcase */
-import { Chat, UserChat } from '../model/chat'
+import firebase from 'firebase'
+import { Chat, ChatInfoBuyer, ChatInfoSeller, UserChat } from '../model/chat'
 import client from './client'
 
 interface IPaginateParams {
@@ -9,6 +10,32 @@ interface IPaginateParams {
 
 interface IChatparams extends IPaginateParams {
   seller?: boolean
+}
+
+type FireReq = firebase.firestore.DocumentReference<firebase.firestore.DocumentData>
+
+const fire = firebase.firestore()
+const defaultLastMsg = {
+  id: '',
+  from_id: '',
+  to_id: '',
+  created: 0
+}
+
+function chatsSeller (id: string, sellerid: string): FireReq {
+  return fire
+    .collection('Sellers')
+    .doc(sellerid)
+    .collection('seller_chats')
+    .doc(id)
+}
+
+function chatsBuyer (id: string, sellerid: string): FireReq {
+  return fire
+    .collection('Users')
+    .doc(id)
+    .collection('chats')
+    .doc(sellerid)
 }
 
 export async function chatRead (id: string, isSeller: boolean): Promise<unknown> {
@@ -23,6 +50,35 @@ export async function chatRead (id: string, isSeller: boolean): Promise<unknown>
     params
   })
   return data.data
+}
+
+export async function getContact (id: string, sellerid: string): Promise<ChatInfoBuyer> {
+  const user = await chatsBuyer(id, sellerid).get()
+
+  if (user.exists) {
+    return user.data() as ChatInfoBuyer
+  }
+
+  return {
+    cs_id: '',
+    last_chat: 0,
+    last_msg: defaultLastMsg,
+    unread: 0
+  }
+}
+
+export async function getContactSeller (id: string, sellerid: string): Promise<ChatInfoSeller> {
+  const user = await chatsSeller(id, sellerid).get()
+
+  if (user.exists) {
+    return user.data() as ChatInfoSeller
+  }
+
+  return {
+    last_chat: 0,
+    last_msg: defaultLastMsg,
+    unread: 0
+  }
 }
 
 export async function chatList (isSeller: boolean, params: IPaginateParams): Promise<UserChat[]> {

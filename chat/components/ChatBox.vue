@@ -11,7 +11,10 @@
         direction="top"
         @infinite="infiniteHandler"
       >
-        <div slot="spinner"><ChatLoading /></div>
+        <div slot="spinner">
+          <div class="spinner-border spinner-grow-sms text-info d-block mg-x-auto"></div>
+          <p class="tx-12 tx-center">Memuat pesan...</p>
+        </div>
         <div slot="no-more"></div>
         <div slot="no-results"></div>
       </InfiniteLoading>
@@ -25,6 +28,8 @@
           />
         </div>
       </div>
+
+      <NoResults v-if="noResult" />
 
     </div>
     <ChatReply
@@ -87,6 +92,7 @@ import { ChatAction, ChatMutation, IChatState } from '../../store/chat'
 import { ISystemState } from '../../store/system'
 import WithNav from '../../navigation/WithNav.vue'
 import { BasicRoute } from '../../navigation/basicroute'
+import NoResults from '../../components/noresults/Chat.vue'
 
 interface ChatUi extends Chat {
   'show_product'?: boolean
@@ -118,12 +124,15 @@ class NavMixins extends WithNav<BasicRoute> {}
     ChatHeader,
     ChatDialog,
     ChatReply,
-    ChatForm
+    ChatForm,
+    NoResults
     // ChartPop
   }
 })
 export default class ChatBox extends Mixins(StoreMixins, NavMixins) {
   @Prop() readonly noClose!: boolean
+
+  endpage = false
 
   get loading (): boolean {
     return this.tstore.state.chat.loading
@@ -131,6 +140,14 @@ export default class ChatBox extends Mixins(StoreMixins, NavMixins) {
 
   get isMobile (): boolean {
     return this.tstore.state.system.isMobile
+  }
+
+  get noResult (): boolean {
+    const { message, unsend, errorchat } = this.tstore.state.chat
+    return message.length === 0 &&
+      unsend.length === 0 &&
+      errorchat.length === 0 &&
+      this.endpage
   }
 
   get bodyClass (): string {
@@ -194,13 +211,16 @@ export default class ChatBox extends Mixins(StoreMixins, NavMixins) {
 
   @Watch('user')
   async updateUser (): Promise<void> {
-    const infiniteLoading = this.$refs.infiniteLoading as InfiniteLoading
-    infiniteLoading.stateChanger.reset()
-    this.tstore.commit('chat/reset_message')
+    if (!this.isMobile) {
+      const infiniteLoading = this.$refs.infiniteLoading as InfiniteLoading
+      infiniteLoading.stateChanger.reset()
+      this.tstore.commit('chat/reset_message')
+    }
   }
 
   async infiniteHandler ($state: StateChanger): Promise<void> {
     const { message, endpage } = this.tstore.state.chat
+    this.endpage = false
     if (message.length) {
       await this.tstore.dispatch('chat/paginateChat')
     } else {
@@ -210,6 +230,7 @@ export default class ChatBox extends Mixins(StoreMixins, NavMixins) {
 
     if (endpage) {
       $state.complete()
+      this.endpage = true
     } else {
       $state.loaded()
     }
