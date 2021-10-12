@@ -213,8 +213,10 @@ export default class ChatBox extends Mixins(StoreMixins, NavMixins) {
   async updateUser (): Promise<void> {
     if (!this.isMobile) {
       const infiniteLoading = this.$refs.infiniteLoading as InfiniteLoading
-      infiniteLoading.stateChanger.reset()
-      this.tstore.commit('chat/reset_message')
+      if (infiniteLoading) {
+        infiniteLoading.stateChanger.reset()
+        this.tstore.commit('chat/reset_message')
+      }
     }
   }
 

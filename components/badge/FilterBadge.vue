@@ -6,7 +6,9 @@
     }"
     @click="$emit('click')"
   >
-    <span v-html="text"></span>
+    <slot>
+      <span v-html="text"></span>
+    </slot>
     <a v-if="destroy" class="ml-2" @click="$emit('destroy')">
       <mdb-icon icon="times" class="tx-info" />
     </a>

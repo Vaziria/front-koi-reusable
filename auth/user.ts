@@ -7,8 +7,10 @@ import { ChatStore } from '../store/chat'
 import { setupNotification } from '../notification'
 import { NotifStore } from '../store/notif'
 import { specialLog } from '../utils/logger'
+import { OrderstatStore } from '../store/orderstat'
+import { INotif } from '../model/notifs'
 
-type Store = UserStore & ChatStore & NotifStore
+type Store = UserStore & ChatStore & NotifStore & OrderstatStore
 const notifids: string[] = []
 
 export async function getAccess (uid: string): Promise<Access | null> {
@@ -33,6 +35,21 @@ export class AuthUser {
 
   async logout (): Promise<void> {
     return await this.auth.signOut()
+  }
+
+  orderStatNotif (notif: INotif): void {
+    switch (notif.type) {
+      case ('new_order'): {
+        this.store.commit('orderstat/add_wait_count', 1)
+        break
+      }
+
+      case ('unverify_paid'): {
+        this.store.commit('orderstat/add_unverif_count', 1)
+        this.store.commit('orderstat/add_unpaid_count', -1)
+        break
+      }
+    }
   }
 
   async setupNotification (userid: string): Promise<void> {

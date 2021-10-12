@@ -6,6 +6,7 @@
 </template>
 <style scoped>
 .counter {
+  min-width: 15px;
   position: absolute;
   top: -5px;
   right: -10px;
