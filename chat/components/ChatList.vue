@@ -236,7 +236,7 @@ export default class ChatList extends Mixins(StoreMixins, NavMixins) {
   }
 
   async contactAction (user: UserChat): Promise<void> {
-    if (this.user.id !== user.id) {
+    if (this.user.id !== user.id || this.isMobile) {
       if (this.action) {
         // await this.tstore.dispatch('chat/openChat', user)
         // this.navigation.push('user_chat', {})

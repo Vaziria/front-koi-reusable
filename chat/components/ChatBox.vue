@@ -1,7 +1,6 @@
 <template>
   <div class="">
     <ChatHeader :no-close="noClose" />
-
     <div
       id="azChatBody"
       :class="bodyClass"
@@ -19,13 +18,32 @@
         <div slot="no-results"></div>
       </InfiniteLoading>
 
-      <div v-for="(msg, key) in messages" :key="key" :class="{ media: true, 'flex-row-reverse': msg.key !== user.id }">
-        <div class="media-body mx-2">
-          <ChatDialog
-            v-for="message in msg.data"
-            :key="message.id"
-            :message="message"
-          />
+      <div
+        v-for="(usermsgs, date) in messages"
+        :key="date"
+        :id="date"
+      >
+        <div class="tx-center mb-4 mt-3 pt-2">
+          <span
+            class="badge badge-dark tx-11 p-2 rounded-10 op-9 tx-gray-200"
+          >{{ date }}</span>
+        </div>
+
+        <div
+          v-for="(usermsg, index) in usermsgs"
+          :key="index"
+          :class="{
+            media: true,
+            'flex-row-reverse': usermsg.key !== user.id
+          }"
+        >
+          <div class="media-body mx-2">
+            <ChatDialog
+              v-for="message in usermsg.data"
+              :key="message.id"
+              :message="message"
+            />
+          </div>
         </div>
       </div>
 
@@ -46,6 +64,15 @@
     />
     <ChatForm @onChat="scrollchat()" />
     <!-- <chart-pop v-if="isMobile" /> -->
+
+    <div
+      v-if="currentDate"
+      class="tx-center mb-4 mt-3 pt-2 pos-absolute t-40 z-index-200 tx-center wd-100p"
+    >
+      <span
+        class="badge badge-dark tx-11 p-2 rounded-10 op-9 tx-gray-200"
+      >{{ currentDate }}</span>
+    </div>
   </div>
 </template>
 <style scoped>
@@ -76,7 +103,6 @@
 </style>
 <script lang="ts">
 import { Component, Mixins, Watch, Prop } from 'vue-property-decorator'
-import $ from 'jquery'
 import InfiniteLoading, { StateChanger } from 'vue-infinite-loading'
 
 import ChatLoading from './ChatLoading.vue'
@@ -93,6 +119,7 @@ import { ISystemState } from '../../store/system'
 import WithNav from '../../navigation/WithNav.vue'
 import { BasicRoute } from '../../navigation/basicroute'
 import NoResults from '../../components/noresults/Chat.vue'
+import dateFormater from '../../filters/date'
 
 interface ChatUi extends Chat {
   'show_product'?: boolean
@@ -102,6 +129,14 @@ interface ChatUi extends Chat {
 interface TransformChat {
   key: string,
   data: ChatUi[]
+}
+
+interface GroupByDateChat {
+  [key: string]: ChatUi[]
+}
+
+interface GroupByDateUserChat {
+  [key: string]: TransformChat[]
 }
 
 type State = {
@@ -133,6 +168,7 @@ export default class ChatBox extends Mixins(StoreMixins, NavMixins) {
   @Prop() readonly noClose!: boolean
 
   endpage = false
+  currentDate = ''
 
   get loading (): boolean {
     return this.tstore.state.chat.loading
@@ -177,7 +213,7 @@ export default class ChatBox extends Mixins(StoreMixins, NavMixins) {
     return this.tstore.state.chat.order
   }
 
-  get messages (): TransformChat[] {
+  get messages (): GroupByDateUserChat {
     const orderids: string[] = []
     const productids: string[] = []
 
@@ -205,8 +241,13 @@ export default class ChatBox extends Mixins(StoreMixins, NavMixins) {
       return chat
     })
 
-    const data = this.transformChat(fixmsgs)
-    return data
+    const groupByDate = this.groupByDate(fixmsgs)
+    const results: GroupByDateUserChat = {}
+    Object.keys(groupByDate).forEach((date) => {
+      results[date] = this.transformChat(groupByDate[date])
+    })
+
+    return results
   }
 
   @Watch('user')
@@ -238,12 +279,64 @@ export default class ChatBox extends Mixins(StoreMixins, NavMixins) {
     }
   }
 
+  mounted (): void {
+    this.scrollchat()
+    this.$el.children[1].addEventListener('scroll', this.handleScroll)
+  }
+
+  destroyed (): void {
+    this.$el.children[1].removeEventListener('scroll', this.handleScroll)
+  }
+
+  handleScroll (elem: Event): void {
+    const { children, scrollTop } = elem.target as HTMLDivElement
+    const getCurrentDate = [...children]
+      .find((child) => {
+        const offset = [(child as HTMLDivElement).offsetTop]
+
+        if (child.nextElementSibling) {
+          offset[1] = (child.nextElementSibling as HTMLDivElement).offsetTop
+        }
+
+        if (scrollTop >= offset[0]) {
+          if (offset[1]) {
+            return scrollTop <= offset[1]
+          }
+          return true
+        }
+      })
+
+    this.currentDate = getCurrentDate?.id || ''
+
+    window.setTimeout(() => {
+      this.currentDate = ''
+    }, 3000)
+  }
+
   scrollchat (): void {
-    setTimeout(() => { $('#azChatBody').scrollTop($('#azChatBody').prop('scrollHeight')) }, 100)
+    const chatBody = this.$el.children[1]
+    chatBody.scrollTo({ top: chatBody.scrollTop })
   }
 
   close (): void {
     this.tstore.commit('chat/mini_show', false)
+  }
+
+  groupByDate (messages: Chat[]): GroupByDateChat {
+    const defaultGroups: GroupByDateChat = {}
+    const groups = messages.reduce((results, message) => {
+      const date = dateFormater(message.created, 'DD MN YY')
+
+      if (results[date]) {
+        results[date].push(message)
+      } else {
+        results[date] = [message]
+      }
+
+      return results
+    }, defaultGroups)
+
+    return groups
   }
 
   transformChat (messages: Chat[]): TransformChat[] {

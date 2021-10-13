@@ -6,7 +6,7 @@
       <span class="wrap mr-2">{{ message.text }}</span>
       <small class="d-block tx-right ml-auto align-self-end op-5">
         <br>
-        <span>{{ parseInt(message.created) | moment('DD MMMM YYYY, HH:mm:ss') }}</span>
+        <span>{{ parseInt(message.created) | moment('HH:mm:ss') }}</span>
         <a href="#"><i class="icon ion-android-more-horizontal"></i></a>
         <i v-if="message.error" class="fas fa-exclamation-triangle" />
       </small>

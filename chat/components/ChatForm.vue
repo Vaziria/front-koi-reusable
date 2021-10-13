@@ -13,8 +13,15 @@
     >
     </textarea>
     <a class="az-msg-send"></a>
-    <a href="#"  class="az-msg-send pos-absolute b-5 r-20" @click="sendMessage()">
-      <i class="fas fa-paper-plane tx-info"></i>
+    <a
+      class="az-msg-send pos-absolute b-5 r-20"
+      @click="sendMessage()"
+    >
+      <i :class="{
+        'fas fa-paper-plane': true,
+        'tx-info': text,
+        'tx-gray-500': !text
+      }"></i>
     </a>
   </div>
 </template>
@@ -82,6 +89,7 @@ class ChatForm extends Mixins(StoreMix, SwalMixin, RootEmitMix) {
   async sendMessage (): Promise<void> {
     if (!this.text) {
       this.topedToast('Pesan Anda kosong.', 'OK')
+      return
     }
 
     this.rootEmit('onChat', undefined)
@@ -98,7 +106,6 @@ class ChatForm extends Mixins(StoreMix, SwalMixin, RootEmitMix) {
     }
 
     this.text = ''
-
     await this.tstore.dispatch('chat/sendChat', chat)
   }
 }
