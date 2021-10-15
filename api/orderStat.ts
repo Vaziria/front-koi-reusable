@@ -2,8 +2,10 @@ import firebase from 'firebase'
 import { PaidStatus, StatusOrder, ThreatTipe } from '../model/order'
 
 type DocData = firebase.firestore.CollectionReference<firebase.firestore.DocumentData>
+| firebase.firestore.Query<firebase.firestore.DocumentData>
+
 export type Payload = {
-  sellerid: string
+  sellerid?: string
   buyerid?: string
 }
 export type StatusPayload = {
@@ -13,16 +15,21 @@ export type StatusPayload = {
 }
 
 const fire = firebase.firestore()
-function orderCol (sellerid: string): DocData {
-  return fire.collection('Sellers')
-    .doc(sellerid)
-    .collection('orders')
+function orderCol (payload: Payload): DocData {
+  const { sellerid, buyerid } = payload
+
+  if (sellerid) {
+    return fire.collection('Sellers')
+      .doc(sellerid)
+      .collection('orders')
+  }
+
+  return fire.collectionGroup('orders').where('buyer.id', '==', buyerid)
 }
 
 export async function orderStatusCount (payload: Payload, payloadStatus: StatusPayload): Promise<number> {
-  const { sellerid, buyerid } = payload
   const { status, payStatus, threat } = payloadStatus
-  let orders = orderCol(sellerid)
+  let orders = orderCol(payload)
     .where('status', '==', status)
 
   if (payStatus) {
@@ -31,10 +38,6 @@ export async function orderStatusCount (payload: Payload, payloadStatus: StatusP
 
   if (threat) {
     orders = orders.where('threat_tipe', '==', threat)
-  }
-
-  if (buyerid) {
-    orders = orders.where('buyer.id', '==', buyerid)
   }
 
   const data = await orders.get()

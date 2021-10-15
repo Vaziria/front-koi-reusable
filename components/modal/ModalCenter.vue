@@ -2,7 +2,7 @@
   <mdb-modal
     :id="idModal"
     :centered="true"
-    :scrollable="true"
+    :scrollable="scrollable"
     :size="size"
     :show="value"
     :direction="direction"
@@ -38,6 +38,9 @@
     /*height: 50vh !important;*/
     max-height: calc(100% - 120px) !important;
   }
+  .modal-dialog-centered {
+    min-height: 100% !important;
+  }
   @media(max-width: 768px) {
     #eb-modal-center .modal-dialog {
       margin: 0;
@@ -71,6 +74,7 @@ class ModalCenter extends Vue {
   @Prop({ default: false }) readonly half!: boolean
   @Prop({ default: true }) readonly closeIcon!: boolean
   @Prop({ default: 'bottom' }) readonly direction!: boolean
+  @Prop({ default: true }) readonly scrollable!: boolean
 
   get idModal (): string {
     if (this.toBasic) {
