@@ -1,6 +1,9 @@
 <template>
   <span class="pos-relative">
-    <span v-if="count" class="counter badge badge-pill badge-info pd-y-3 pd-x-5">{{ count | counter }}</span>
+    <span
+      v-if="count"
+      class="counter badge badge-pill badge-info pd-y-3 pd-x-5"
+    >{{ count | counter }}</span>
     <slot />
   </span>
 </template>
@@ -25,6 +28,10 @@ import { Component, Vue, Prop } from 'vue-property-decorator'
     counter (count: number): string {
       if (count > 99) {
         return '99+'
+      }
+
+      if (count < 1) {
+        return ''
       }
 
       return count.toString()
