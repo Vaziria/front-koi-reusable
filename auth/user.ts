@@ -44,6 +44,30 @@ export class AuthUser {
         break
       }
 
+      case ('confirm_order'): {
+        this.store.commit('orderstat/add_wait_count', -1)
+        this.store.commit('orderstat/add_unpaid_count', 1)
+        break
+      }
+
+      case ('process_order'): {
+        this.store.commit('orderstat/add_unverif_count', -1)
+        this.store.commit('orderstat/add_ready_send_count', 1)
+        break
+      }
+
+      case ('karantina_order'): {
+        this.store.commit('orderstat/add_ready_send_count', -1)
+        this.store.commit('orderstat/add_karantina_count', 1)
+        break
+      }
+
+      case ('titip_order'): {
+        this.store.commit('orderstat/add_ready_send_count', -1)
+        this.store.commit('orderstat/add_titip_count', 1)
+        break
+      }
+
       case ('unverify_paid'): {
         this.store.commit('orderstat/add_unverif_count', 1)
         this.store.commit('orderstat/add_unpaid_count', -1)

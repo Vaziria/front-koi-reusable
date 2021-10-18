@@ -282,9 +282,9 @@ const actions = {
   async getMessage (store: Context): Promise<void> {
     const { commit, state, rootState } = store
     const { isSeller } = rootState.system
-    const userid = rootState.user.shopid
-    const uid = state.userActive.id
-    if (uid === '') {
+    const userid = isSeller ? rootState.user.shopid : rootState.user.uid
+    const targetid = state.userActive.id
+    if (targetid === '') {
       return
     }
 
@@ -298,14 +298,15 @@ const actions = {
     let unread = 0
     try {
       if (isSeller) {
-        const chatInfo = await getContactSeller(uid, userid)
+        const chatInfo = await getContactSeller(targetid, userid)
         unread = chatInfo.unread
       } else {
-        const chatInfo = await getContact(userid, uid)
+        console.log(userid, 'and', targetid)
+        const chatInfo = await getContact(userid, targetid)
         unread = chatInfo.unread
       }
       await chatRead(state.userActive.id, isSeller)
-      msg = await chatMessages(uid, {
+      msg = await chatMessages(targetid, {
         seller: isSeller,
         limit: perpage
       })
@@ -315,7 +316,7 @@ const actions = {
 
     const fixmsg: Chat[] = msg.reverse()
     commit('add_unread', -(unread))
-    commit('set_user_read', uid)
+    commit('set_user_read', targetid)
     commit('set_message', fixmsg)
   },
 
