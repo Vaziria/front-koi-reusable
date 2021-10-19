@@ -284,7 +284,7 @@ export default class ChatBox extends Mixins(StoreMixins, NavMixins) {
     this.$el.children[1].addEventListener('scroll', this.handleScroll)
   }
 
-  destroyed (): void {
+  beforeDestroy (): void {
     this.$el.children[1].removeEventListener('scroll', this.handleScroll)
   }
 
@@ -315,7 +315,7 @@ export default class ChatBox extends Mixins(StoreMixins, NavMixins) {
 
   scrollchat (): void {
     const chatBody = this.$el.children[1]
-    chatBody.scrollTo({ top: chatBody.scrollTop })
+    chatBody.scrollTo({ top: chatBody.scrollHeight })
   }
 
   close (): void {

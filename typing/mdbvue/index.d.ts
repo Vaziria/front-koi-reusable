@@ -32,5 +32,7 @@ declare module 'mdbvue'
   }
   export class mdbRating extends Vue {
   }
+  export class mdbCollapse extends Vue {
+  }
 
 }

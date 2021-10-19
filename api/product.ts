@@ -10,7 +10,7 @@ export interface IkanFilter {
   pmax?: number
   seller_id?: string
   kategori?: string
-  kota?: string[] | string
+  kota?: string
   name?: string
   order?: IkanKey
   order_type?: 'asc' | 'desc',
@@ -18,6 +18,8 @@ export interface IkanFilter {
   offset?: number,
   tags?: string,
   status?: string
+  sizemax?: number
+  sizemin?: number
 }
 
 function cleanparams<T> (params: IkanFilter): T {

@@ -6,6 +6,7 @@ import { IUserState } from '../store/user'
 import { Module } from 'vuex'
 import { getShop } from '../api/shop'
 import { getUser } from '../api/user'
+import { errorLog } from '../utils/logger'
 
 const perpage = 20
 const contactPerpage = 20
@@ -301,7 +302,6 @@ const actions = {
         const chatInfo = await getContactSeller(targetid, userid)
         unread = chatInfo.unread
       } else {
-        console.log(userid, 'and', targetid)
         const chatInfo = await getContact(userid, targetid)
         unread = chatInfo.unread
       }
@@ -311,7 +311,7 @@ const actions = {
         limit: perpage
       })
     } catch (e) {
-      console.error(e)
+      errorLog(e)
     }
 
     const fixmsg: Chat[] = msg.reverse()
@@ -335,16 +335,15 @@ const actions = {
 
   async pushChat (store: Context, chat: Chat): Promise<void> {
     const { commit, state, rootState } = store
-    const { isMobile, isSeller } = rootState.system
 
-    if (!isMobile && chat.from_id === state.userActive.id) {
+    if (chat.from_id === state.userActive.id) {
       commit('push_message', chat)
     } else {
       const findUser = state.userlist.find(user => user.id === chat.from_id)
       if (findUser) {
         commit('update_user_list', chat)
       } else {
-        if (isSeller) {
+        if (rootState.system.isSeller) {
           const userChat = await getUserChat(chat.from_id)
           userChat.last_msg = chat
           userChat.last_chat = chat.created
