@@ -16,7 +16,7 @@ export interface IIkan {
   id: string
   permalink_id: string
   user_id: string
-  dilihat: number
+  view?: number
   order_count: number
   gambar: string[]
   video: string
@@ -26,8 +26,8 @@ export interface IIkan {
   price: number
   ukuran: number
   ukuran_range?: {
-      min: number
-      max: number
+    min: number
+    max: number
   }
   kategori: string
   ship_from: string

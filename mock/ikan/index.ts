@@ -79,7 +79,7 @@ export function single (): IIkan {
     city: wilayah.region,
     created: new Date().getTime(),
     deskripsi,
-    dilihat: getRandomNum(100),
+    view: getRandomNum(100),
     gambar: [getRandomValue(images)],
     id: getId(11),
     kategori,
