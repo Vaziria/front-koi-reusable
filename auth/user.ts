@@ -101,6 +101,7 @@ export class AuthUser {
       this.store.commit('user/set_logout')
       this.store.commit('chat/reset_message')
       this.store.commit('chat/reset_user')
+      this.store.commit('orderstat/reset_count')
     }
   }
 

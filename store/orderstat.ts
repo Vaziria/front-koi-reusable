@@ -68,6 +68,15 @@ const mutations = {
 
   add_titip_count (state: IOrderstatState, add: number): void {
     state.orderTitipCount += add
+  },
+
+  reset_count (state: IOrderstatState): void {
+    state.orderWaitCount = 0
+    state.orderUnpaidCount = 0
+    state.orderUnverifCount = 0
+    state.orderReadyToSendCount = 0
+    state.orderKarantinaCount = 0
+    state.orderTitipCount = 0
   }
 }
 
@@ -83,6 +92,8 @@ function getCountPayload (sellerid: string, rootState: RootState): Payload {
 
   if (!rootState.system.isSeller) {
     payload.buyerid = rootState.user.uid
+  } else if (rootState.user.uid !== sellerid) {
+    payload.csid = rootState.user.uid
   }
 
   return payload

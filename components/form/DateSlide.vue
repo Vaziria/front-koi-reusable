@@ -12,6 +12,7 @@
           'py-2 ht-40 d-block': true,
           'bg-gray-200': index === 1
         }"
+        @click="slideAction(addDays, index)"
       >{{ day }}</div>
       <a class="py-3 d-block" @click="addDays(1)">
         <i class="fa fa-chevron-down"></i>
@@ -30,6 +31,7 @@
           'py-2 ht-40 d-block': true,
           'bg-gray-200': index === 1
         }"
+        @click="slideAction(addmonth, index)"
       >{{ month }}</div>
       <a class="py-3 d-block" @click="addmonth(1)">
         <i class="fa fa-chevron-down"></i>
@@ -48,6 +50,7 @@
           'py-2 ht-40 d-block': true,
           'bg-gray-200': index === 1
         }"
+        @click="slideAction(addYear, index)"
       >{{ year }}</div>
       <a class="py-3 d-block" @click="addYear(1)">
         <i class="fa fa-chevron-down"></i>
@@ -144,6 +147,12 @@ class DateSlide extends Vue {
     }
 
     return years
+  }
+
+  slideAction (action: (date: number) => void, index: number): void {
+    if (index !== 1) {
+      action(index - 1)
+    }
   }
 
   @Emit('input')

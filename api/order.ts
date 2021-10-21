@@ -27,6 +27,32 @@ interface IBuktiPembayaran {
   orderid: string
 }
 
+function cleanQuery (query: Partial<FilterPageOrder>): Partial<FilterPageOrder> {
+  const queryKey: (keyof FilterPageOrder)[] = [
+    'q',
+    'status',
+    'pay_status',
+    'datemin',
+    'datemax',
+    'offset',
+    'limit',
+    'order_type',
+    'order',
+    'csid',
+    'target_kirim_min',
+    'target_kirim_max',
+    'threat_tipe'
+  ]
+
+  queryKey.forEach(key => {
+    if (!query[key]) {
+      delete query[key]
+    }
+  })
+
+  return query
+}
+
 export interface ReviewPayload {
   msg: string
   rating: number
@@ -43,7 +69,7 @@ export async function listOrder (query: Partial<FilterPageOrder>): Promise<Order
     return getAllStatus(status, pay_status, threat_tipe)
   }
 
-  const data = await client.get('/seller/order/list', { params: query })
+  const data = await client.get('/seller/order/list', { params: cleanQuery(query) })
   return data.data
 }
 
