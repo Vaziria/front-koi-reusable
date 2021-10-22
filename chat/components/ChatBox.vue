@@ -19,18 +19,18 @@
       </InfiniteLoading>
 
       <div
-        v-for="(usermsgs, date) in messages"
-        :key="date"
-        :id="date"
+        v-for="groupDate in messagesGroupDate"
+        :key="groupDate.dateKey"
+        :id="groupDate.dateString"
       >
         <div class="tx-center mb-4 mt-3 pt-2">
           <span
             class="badge badge-dark tx-11 p-2 rounded-10 op-9 tx-gray-200"
-          >{{ date }}</span>
+          >{{ groupDate.dateString }}</span>
         </div>
 
         <div
-          v-for="(usermsg, index) in usermsgs"
+          v-for="(usermsg, index) in groupDate.messages"
           :key="index"
           :class="{
             media: true,
@@ -115,11 +115,13 @@ import { Chat, ChatOrder, ChatProduct, UserChat } from '../../model/chat'
 import VueWithStore from '../../store/wrapper.vue'
 import { Namespaced, Store } from '../../store/types'
 import { ChatAction, ChatMutation, IChatState } from '../../store/chat'
+import { IUserState } from '../../store/user'
 import { ISystemState } from '../../store/system'
 import WithNav from '../../navigation/WithNav.vue'
 import { BasicRoute } from '../../navigation/basicroute'
 import NoResults from '../../components/noresults/Chat.vue'
 import dateFormater from '../../filters/date'
+import { ChatMessages, initBuyerChat, FireChatPayload } from '../../api/fireChat'
 
 interface ChatUi extends Chat {
   'show_product'?: boolean
@@ -131,20 +133,28 @@ interface TransformChat {
   data: ChatUi[]
 }
 
-interface GroupByDateChat {
-  [key: string]: ChatUi[]
+type UnformatGroupByDateMessages = {
+  dateString: string
+  dateKey: string
+  messages: ChatUi[]
 }
 
-interface GroupByDateUserChat {
-  [key: string]: TransformChat[]
+type GroupByDateMessages = {
+  dateString: string
+  dateKey: string
+  messages: TransformChat[]
 }
 
 type State = {
   'chat': IChatState
   'system': ISystemState
+  'user': IUserState
 }
 
-type ChatStore = Store<State, Namespaced<ChatMutation, 'chat'>, Namespaced<ChatAction, 'chat'>>
+type ChatStore = Store<State,
+  Namespaced<ChatMutation, 'chat'>,
+  Namespaced<ChatAction, 'chat'>
+>
 
 @Component
 class StoreMixins extends VueWithStore<ChatStore> {}
@@ -169,18 +179,44 @@ export default class ChatBox extends Mixins(StoreMixins, NavMixins) {
 
   endpage = false
   currentDate = ''
+  messages: Chat[] = []
 
-  get loading (): boolean {
-    return this.tstore.state.chat.loading
+  chatMessages: ChatMessages | null = null
+  subChat: () => void = () => undefined
+
+  get payload (): FireChatPayload {
+    if (this.isSeller) {
+      let csid
+      const { uid, shopid } = this.tstore.state.user
+
+      if (uid !== shopid) {
+        csid = uid
+      }
+
+      return {
+        sellerid: shopid,
+        userid: this.user.id,
+        csid
+      }
+    }
+
+    return {
+      sellerid: this.user.id,
+      userid: this.tstore.state.user.uid
+    }
   }
 
   get isMobile (): boolean {
     return this.tstore.state.system.isMobile
   }
 
+  get isSeller (): boolean {
+    return this.tstore.state.system.isSeller
+  }
+
   get noResult (): boolean {
-    const { message, unsend, errorchat } = this.tstore.state.chat
-    return message.length === 0 &&
+    const { unsend, errorchat } = this.tstore.state.chat
+    return this.messages.length === 0 &&
       unsend.length === 0 &&
       errorchat.length === 0 &&
       this.endpage
@@ -213,79 +249,146 @@ export default class ChatBox extends Mixins(StoreMixins, NavMixins) {
     return this.tstore.state.chat.order
   }
 
-  get messages (): GroupByDateUserChat {
+  get unsendMessages (): ChatUi[] {
+    return this.tstore.state.chat.unsend.map(chat => {
+      return {
+        ...chat,
+        send_process: true
+      }
+    })
+  }
+
+  get errorMessages (): ChatUi[] {
+    return this.tstore.state.chat.errorchat.map(chat => {
+      return {
+        ...chat,
+        send_error: true
+      }
+    })
+  }
+
+  get messagesUi (): ChatUi[] {
     const orderids: string[] = []
     const productids: string[] = []
-
-    const unsend = this.tstore.state.chat.unsend.map(chat => {
-      return { ...chat, send_process: true }
-    })
-    const error = this.tstore.state.chat.errorchat.map(chat => {
-      return { ...chat, send_error: true }
-    })
-    const msgs = [...this.tstore.state.chat.message, ...error, ...unsend]
-    const fixmsgs = msgs.filter(chat => chat).map((chat: ChatUi) => {
-      if (chat.productid) {
-        if (!productids.includes(chat.productid)) {
-          productids.push(chat.productid)
-          chat.show_product = true
+    const msgs = [
+      ...this.messages,
+      ...this.unsendMessages,
+      ...this.errorMessages
+    ]
+    const fixmsgs = msgs
+      .filter(chat => chat)
+      .map((chat: ChatUi) => {
+        if (chat.productid) {
+          if (!productids.includes(chat.productid)) {
+            productids.push(chat.productid)
+            chat.show_product = true
+          }
         }
+
+        if (chat.orderid) {
+          if (!orderids.includes(chat.orderid)) {
+            orderids.push(chat.orderid)
+            chat.show_order = true
+          }
+        }
+        return chat
+      })
+
+    return fixmsgs
+  }
+
+  get messagesGroupDate (): GroupByDateMessages[] {
+    const defaultGroups: UnformatGroupByDateMessages[] = []
+    const messagesGroupDate = this.messagesUi.reduce((results, message) => {
+      const dateString = dateFormater(message.created, 'DD MN YY')
+      const dateKey = dateFormater(message.created, 'YYMMDD')
+
+      const findResultDate = results.find(dateGroup => {
+        return dateGroup.dateKey === dateKey
+      })
+
+      if (findResultDate) {
+        findResultDate.messages.push(message)
+        results = results.map(messageData => {
+          if (messageData.dateKey === dateKey) {
+            return findResultDate
+          }
+          return messageData
+        })
+      } else {
+        results.push({
+          dateString,
+          dateKey,
+          messages: [message]
+        })
       }
 
-      if (chat.orderid) {
-        if (!orderids.includes(chat.orderid)) {
-          orderids.push(chat.orderid)
-          chat.show_order = true
+      return results
+    }, defaultGroups)
+
+    return messagesGroupDate
+      .map(groupDate => {
+        const { dateString, dateKey, messages } = groupDate
+        return {
+          dateString,
+          dateKey,
+          messages: this.transformChat(messages)
         }
-      }
-      return chat
-    })
-
-    const groupByDate = this.groupByDate(fixmsgs)
-    const results: GroupByDateUserChat = {}
-    Object.keys(groupByDate).forEach((date) => {
-      results[date] = this.transformChat(groupByDate[date])
-    })
-
-    return results
+      })
+      .sort((curgroupDate, nextgroupDate) => {
+        return (curgroupDate.dateKey > nextgroupDate.dateKey ? 1 : -1)
+      })
   }
 
   @Watch('user')
   async updateUser (): Promise<void> {
+    this.subChat()
+    this.initChat()
     if (!this.isMobile) {
       const infiniteLoading = this.$refs.infiniteLoading as InfiniteLoading
       if (infiniteLoading) {
+        this.messages = []
         infiniteLoading.stateChanger.reset()
-        this.tstore.commit('chat/reset_message')
       }
     }
   }
 
   async infiniteHandler ($state: StateChanger): Promise<void> {
-    const { message, endpage } = this.tstore.state.chat
-    this.endpage = false
-    if (message.length) {
-      await this.tstore.dispatch('chat/paginateChat')
-    } else {
-      await this.tstore.dispatch('chat/getMessage')
-      this.scrollchat()
-    }
+    if (this.chatMessages) {
+      if (this.messages.length) {
+        const messages = await this.chatMessages.paginateChat()
+        this.messages = [...this.messages, ...messages]
+      } else {
+        const messages = await this.chatMessages.getChat()
+        this.messages = messages
+        setTimeout(() => this.scrollchat(), 300)
+      }
 
-    if (endpage) {
-      $state.complete()
-      this.endpage = true
-    } else {
-      $state.loaded()
+      if (this.chatMessages.haveNext) {
+        $state.loaded()
+      } else {
+        $state.complete()
+        this.endpage = true
+      }
     }
   }
 
-  mounted (): void {
+  async mounted (): Promise<void> {
+    this.initChat()
     this.scrollchat()
     this.$el.children[1].addEventListener('scroll', this.handleScroll)
   }
 
   beforeDestroy (): void {
+    this.subChat()
     this.$el.children[1].removeEventListener('scroll', this.handleScroll)
+  }
+
+  initChat (): void {
+    this.chatMessages = new ChatMessages(this.payload)
+    this.subChat = initBuyerChat(this.payload, (msg) => {
+      this.messages = [...this.messages, msg]
+    })
   }
 
   handleScroll (elem: Event): void {
@@ -320,23 +423,6 @@ export default class ChatBox extends Mixins(StoreMixins, NavMixins) {
 
   close (): void {
     this.tstore.commit('chat/mini_show', false)
-  }
-
-  groupByDate (messages: Chat[]): GroupByDateChat {
-    const defaultGroups: GroupByDateChat = {}
-    const groups = messages.reduce((results, message) => {
-      const date = dateFormater(message.created, 'DD MN YY')
-
-      if (results[date]) {
-        results[date].push(message)
-      } else {
-        results[date] = [message]
-      }
-
-      return results
-    }, defaultGroups)
-
-    return groups
   }
 
   transformChat (messages: Chat[]): TransformChat[] {
