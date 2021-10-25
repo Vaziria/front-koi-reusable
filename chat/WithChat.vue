@@ -31,7 +31,6 @@ export default class WithChat extends Mixins(StoreMixins, NavMixins) {
 
   async toChat (shopid: string): Promise<void> {
     this.tstore.commit('chat/reset_user')
-    this.tstore.commit('chat/reset_message')
 
     if (this.isMobile) {
       this.navigation.push('user_chat', {})

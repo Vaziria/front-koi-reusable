@@ -18,6 +18,11 @@ export interface Chat {
     send_error?: boolean
 }
 
+export interface ChatUI extends Chat {
+    show_product?: boolean
+    show_order?: boolean
+}
+
 export interface UserChatBasic {
     unread: number
     last_msg: Chat
