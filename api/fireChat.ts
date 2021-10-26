@@ -155,14 +155,14 @@ export class ChatBuyerContact extends ContactRequest {
 
   constructor (userid: string) {
     super()
-    this.chatCol = chatsBuyerCol(userid).where('das', '==', '')
+    this.chatCol = chatsBuyerCol(userid)
   }
 
   async contactUserInfo (contact: UserChat): Promise<UserChat> {
     const getUser = await SellerCol().doc(contact.id).get()
 
     if (getUser.exists) {
-      const user = getUser.data() as IUser
+      const user = getUser.data() as Seller
       contact = {
         ...contact,
         ...user
@@ -188,7 +188,7 @@ export class ChatSellerContact extends ContactRequest {
     const getUser = await UserCol().doc(contact.id).get()
 
     if (getUser.exists) {
-      const user = getUser.data() as Seller
+      const user = getUser.data() as IUser
       contact = {
         ...contact,
         ...user
