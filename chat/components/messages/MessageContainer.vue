@@ -42,7 +42,7 @@
     overflow: auto;
   }
   #azChatBody.with-reply {
-    height: calc(100% - 177px) !important;
+    height: calc(100% - 160px) !important;
   }
   #azChatBody::-webkit-scrollbar-track
   {

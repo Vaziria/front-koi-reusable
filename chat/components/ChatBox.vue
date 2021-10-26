@@ -41,7 +41,6 @@ import { Component, Mixins, Watch, Prop } from 'vue-property-decorator'
 import InfiniteLoading, { StateChanger } from 'vue-infinite-loading'
 
 import ChatHeader from './ChatHeader.vue'
-// import ChatDialog from './ChatDialog.vue'
 import ChatForm from './ChatForm.vue'
 
 import MessageContainer from './messages/MessageContainer.vue'
