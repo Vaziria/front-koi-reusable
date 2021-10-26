@@ -77,7 +77,10 @@ import { ChatAction, ChatMutation, IChatState } from '../../store/chat'
 import { ISystemState } from '../../store/system'
 import WithNav from '../../navigation/WithNav.vue'
 import { BasicRoute } from '../../navigation/basicroute'
-import { ChatBuyerContact, DocData, initBuyerContacts, initSellerContacts, StoreQuery, subscribeContact } from '../../api/fireChat'
+import {
+  ChatBuyerContact, ChatSellerContact, DocData, initBuyerContacts,
+  initSellerContacts, StoreQuery, subscribeContact
+} from '../../api/fireChat'
 import { IUserState } from '../../store/user'
 
 import ContactList from './contacts/ContactList.vue'
@@ -125,7 +128,13 @@ export default class ChatList extends Mixins(StoreMixins, NavMixins) {
   }
 
   get contactModel (): ChatBuyerContact {
-    return new ChatBuyerContact(this.tstore.state.user.uid)
+    const { uid, shopid } = this.tstore.state.user
+    if (this.isSeller) {
+      const csid = uid !== shopid ? uid : ''
+      return new ChatSellerContact(shopid, csid)
+    }
+
+    return new ChatBuyerContact(uid)
   }
 
   get initCollection (): StoreQuery<DocData> {

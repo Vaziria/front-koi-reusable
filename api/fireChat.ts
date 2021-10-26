@@ -1,8 +1,9 @@
 /* eslint-disable camelcase */
 import firebase from 'firebase'
 import { Chat, UserChat } from '../model/chat'
+import { Seller } from '../model/seller'
 import { IUser } from '../model/user'
-import { chatsBuyerCol, chatsSellerCol, FireReq, UserCol } from '../utils/firebaseCollection'
+import { chatsBuyerCol, chatsSellerCol, FireReq, SellerCol, UserCol } from '../utils/firebaseCollection'
 import { errorLog, specialLog } from '../utils/logger'
 
 export type FireChatPayload = {
@@ -23,6 +24,7 @@ export function initSellerContacts (sellerid: string, csid?: string): StoreQuery
   let collection = chatsSellerCol(sellerid).orderBy('last_chat', 'asc')
 
   if (csid) {
+    console.log(csid)
     collection = collection.where('cs_id', '==', csid)
   }
 
@@ -90,7 +92,7 @@ export function subscribeChat (payload: FireChatPayload, callback: ChatCallback)
 class ChatRequest {
   limit = 20
 
-  chatCol: FireReq|null = null
+  chatCol: FireReq|StoreQuery<DocData>|null = null
   lastVisible: DocumentSnapData|null = null
   haveNext = true
 
@@ -153,14 +155,40 @@ export class ChatBuyerContact extends ContactRequest {
 
   constructor (userid: string) {
     super()
-    this.chatCol = chatsBuyerCol(userid)
+    this.chatCol = chatsBuyerCol(userid).where('das', '==', '')
+  }
+
+  async contactUserInfo (contact: UserChat): Promise<UserChat> {
+    const getUser = await SellerCol().doc(contact.id).get()
+
+    if (getUser.exists) {
+      const user = getUser.data() as IUser
+      contact = {
+        ...contact,
+        ...user
+      }
+    }
+
+    return contact
+  }
+}
+
+export class ChatSellerContact extends ContactRequest {
+  limit = 20
+
+  constructor (sellerid: string, csid: string) {
+    super()
+    this.chatCol = chatsSellerCol(sellerid)
+    if (csid) {
+      this.chatCol = this.chatCol.where('cs_id', '==', csid)
+    }
   }
 
   async contactUserInfo (contact: UserChat): Promise<UserChat> {
     const getUser = await UserCol().doc(contact.id).get()
 
     if (getUser.exists) {
-      const user = getUser.data() as IUser
+      const user = getUser.data() as Seller
       contact = {
         ...contact,
         ...user
