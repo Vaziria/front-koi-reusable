@@ -83,7 +83,7 @@ import { IUserState } from '../../store/user'
 import ContactList from './contacts/ContactList.vue'
 import NoResults from './contacts/NoResults.vue'
 import ContactLoading from './contacts/ContactLoading.vue'
-import { chatRead } from '@/reusable/api/chat'
+import { chatRead } from '../../api/chat'
 
 type State = {
   'chat': IChatState
