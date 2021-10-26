@@ -19,8 +19,8 @@
     >
       <i :class="{
         'fas fa-paper-plane': true,
-        'tx-info': text,
-        'tx-gray-500': !text
+        'tx-info': text.trim(),
+        'tx-gray-500': !text.trim()
       }"></i>
     </a>
   </div>
@@ -87,7 +87,7 @@ class ChatForm extends Mixins(StoreMix, SwalMixin, RootEmitMix) {
 
   @Emit('onChat')
   async sendMessage (): Promise<void> {
-    if (!this.text) {
+    if (!this.text.trim()) {
       this.topedToast('Pesan Anda kosong.', 'OK')
       return
     }

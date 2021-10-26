@@ -38,7 +38,7 @@
   #azChatBody {
     position: absolute;
     width: 100%;
-    height: calc(100% - 103px) !important;
+    height: calc(100% - 95px) !important;
     overflow: auto;
   }
   #azChatBody.with-reply {
@@ -94,7 +94,7 @@ class MessageContainer extends StoreMixins {
 
   get bodyClass (): string {
     const { chat, system } = this.tstore.state
-    let defaultClass = 'az-chat-body content-inner py-3'
+    let defaultClass = 'az-chat-body content-inner py-0 bg-gray-100'
 
     if (!system.isMobile) {
       defaultClass += ' mg-t-60 mg-md-t-0'

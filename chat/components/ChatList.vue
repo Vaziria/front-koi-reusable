@@ -111,6 +111,7 @@ export default class ChatList extends Mixins(StoreMixins, NavMixins) {
   @Prop() readonly action!: (user: UserChat) => void|Promise<void>
 
   chatContacts: UserChat[] = []
+  subContact: () => void = () => undefined
   loading = false
   endpage = false
   q = ''
@@ -177,7 +178,11 @@ export default class ChatList extends Mixins(StoreMixins, NavMixins) {
   }
 
   mounted (): void {
-    subscribeContact(this.initCollection, async (type, contact) => {
+    this.subContact = subscribeContact(this.initCollection, async (type, contact) => {
+      if (contact.id === this.activeUser.id) {
+        this.readChat(contact)
+      }
+
       if (type === 'added') {
         const contactExist = !this.userlist
           .find(user => user.id === contact.id)
@@ -190,6 +195,10 @@ export default class ChatList extends Mixins(StoreMixins, NavMixins) {
         this.tstore.commit('chat/update_user_list', contact)
       }
     })
+  }
+
+  beforeDestroy (): void {
+    this.subContact()
   }
 
   async infiniteHandler ($state: StateChanger): Promise<void> {
@@ -216,7 +225,6 @@ export default class ChatList extends Mixins(StoreMixins, NavMixins) {
 
   async readChat (contact: UserChat): Promise<void> {
     if (contact.unread > 0) {
-      console.log('readChat')
       await chatRead(contact.id, this.isSeller)
       this.tstore.commit('chat/add_unread', -contact.unread)
     }

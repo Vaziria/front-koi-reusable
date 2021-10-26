@@ -1,3 +1,4 @@
+import { IIkan } from './ikan'
 import { Seller } from './seller'
 import { IUser } from './user'
 
@@ -57,12 +58,15 @@ export type ChatInfo = ChatInfoBuyer | ChatInfoSeller
 
 export interface ChatOrder {
     id: string
+    ikans: IIkan[]
+    total: number
 }
 
 export interface ChatProduct {
     id: string
     shopid: string
     name: string
+    price: number
     send_process: boolean
     gambar: string
 }

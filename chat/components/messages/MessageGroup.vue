@@ -4,7 +4,9 @@
       v-for="(group, index) in messageGroup"
       :key="index"
       :class="{
-        media: true,
+        'media my-2': true,
+        'pr-5': !group.reverse,
+        'pl-5': group.reverse,
         'flex-row-reverse': group.reverse
       }"
     >
@@ -53,12 +55,12 @@ class MessageGroup extends StoreMixins {
     const messageGroup: GroupMessage[] = []
     const userid = this.tstore.state.user.uid
 
-    this.messages.forEach(message => {
+    this.messages.reverse().forEach(message => {
       if (id !== message.from_id) {
         messageGroup.push({
           key: message.from_id,
           messages: [],
-          reverse: message.from_id !== userid
+          reverse: message.from_id === userid
         })
         id = message.from_id
       }

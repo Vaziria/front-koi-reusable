@@ -76,7 +76,7 @@ export function subscribeChat (payload: FireChatPayload, callback: ChatCallback)
       const msg = change.doc.data() as Chat
       msg.id = change.doc.id
       callback(msg)
-      specialLog('msg from seller', msg)
+      specialLog('getting message', msg)
     })
   }
 
@@ -187,7 +187,9 @@ export class ChatMessages extends ChatRequest {
     const messages: Chat[] = []
 
     if (this.request) {
-      const request = await this.request.get()
+      const request = await this.request
+        .orderBy('created', 'desc')
+        .get()
       this.checkNext(request.docs)
 
       request.docs.forEach(chat => {
@@ -202,9 +204,9 @@ export class ChatMessages extends ChatRequest {
 
   async paginateChat (): Promise<Chat[]> {
     const messages: Chat[] = []
-    console.log(this.lastVisible)
     if (this.request && this.lastVisible) {
       const request = await this.request
+        .orderBy('created', 'desc')
         .startAfter(this.lastVisible)
         .get()
       this.checkNext(request.docs)

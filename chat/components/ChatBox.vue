@@ -10,7 +10,7 @@
         @infinite="infiniteHandler"
       >
         <div slot="spinner">
-          <div class="spinner-border spinner-grow-sms text-info d-block mg-x-auto"></div>
+          <div class="spinner-border spinner-grow-sms text-info d-block mg-x-auto mt-3"></div>
           <p class="tx-12 tx-center">Memuat pesan...</p>
         </div>
         <div slot="no-more"></div>
@@ -30,72 +30,29 @@
       <NoResults v-if="noResult" slot="noresult" />
     </MessageContainer>
 
-    <ChatReply
-      v-if="product"
-      :image="product.gambar"
-      :text="product.name"
-      :action="removeProduct"
-    />
-    <ChatReply
-      v-if="order"
-      :image="order.ikans[0].gambar[0]"
-      :text="order.id"
-      :action="removeOrder"
-    />
-    <ChatForm @onChat="scrollchat()" />
-    <!-- <chart-pop v-if="isMobile" /> -->
+    <ReplyProduct />
+    <ReplyOrder />
 
-    <div
-      v-if="currentDate"
-      class="tx-center mb-4 mt-3 pt-2 pos-absolute t-40 z-index-200 tx-center wd-100p"
-    >
-      <span
-        class="badge badge-dark tx-11 p-2 rounded-10 op-9 tx-gray-200"
-      >{{ currentDate }}</span>
-    </div>
+    <ChatForm @onChat="scrollchat()" />
   </div>
 </template>
-<style scoped>
-  #azChatBody {
-    position: absolute;
-    width: 100%;
-    height: calc(100% - 103px) !important;
-    overflow: auto;
-  }
-  #azChatBody.with-reply {
-    height: calc(100% - 177px) !important;
-  }
-  #azChatBody::-webkit-scrollbar-track
-  {
-    background-color: #FFF;
-  }
-
-  #azChatBody::-webkit-scrollbar
-  {
-    width: 2px;
-    background-color: #FFF;
-  }
-
-  #azChatBody::-webkit-scrollbar-thumb
-  {
-    background-color: #97a3b9;
-  }
-</style>
 <script lang="ts">
 import { Component, Mixins, Watch, Prop } from 'vue-property-decorator'
 import InfiniteLoading, { StateChanger } from 'vue-infinite-loading'
 
-import ChatLoading from './ChatLoading.vue'
 import ChatHeader from './ChatHeader.vue'
-import ChatDialog from './ChatDialog.vue'
-import ChatReply from './ChatReply.vue'
+// import ChatDialog from './ChatDialog.vue'
 import ChatForm from './ChatForm.vue'
 
 import MessageContainer from './messages/MessageContainer.vue'
 import MessageGroup from './messages/MessageGroup.vue'
 
-// import ChartPop from '../../../components/Chart/ChartPop.vue'
-import { Chat, ChatOrder, ChatProduct, ChatUI, UserChat } from '../../model/chat'
+import ChatDialog from './dialog/ChatDialog.vue'
+
+import ReplyProduct from './reply/ReplyProduct.vue'
+import ReplyOrder from './reply/ReplyOrder.vue'
+
+import { Chat, ChatUI, UserChat } from '../../model/chat'
 import VueWithStore from '../../store/wrapper.vue'
 import { Namespaced, Store } from '../../store/types'
 import { ChatAction, ChatMutation, IChatState } from '../../store/chat'
@@ -105,6 +62,7 @@ import WithNav from '../../navigation/WithNav.vue'
 import { BasicRoute } from '../../navigation/basicroute'
 import NoResults from '../../components/noresults/Chat.vue'
 import { ChatMessages, subscribeChat, FireChatPayload } from '../../api/fireChat'
+import { chatRead } from '../../api/chat'
 
 type State = {
   'chat': IChatState
@@ -126,23 +84,20 @@ class NavMixins extends WithNav<BasicRoute> {}
 @Component({
   components: {
     InfiniteLoading,
-    ChatLoading,
     ChatHeader,
     MessageContainer,
     MessageGroup,
+    ReplyProduct,
+    ReplyOrder,
     ChatDialog,
-    ChatReply,
     ChatForm,
     NoResults
-    // ChartPop
   }
 })
 export default class ChatBox extends Mixins(StoreMixins, NavMixins) {
   @Prop() readonly noClose!: boolean
 
-  currentDate = ''
   messages: Chat[] = []
-
   chatMessages: ChatMessages | null = null
   subChat: () => void = () => undefined
 
@@ -184,17 +139,8 @@ export default class ChatBox extends Mixins(StoreMixins, NavMixins) {
       !this.chatMessages?.haveNext
   }
 
-  // getter product dan order chat dari store
-  get product (): ChatProduct | null {
-    return this.tstore.state.chat.product
-  }
-
   get user (): UserChat {
     return this.tstore.state.chat.userActive
-  }
-
-  get order (): ChatOrder | null {
-    return this.tstore.state.chat.order
   }
 
   get unsendMessages (): ChatUI[] {
@@ -219,9 +165,9 @@ export default class ChatBox extends Mixins(StoreMixins, NavMixins) {
     const orderids: string[] = []
     const productids: string[] = []
     const msgs = [
-      ...this.messages,
       ...this.unsendMessages,
-      ...this.errorMessages
+      ...this.errorMessages,
+      ...this.messages
     ]
     const fixmsgs = msgs
       .filter(chat => chat)
@@ -247,9 +193,10 @@ export default class ChatBox extends Mixins(StoreMixins, NavMixins) {
 
   @Watch('user')
   async updateUser (): Promise<void> {
-    this.subChat()
-    this.initChat()
     if (!this.isMobile) {
+      this.subChat()
+      this.initChat()
+
       const infiniteLoading = this.$refs.infiniteLoading as InfiniteLoading
       if (infiniteLoading) {
         this.messages = []
@@ -263,14 +210,11 @@ export default class ChatBox extends Mixins(StoreMixins, NavMixins) {
       if (this.messages.length) {
         const messages = await this.chatMessages.paginateChat()
         this.messages = [...this.messages, ...messages]
-        console.log([...this.messages, ...messages], messages)
       } else {
         const messages = await this.chatMessages.getChat()
         this.messages = [...messages]
-        setTimeout(() => this.scrollchat(), 300)
+        this.scrollchat()
       }
-
-      console.log(this.messages.length)
 
       if (this.chatMessages.haveNext) {
         setTimeout(() => $state.loaded(), 300)
@@ -286,31 +230,28 @@ export default class ChatBox extends Mixins(StoreMixins, NavMixins) {
   }
 
   beforeDestroy (): void {
+    const { chat, system } = this.tstore.state
+    chatRead(chat.userActive.id, system.isSeller)
+    this.tstore.commit('chat/reset_user')
     this.subChat()
   }
 
   initChat (): void {
     this.chatMessages = new ChatMessages(this.payload)
     this.subChat = subscribeChat(this.payload, (msg) => {
-      this.messages = [...this.messages, msg]
+      this.messages = [msg, ...this.messages]
     })
   }
 
   scrollchat (): void {
-    const chatBody = this.$el.children[1]
-    chatBody.scrollTo({ top: chatBody.scrollHeight })
+    setTimeout(() => {
+      const chatBody = this.$el.children[1].children[0]
+      chatBody.scrollTo({ top: chatBody.scrollHeight })
+    }, 300)
   }
 
   close (): void {
     this.tstore.commit('chat/mini_show', false)
-  }
-
-  removeOrder (): void {
-    this.tstore.commit('chat/set_order', null)
-  }
-
-  removeProduct (): void {
-    this.tstore.commit('chat/set_product', null)
   }
 }
 </script>
