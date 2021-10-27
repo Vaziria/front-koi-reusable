@@ -24,6 +24,7 @@
           <ChatDialog
             slot-scope="data"
             :message="data.message"
+            @onResend="scrollchat()"
           />
       </MessageGroup>
 
@@ -143,21 +144,25 @@ export default class ChatBox extends Mixins(StoreMixins, NavMixins) {
   }
 
   get unsendMessages (): ChatUI[] {
-    return this.tstore.state.chat.unsend.map(chat => {
-      return {
-        ...chat,
-        send_process: true
-      }
-    })
+    return this.tstore.state.chat.unsend
+      .filter(chat => chat.to_id === this.user.id)
+      .map(chat => {
+        return {
+          ...chat,
+          send_process: true
+        }
+      })
   }
 
   get errorMessages (): ChatUI[] {
-    return this.tstore.state.chat.errorchat.map(chat => {
-      return {
-        ...chat,
-        send_error: true
-      }
-    })
+    return this.tstore.state.chat.errorchat
+      .filter(chat => chat.to_id === this.user.id)
+      .map(chat => {
+        return {
+          ...chat,
+          send_error: true
+        }
+      })
   }
 
   get messagesUi (): ChatUI[] {
@@ -170,6 +175,9 @@ export default class ChatBox extends Mixins(StoreMixins, NavMixins) {
     ]
     const fixmsgs = msgs
       .filter(chat => chat)
+      .sort((currentMsg, nextMsg) => {
+        return currentMsg.created > nextMsg.created ? -1 : 1
+      })
       .map((chat: ChatUI) => {
         const notProcessOrError = !chat.send_process && !chat.send_error
 
@@ -234,6 +242,7 @@ export default class ChatBox extends Mixins(StoreMixins, NavMixins) {
     const { chat, system } = this.tstore.state
     chatRead(chat.userActive.id, system.isSeller)
     this.tstore.commit('chat/reset_user')
+    this.tstore.commit('chat/reset_message_unsend_error')
     this.subChat()
   }
 

@@ -112,6 +112,20 @@ const mutations = {
     })
   },
 
+  remove_message_error (state: IChatState, data: Chat): void {
+    state.errorchat = state.errorchat.filter(chat => {
+      if (chat.id === data.id) {
+        return false
+      }
+      return true
+    })
+  },
+
+  reset_message_unsend_error (state: IChatState): void {
+    state.errorchat = []
+    state.unsend = []
+  },
+
   clear_order_product (state: IChatState): void {
     state.order = null
     state.product = null
@@ -203,6 +217,7 @@ const actions = {
       chat.cs_id = rootState.user.uid
     }
 
+    commit('remove_message_error', chat)
     commit('push_message_unsend', chat)
     try {
       await sendChat(state.userActive.id, isSeller, chat)

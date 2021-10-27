@@ -86,7 +86,7 @@ class ChatForm extends Mixins(StoreMix, SwalMixin, RootEmitMix) {
   }
 
   @Emit('onChat')
-  async sendMessage (): Promise<void> {
+  sendMessage (): void {
     if (!this.text.trim()) {
       this.topedToast('Pesan Anda kosong.', 'OK')
       return
@@ -106,7 +106,7 @@ class ChatForm extends Mixins(StoreMix, SwalMixin, RootEmitMix) {
     }
 
     this.text = ''
-    await this.tstore.dispatch('chat/sendChat', chat)
+    this.tstore.dispatch('chat/sendChat', chat)
   }
 }
 

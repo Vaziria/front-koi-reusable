@@ -1,14 +1,17 @@
 <template>
-  <div :class="{
-    'az-msg-wrapper rounded-5 p-2': true,
-    'op-5': unsend
-  }">
+  <div
+    :class="{
+      'az-msg-wrapper rounded-5 p-2': true,
+      'op-5': unsend || error,
+      pointer: error
+    }"
+    @click="$emit('click')"
+  >
     <div class="d-flex tx-12">
       <span class="wrap mr-2">{{ text }}</span>
       <small class="d-block tx-right ml-auto align-self-end op-5">
-        <br>
-        <span>{{ parseInt(date) | moment('HH:mm:ss') }}</span>
-        <a><i class="icon ion-android-more-horizontal"></i></a>
+        <span class="mr-1">{{ parseInt(date) | moment('HH:mm:ss') }}</span>
+        <i v-if="unsend" class="fas fa-clock" />
         <i v-if="error" class="fas fa-exclamation-triangle" />
       </small>
     </div>

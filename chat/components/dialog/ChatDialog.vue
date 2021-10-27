@@ -14,49 +14,47 @@
       :unsend="isUnsend"
       :self-chat="selfChat"
     />
-    <div class="d-block">
+    <div class="d-block mb-1">
       <div :class="{
         'd-flex': true,
         'justify-content-end': selfChat
       }">
         <TextDialog
           :text="message.text"
-          :unsend="isUnsend"
+          :unsend="message.send_process"
           :date="message.created"
           :error="message.send_error"
+          class="mb-0"
+          @click="resendChat()"
         />
+      </div>
+      <div
+        v-if="message.send_error"
+        :class="{
+          'd-flex tx-info tx-10': true,
+          'justify-content-end': selfChat
+        }"
+      >
+        <span>klik untuk mengirim ulang</span>
       </div>
     </div>
   </div>
-  <!-- <div :class="{ 'az-msg-wrapper rounded-5 p-2': true, 'op-5': message.send_process }">
-    <ProductChat v-if="message.show_product" :productid="message.productid" :shopid="message.shopid"/>
-    <OrderChat v-if="message.show_order" :orderid="message.orderid" :shopid="message.shopid" />
-    <div class="d-flex tx-12">
-      <span class="wrap mr-2">{{ message.text }}</span>
-      <small class="d-block tx-right ml-auto align-self-end op-5">
-        <br>
-        <span>{{ parseInt(message.created) | moment('HH:mm:ss') }}</span>
-        <a href="#"><i class="icon ion-android-more-horizontal"></i></a>
-        <i v-if="message.error" class="fas fa-exclamation-triangle" />
-      </small>
-    </div>
-  </div> -->
 </template>
 <script lang="ts">
 import { ChatUI } from '../../../model/chat'
-import { Component, Prop } from 'vue-property-decorator'
+import { Component, Prop, Emit } from 'vue-property-decorator'
 import ProductDialog from './ProductDialog.vue'
 import OrderDialog from './OrderDialog.vue'
 import TextDialog from './TextDialog.vue'
-import { IChatState } from '../../../store/chat'
-import { Store } from '../../../store/types'
+import { IChatState, ChatAction } from '../../../store/chat'
+import { Namespaced, Store } from '../../../store/types'
 import VueWithStore from '../../../store/wrapper.vue'
 
 type State = {
   'chat': IChatState
 }
 // eslint-disable-next-line @typescript-eslint/ban-types
-type ChatStore = Store<State, {}, {}>
+type ChatStore = Store<State, {}, Namespaced<ChatAction, 'chat'>>
 
 @Component
 class StoreMixins extends VueWithStore<ChatStore> {}
@@ -78,6 +76,23 @@ class ChatDialog extends StoreMixins {
   get selfChat (): boolean {
     const targetId = this.tstore.state.chat.userActive.id
     return this.message.from_id !== targetId
+  }
+
+  @Emit('onResend')
+  resendChat (): void {
+    if (this.message.send_error) {
+      // eslint-disable-next-line camelcase
+      const { id, from_id, text, to_id } = this.message
+      const created = new Date().getTime()
+
+      this.tstore.dispatch('chat/sendChat', {
+        id,
+        created,
+        from_id,
+        text,
+        to_id
+      })
+    }
   }
 }
 
