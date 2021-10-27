@@ -24,7 +24,6 @@ export function initSellerContacts (sellerid: string, csid?: string): StoreQuery
   let collection = chatsSellerCol(sellerid).orderBy('last_chat', 'asc')
 
   if (csid) {
-    console.log(csid)
     collection = collection.where('cs_id', '==', csid)
   }
 
@@ -54,18 +53,12 @@ export function subscribeContact (collection: StoreQuery<DocData>, callback: Con
 }
 
 export function initChats (payload: FireChatPayload): StoreQuery<DocData> {
-  const { sellerid, userid, csid } = payload
+  const { sellerid, userid } = payload
   specialLog('Init chat targetid:', sellerid)
-  let collection = chatsSellerCol(sellerid)
+  return chatsSellerCol(sellerid)
     .doc(userid)
     .collection('messages')
     .where('created', '>', Date.now())
-
-  if (csid) {
-    collection = collection.where('cs_id', '==', csid)
-  }
-
-  return collection
     .orderBy('created', 'desc')
     .limit(20)
 }

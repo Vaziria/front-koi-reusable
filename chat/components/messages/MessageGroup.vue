@@ -53,14 +53,19 @@ class MessageGroup extends StoreMixins {
   get messageGroup (): GroupMessage[] {
     let id = ''
     const messageGroup: GroupMessage[] = []
-    const userid = this.tstore.state.user.uid
+    const { uid, shopid } = this.tstore.state.user
 
     this.messages.reverse().forEach(message => {
       if (id !== message.from_id) {
+        let reverse = message.from_id === uid
+        if (message.from_seller) {
+          reverse = message.shopid === shopid
+        }
+
         messageGroup.push({
           key: message.from_id,
           messages: [],
-          reverse: message.from_id === userid
+          reverse
         })
         id = message.from_id
       }

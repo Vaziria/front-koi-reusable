@@ -143,7 +143,7 @@ export default class ChatList extends Mixins(StoreMixins, NavMixins) {
     if (system.isSeller) {
       const isCs = user.uid !== user.shopid
       const csid = isCs ? user.uid : ''
-      return initSellerContacts(user.uid, csid)
+      return initSellerContacts(user.shopid, csid)
     }
 
     return initBuyerContacts(user.uid)

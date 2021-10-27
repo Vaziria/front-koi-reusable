@@ -171,14 +171,16 @@ export default class ChatBox extends Mixins(StoreMixins, NavMixins) {
     const fixmsgs = msgs
       .filter(chat => chat)
       .map((chat: ChatUI) => {
-        if (chat.productid) {
+        const notProcessOrError = !chat.send_process && !chat.send_error
+
+        if (chat.productid && notProcessOrError) {
           if (!productids.includes(chat.productid)) {
             productids.push(chat.productid)
             chat.show_product = true
           }
         }
 
-        if (chat.orderid) {
+        if (chat.orderid && notProcessOrError) {
           if (!orderids.includes(chat.orderid)) {
             orderids.push(chat.orderid)
             chat.show_order = true
