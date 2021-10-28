@@ -1,14 +1,11 @@
-import { chatList, chatMessages, chatRead, sendChat, getContact, getContactSeller } from '../api/chat'
-import { Chat, ChatOrder, ChatProduct, UserChat, UserChatBasic, UserChatSeller } from '../model/chat'
+import { chatList, sendChat, getContact, getContactSeller } from '../api/chat'
+import { Chat, ChatOrder, ChatProduct, UserChat, UserChatBasic } from '../model/chat'
 import { ISystemState } from '../store/system'
 import { Commit, Namespaced, Store } from '../store/types'
 import { IUserState } from '../store/user'
 import { Module } from 'vuex'
-import { getShop } from '../api/shop'
-import { getUser } from '../api/user'
-import { errorLog } from '../utils/logger'
+import { emptyUserActive, getSellerChat, getUserChat } from '../api/chatUser'
 
-const perpage = 20
 const contactPerpage = 20
 
 export interface IChatState {
@@ -17,82 +14,29 @@ export interface IChatState {
   showRecomend: boolean
   userActive: UserChatBasic
 
-  // extra
-  productids: string[]
-  orderids: string[]
-  unread: number
-
   // messages
   product: ChatProduct | null
   order: ChatOrder | null
-  message: Chat[]
   unsend: Chat[]
   errorchat: Chat[]
-  loading: boolean
-  endpage: boolean
 
   // contact
   userlist: UserChat[]
-  contactEndpage: boolean
-  contactLoading: boolean
-}
 
-export const emptyUserActive: UserChatBasic = {
-  id: '',
-  unread: 0,
-  last_chat: 0,
-  last_msg: {
-    id: '',
-    from_id: '',
-    to_id: '',
-    created: 0
-  },
-  name: '',
-  seller_name: '',
-  state: 'offline',
-  photoUrl: ''
-}
-
-export async function getUserChat (id: string): Promise<UserChat> {
-  const user = await getUser(id)
-  const userChat: UserChat = {
-    ...emptyUserActive,
-    id: user.id,
-    name: user.name,
-    photoUrl: user.photoUrl || ''
-  }
-
-  return userChat
-}
-
-async function getSellerChat (shopid: string): Promise<UserChatSeller> {
-  const seller = await getShop(shopid)
-  const userChat: UserChatSeller = {
-    ...emptyUserActive,
-    ...seller,
-    is_seller: true
-  }
-
-  return userChat
+  // extra
+  unread: number
 }
 
 const state: IChatState = {
   showMini: false,
   showRecomend: false,
-  loading: false,
   userActive: emptyUserActive,
-  message: [],
   unsend: [],
   errorchat: [],
   userlist: [],
   product: null,
   order: null,
-  productids: [],
-  orderids: [],
-  unread: 0,
-  endpage: false,
-  contactEndpage: false,
-  contactLoading: false
+  unread: 0
 }
 
 const mutations = {
@@ -132,17 +76,16 @@ const mutations = {
   },
 
   set_user_list (state: IChatState, data: UserChat[]): void {
-    state.userlist = [...state.userlist, ...data]
-    state.contactLoading = false
-    state.contactEndpage = data.length < contactPerpage
+    state.userlist = data
   },
 
-  update_user_list (state: IChatState, data: Chat): void {
+  update_user_list (state: IChatState, contact: UserChat): void {
     state.userlist = state.userlist.map(user => {
-      if (user.id === data.from_id) {
-        user.last_chat = data.created
-        user.last_msg = data
-        user.unread += 1
+      if (user.id === contact.id) {
+        return {
+          ...user,
+          ...contact
+        }
       }
       return user
     })
@@ -150,25 +93,6 @@ const mutations = {
 
   push_user_list (state: IChatState, data: UserChat): void {
     state.userlist = [data, ...state.userlist]
-  },
-
-  set_message (state: IChatState, data: Chat[]): void {
-    state.message = [...data, ...state.message]
-    state.loading = false
-    state.endpage = data.length < perpage
-    state.unsend = []
-    state.errorchat = []
-    state.orderids = []
-    state.productids = []
-  },
-
-  reset_message (state: IChatState): void {
-    state.message = []
-    state.endpage = false
-  },
-
-  push_message (state: IChatState, data: Chat): void {
-    state.message.push(data)
   },
 
   push_message_error (state: IChatState, data: Chat): void {
@@ -188,14 +112,18 @@ const mutations = {
     })
   },
 
-  set_user_read (state: IChatState, id: string): void {
-    state.userlist = state.userlist.map(user => {
-      let unread = user.unread
-      if (user.id === id) {
-        unread = 0
+  remove_message_error (state: IChatState, data: Chat): void {
+    state.errorchat = state.errorchat.filter(chat => {
+      if (chat.id === data.id) {
+        return false
       }
-      return { ...user, unread }
+      return true
     })
+  },
+
+  reset_message_unsend_error (state: IChatState): void {
+    state.errorchat = []
+    state.unsend = []
   },
 
   clear_order_product (state: IChatState): void {
@@ -226,13 +154,11 @@ type Context = Commit<ChatMutation> & { state: IChatState } & { rootState: RootS
 const actions = {
   async open (store: Context): Promise<void> {
     const { state } = store
-    state.message = []
     state.showMini = true
   },
 
   async openContact (store: Context): Promise<void> {
     const { commit, rootState, state } = store
-    state.contactLoading = true
     const userlist = await chatList(rootState.system.isSeller, {
       limit: contactPerpage
     })
@@ -246,23 +172,9 @@ const actions = {
     commit('set_user_list', userlist)
   },
 
-  async paginateContact (store: Context): Promise<void> {
-    const { commit, state, rootState } = store
-    const { isSeller } = rootState.system
-
-    const userlist = await chatList(isSeller, {
-      start_after: state.userlist[state.userlist.length - 1].id,
-      limit: contactPerpage
-    })
-
-    commit('set_user_list', userlist)
-  },
-
   async openChat (store: Context, user: UserChat|string): Promise<void> {
     const { commit, rootState } = store
     const uid = rootState.user.uid
-    state.message = []
-    state.loading = true
     commit('set_user', emptyUserActive)
 
     if (typeof user === 'string') {
@@ -273,90 +185,10 @@ const actions = {
       } else {
         const userChat = await getSellerChat(user)
         const contact = await getContact(uid, user)
-        commit('set_user', { ...contact, ...userChat })
+        commit('set_user', { ...userChat, ...contact })
       }
     } else {
       commit('set_user', user)
-    }
-  },
-
-  async getMessage (store: Context): Promise<void> {
-    const { commit, state, rootState } = store
-    const { isSeller } = rootState.system
-    const userid = isSeller ? rootState.user.shopid : rootState.user.uid
-    const targetid = state.userActive.id
-    if (targetid === '') {
-      return
-    }
-
-    store.state = {
-      ...state,
-      message: [],
-      loading: true
-    }
-
-    let msg: Chat[] = []
-    let unread = 0
-    try {
-      if (isSeller) {
-        const chatInfo = await getContactSeller(targetid, userid)
-        unread = chatInfo.unread
-      } else {
-        const chatInfo = await getContact(userid, targetid)
-        unread = chatInfo.unread
-      }
-      await chatRead(state.userActive.id, isSeller)
-      msg = await chatMessages(targetid, {
-        seller: isSeller,
-        limit: perpage
-      })
-    } catch (e) {
-      errorLog(e)
-    }
-
-    const fixmsg: Chat[] = msg.reverse()
-    commit('add_unread', -(unread))
-    commit('set_user_read', targetid)
-    commit('set_message', fixmsg)
-  },
-
-  async paginateChat (store: Context): Promise<void> {
-    const { commit, state, rootState } = store
-    const { isSeller } = rootState.system
-
-    const msg = await chatMessages(state.userActive.id, {
-      seller: isSeller,
-      start_after: state.message[0].id,
-      limit: perpage
-    })
-
-    commit('set_message', msg.reverse())
-  },
-
-  async pushChat (store: Context, chat: Chat): Promise<void> {
-    const { commit, state, rootState } = store
-
-    if (chat.from_id === state.userActive.id) {
-      commit('push_message', chat)
-    } else {
-      const findUser = state.userlist.find(user => user.id === chat.from_id)
-      if (findUser) {
-        commit('update_user_list', chat)
-      } else {
-        if (rootState.system.isSeller) {
-          const userChat = await getUserChat(chat.from_id)
-          userChat.last_msg = chat
-          userChat.last_chat = chat.created
-          userChat.unread = 1
-          commit('push_user_list', userChat)
-        } else {
-          const userChat = await getSellerChat(chat.from_id)
-          userChat.last_msg = chat
-          userChat.last_chat = chat.created
-          userChat.unread = 1
-          commit('push_user_list', userChat)
-        }
-      }
     }
   },
 
@@ -385,12 +217,11 @@ const actions = {
       chat.cs_id = rootState.user.uid
     }
 
+    commit('remove_message_error', chat)
     commit('push_message_unsend', chat)
     try {
-      const chatsuccess = await sendChat(state.userActive.id, isSeller, chat)
+      await sendChat(state.userActive.id, isSeller, chat)
       commit('remove_message_unsend', chat)
-      commit('push_message', chatsuccess)
-      commit('update_user_list', chatsuccess)
     } catch {
       commit('push_message_error', chat)
     }
@@ -407,7 +238,6 @@ const actions = {
     const { commit } = store
     commit('set_user', emptyUserActive)
     commit('mini_show', false)
-    commit('set_message', [])
   }
 }
 

@@ -81,9 +81,7 @@ export class AuthUser {
     await setupNotification((notif) => {
       if (!notifids.includes(notif.id)) {
         notifids.push(notif.id)
-        if (notif.type === 'new_chat') {
-          this.store.commit('chat/add_unread', 1)
-        } else {
+        if (notif.type !== 'new_chat') {
           this.store.commit('notif/push_new_notif', notif)
         }
       }
@@ -99,7 +97,6 @@ export class AuthUser {
       setupPresence(user.uid, db, realdb)
     } else {
       this.store.commit('user/set_logout')
-      this.store.commit('chat/reset_message')
       this.store.commit('chat/reset_user')
       this.store.commit('orderstat/reset_count')
     }

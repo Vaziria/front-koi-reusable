@@ -12,10 +12,10 @@
       style="cursor: pointer;"
       @click="toggleShow()"
     >
-      <Counter :count="unreadChat" class="d-flex">
-        <mdb-icon icon="comment" class="tx-26 mr-2" />
-        <span class="align-self-center">Chat</span>
+      <Counter :count="unreadChat" class="d-flex mr-2">
+        <mdb-icon icon="comment" class="tx-26" />
       </Counter>
+      <span class="align-self-center">Chat</span>
     </div>
   </div>
 </template>

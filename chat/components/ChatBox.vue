@@ -1,150 +1,79 @@
 <template>
   <div class="">
     <ChatHeader :no-close="noClose" />
-    <div
-      id="azChatBody"
-      :class="bodyClass"
-    >
+
+    <MessageContainer :messages="messagesUi">
       <InfiniteLoading
+        slot="infinite"
         ref="infiniteLoading"
         direction="top"
         @infinite="infiniteHandler"
       >
         <div slot="spinner">
-          <div class="spinner-border spinner-grow-sms text-info d-block mg-x-auto"></div>
+          <div class="spinner-border spinner-grow-sms text-info d-block mg-x-auto mt-3"></div>
           <p class="tx-12 tx-center">Memuat pesan...</p>
         </div>
         <div slot="no-more"></div>
         <div slot="no-results"></div>
       </InfiniteLoading>
 
-      <div
-        v-for="(usermsgs, date) in messages"
-        :key="date"
-        :id="date"
+      <MessageGroup
+        slot-scope="data"
+        :messages="data.messages"
       >
-        <div class="tx-center mb-4 mt-3 pt-2">
-          <span
-            class="badge badge-dark tx-11 p-2 rounded-10 op-9 tx-gray-200"
-          >{{ date }}</span>
-        </div>
+          <ChatDialog
+            slot-scope="data"
+            :message="data.message"
+            @onResend="scrollchat()"
+          />
+      </MessageGroup>
 
-        <div
-          v-for="(usermsg, index) in usermsgs"
-          :key="index"
-          :class="{
-            media: true,
-            'flex-row-reverse': usermsg.key !== user.id
-          }"
-        >
-          <div class="media-body mx-2">
-            <ChatDialog
-              v-for="message in usermsg.data"
-              :key="message.id"
-              :message="message"
-            />
-          </div>
-        </div>
-      </div>
+      <NoResults v-if="noResult" slot="noresult" />
+    </MessageContainer>
 
-      <NoResults v-if="noResult" />
+    <ReplyProduct />
+    <ReplyOrder />
 
-    </div>
-    <ChatReply
-      v-if="product"
-      :image="product.gambar"
-      :text="product.name"
-      :action="removeProduct"
-    />
-    <ChatReply
-      v-if="order"
-      :image="order.ikans[0].gambar[0]"
-      :text="order.id"
-      :action="removeOrder"
-    />
     <ChatForm @onChat="scrollchat()" />
-    <!-- <chart-pop v-if="isMobile" /> -->
-
-    <div
-      v-if="currentDate"
-      class="tx-center mb-4 mt-3 pt-2 pos-absolute t-40 z-index-200 tx-center wd-100p"
-    >
-      <span
-        class="badge badge-dark tx-11 p-2 rounded-10 op-9 tx-gray-200"
-      >{{ currentDate }}</span>
-    </div>
   </div>
 </template>
-<style scoped>
-  #azChatBody {
-    position: absolute;
-    width: 100%;
-    height: calc(100% - 103px) !important;
-    overflow: auto;
-  }
-  #azChatBody.with-reply {
-    height: calc(100% - 177px) !important;
-  }
-  #azChatBody::-webkit-scrollbar-track
-  {
-    background-color: #FFF;
-  }
-
-  #azChatBody::-webkit-scrollbar
-  {
-    width: 2px;
-    background-color: #FFF;
-  }
-
-  #azChatBody::-webkit-scrollbar-thumb
-  {
-    background-color: #97a3b9;
-  }
-</style>
 <script lang="ts">
 import { Component, Mixins, Watch, Prop } from 'vue-property-decorator'
 import InfiniteLoading, { StateChanger } from 'vue-infinite-loading'
 
-import ChatLoading from './ChatLoading.vue'
 import ChatHeader from './ChatHeader.vue'
-import ChatDialog from './ChatDialog.vue'
-import ChatReply from './ChatReply.vue'
 import ChatForm from './ChatForm.vue'
-// import ChartPop from '../../../components/Chart/ChartPop.vue'
-import { Chat, ChatOrder, ChatProduct, UserChat } from '../../model/chat'
+
+import MessageContainer from './messages/MessageContainer.vue'
+import MessageGroup from './messages/MessageGroup.vue'
+
+import ChatDialog from './dialog/ChatDialog.vue'
+
+import ReplyProduct from './reply/ReplyProduct.vue'
+import ReplyOrder from './reply/ReplyOrder.vue'
+
+import { Chat, ChatUI, UserChat } from '../../model/chat'
 import VueWithStore from '../../store/wrapper.vue'
 import { Namespaced, Store } from '../../store/types'
 import { ChatAction, ChatMutation, IChatState } from '../../store/chat'
+import { IUserState } from '../../store/user'
 import { ISystemState } from '../../store/system'
 import WithNav from '../../navigation/WithNav.vue'
 import { BasicRoute } from '../../navigation/basicroute'
 import NoResults from '../../components/noresults/Chat.vue'
-import dateFormater from '../../filters/date'
-
-interface ChatUi extends Chat {
-  'show_product'?: boolean
-  'show_order'?: boolean
-}
-
-interface TransformChat {
-  key: string,
-  data: ChatUi[]
-}
-
-interface GroupByDateChat {
-  [key: string]: ChatUi[]
-}
-
-interface GroupByDateUserChat {
-  [key: string]: TransformChat[]
-}
+import { ChatMessages, subscribeChat, FireChatPayload } from '../../api/fireChat'
+import { chatRead } from '../../api/chat'
 
 type State = {
   'chat': IChatState
   'system': ISystemState
+  'user': IUserState
 }
 
-type ChatStore = Store<State, Namespaced<ChatMutation, 'chat'>, Namespaced<ChatAction, 'chat'>>
+type ChatStore = Store<State,
+  Namespaced<ChatMutation, 'chat'>,
+  Namespaced<ChatAction, 'chat'>
+>
 
 @Component
 class StoreMixins extends VueWithStore<ChatStore> {}
@@ -155,210 +84,184 @@ class NavMixins extends WithNav<BasicRoute> {}
 @Component({
   components: {
     InfiniteLoading,
-    ChatLoading,
     ChatHeader,
+    MessageContainer,
+    MessageGroup,
+    ReplyProduct,
+    ReplyOrder,
     ChatDialog,
-    ChatReply,
     ChatForm,
     NoResults
-    // ChartPop
   }
 })
 export default class ChatBox extends Mixins(StoreMixins, NavMixins) {
   @Prop() readonly noClose!: boolean
 
-  endpage = false
-  currentDate = ''
+  messages: Chat[] = []
+  chatMessages: ChatMessages | null = null
+  subChat: () => void = () => undefined
 
-  get loading (): boolean {
-    return this.tstore.state.chat.loading
+  get payload (): FireChatPayload {
+    if (this.isSeller) {
+      let csid
+      const { uid, shopid } = this.tstore.state.user
+
+      if (uid !== shopid) {
+        csid = uid
+      }
+
+      return {
+        sellerid: shopid,
+        userid: this.user.id,
+        csid
+      }
+    }
+
+    return {
+      sellerid: this.user.id,
+      userid: this.tstore.state.user.uid
+    }
   }
 
   get isMobile (): boolean {
     return this.tstore.state.system.isMobile
   }
 
+  get isSeller (): boolean {
+    return this.tstore.state.system.isSeller
+  }
+
   get noResult (): boolean {
-    const { message, unsend, errorchat } = this.tstore.state.chat
-    return message.length === 0 &&
+    const { unsend, errorchat } = this.tstore.state.chat
+    return this.messages.length === 0 &&
       unsend.length === 0 &&
       errorchat.length === 0 &&
-      this.endpage
-  }
-
-  get bodyClass (): string {
-    let defaultClass = 'az-chat-body content-inner py-3'
-
-    if (!this.tstore.state.system.isMobile) {
-      defaultClass += ' mg-t-60 mg-md-t-0'
-    }
-
-    if (this.product || this.order) {
-      defaultClass += ' with-reply'
-    }
-
-    return defaultClass
-  }
-
-  // getter product dan order chat dari store
-  get product (): ChatProduct | null {
-    return this.tstore.state.chat.product
+      !this.chatMessages?.haveNext
   }
 
   get user (): UserChat {
     return this.tstore.state.chat.userActive
   }
 
-  get order (): ChatOrder | null {
-    return this.tstore.state.chat.order
+  get unsendMessages (): ChatUI[] {
+    return this.tstore.state.chat.unsend
+      .filter(chat => chat.to_id === this.user.id)
+      .map(chat => {
+        return {
+          ...chat,
+          send_process: true
+        }
+      })
   }
 
-  get messages (): GroupByDateUserChat {
+  get errorMessages (): ChatUI[] {
+    return this.tstore.state.chat.errorchat
+      .filter(chat => chat.to_id === this.user.id)
+      .map(chat => {
+        return {
+          ...chat,
+          send_error: true
+        }
+      })
+  }
+
+  get messagesUi (): ChatUI[] {
     const orderids: string[] = []
     const productids: string[] = []
+    const msgs = [
+      ...this.unsendMessages,
+      ...this.errorMessages,
+      ...this.messages
+    ]
+    const fixmsgs = msgs
+      .filter(chat => chat)
+      .sort((currentMsg, nextMsg) => {
+        return currentMsg.created > nextMsg.created ? -1 : 1
+      })
+      .map((chat: ChatUI) => {
+        const notProcessOrError = !chat.send_process && !chat.send_error
 
-    const unsend = this.tstore.state.chat.unsend.map(chat => {
-      return { ...chat, send_process: true }
-    })
-    const error = this.tstore.state.chat.errorchat.map(chat => {
-      return { ...chat, send_error: true }
-    })
-    const msgs = [...this.tstore.state.chat.message, ...error, ...unsend]
-    const fixmsgs = msgs.filter(chat => chat).map((chat: ChatUi) => {
-      if (chat.productid) {
-        if (!productids.includes(chat.productid)) {
-          productids.push(chat.productid)
-          chat.show_product = true
+        if (chat.productid && notProcessOrError) {
+          if (!productids.includes(chat.productid)) {
+            productids.push(chat.productid)
+            chat.show_product = true
+          }
         }
-      }
 
-      if (chat.orderid) {
-        if (!orderids.includes(chat.orderid)) {
-          orderids.push(chat.orderid)
-          chat.show_order = true
+        if (chat.orderid && notProcessOrError) {
+          if (!orderids.includes(chat.orderid)) {
+            orderids.push(chat.orderid)
+            chat.show_order = true
+          }
         }
-      }
-      return chat
-    })
+        return chat
+      })
 
-    const groupByDate = this.groupByDate(fixmsgs)
-    const results: GroupByDateUserChat = {}
-    Object.keys(groupByDate).forEach((date) => {
-      results[date] = this.transformChat(groupByDate[date])
-    })
-
-    return results
+    return fixmsgs
   }
 
   @Watch('user')
   async updateUser (): Promise<void> {
     if (!this.isMobile) {
+      this.subChat()
+      this.initChat()
+
       const infiniteLoading = this.$refs.infiniteLoading as InfiniteLoading
       if (infiniteLoading) {
+        this.messages = []
         infiniteLoading.stateChanger.reset()
-        this.tstore.commit('chat/reset_message')
       }
     }
   }
 
   async infiniteHandler ($state: StateChanger): Promise<void> {
-    const { message, endpage } = this.tstore.state.chat
-    this.endpage = false
-    if (message.length) {
-      await this.tstore.dispatch('chat/paginateChat')
-    } else {
-      await this.tstore.dispatch('chat/getMessage')
-      this.scrollchat()
-    }
+    if (this.chatMessages) {
+      if (this.messages.length) {
+        const messages = await this.chatMessages.paginateChat()
+        this.messages = [...this.messages, ...messages]
+      } else {
+        const messages = await this.chatMessages.getChat()
+        this.messages = [...messages]
+        this.scrollchat()
+      }
 
-    if (endpage) {
-      $state.complete()
-      this.endpage = true
-    } else {
-      $state.loaded()
+      if (this.chatMessages.haveNext) {
+        setTimeout(() => $state.loaded(), 300)
+      } else {
+        $state.complete()
+      }
     }
   }
 
-  mounted (): void {
+  async mounted (): Promise<void> {
+    this.initChat()
     this.scrollchat()
-    this.$el.children[1].addEventListener('scroll', this.handleScroll)
   }
 
   beforeDestroy (): void {
-    this.$el.children[1].removeEventListener('scroll', this.handleScroll)
+    const { chat, system } = this.tstore.state
+    chatRead(chat.userActive.id, system.isSeller)
+    this.tstore.commit('chat/reset_user')
+    this.tstore.commit('chat/reset_message_unsend_error')
+    this.subChat()
   }
 
-  handleScroll (elem: Event): void {
-    const { children, scrollTop } = elem.target as HTMLDivElement
-    const getCurrentDate = [...children]
-      .find((child) => {
-        const offset = [(child as HTMLDivElement).offsetTop]
-
-        if (child.nextElementSibling) {
-          offset[1] = (child.nextElementSibling as HTMLDivElement).offsetTop
-        }
-
-        if (scrollTop >= offset[0]) {
-          if (offset[1]) {
-            return scrollTop <= offset[1]
-          }
-          return true
-        }
-      })
-
-    this.currentDate = getCurrentDate?.id || ''
-
-    window.setTimeout(() => {
-      this.currentDate = ''
-    }, 3000)
+  initChat (): void {
+    this.chatMessages = new ChatMessages(this.payload)
+    this.subChat = subscribeChat(this.payload, (msg) => {
+      this.messages = [msg, ...this.messages]
+    })
   }
 
   scrollchat (): void {
-    const chatBody = this.$el.children[1]
-    chatBody.scrollTo({ top: chatBody.scrollHeight })
+    setTimeout(() => {
+      const chatBody = this.$el.children[1].children[0]
+      chatBody.scrollTo({ top: chatBody.scrollHeight })
+    }, 300)
   }
 
   close (): void {
     this.tstore.commit('chat/mini_show', false)
-  }
-
-  groupByDate (messages: Chat[]): GroupByDateChat {
-    const defaultGroups: GroupByDateChat = {}
-    const groups = messages.reduce((results, message) => {
-      const date = dateFormater(message.created, 'DD MN YY')
-
-      if (results[date]) {
-        results[date].push(message)
-      } else {
-        results[date] = [message]
-      }
-
-      return results
-    }, defaultGroups)
-
-    return groups
-  }
-
-  transformChat (messages: Chat[]): TransformChat[] {
-    // getting pesan
-    let id: string
-    const hasil: TransformChat[] = []
-
-    messages.forEach(d => {
-      id !== d.from_id && hasil.push({ key: d.from_id, data: [] })
-      id !== d.from_id && (id = d.from_id)
-
-      hasil[hasil.length - 1].data.push(d)
-    })
-    return hasil
-  }
-
-  removeOrder (): void {
-    this.tstore.commit('chat/set_order', null)
-  }
-
-  removeProduct (): void {
-    this.tstore.commit('chat/set_product', null)
   }
 }
 </script>

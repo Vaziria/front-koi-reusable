@@ -2,6 +2,8 @@ import firebase from 'firebase'
 import { PaidStatus, StatusOrder, ThreatTipe } from '../model/order'
 
 type DocData = firebase.firestore.CollectionReference<firebase.firestore.DocumentData>
+type ColQuery = firebase.firestore.Query<firebase.firestore.DocumentData>
+
 export type Payload = {
   sellerid: string
   csid?: string
@@ -14,10 +16,14 @@ export type StatusPayload = {
 }
 
 const fire = firebase.firestore()
-function orderCol (sellerid: string): DocData {
-  return fire.collection('Sellers')
-    .doc(sellerid)
-    .collection('orders')
+function orderCol (sellerid: string): DocData | ColQuery {
+  if (sellerid) {
+    return fire.collection('Sellers')
+      .doc(sellerid)
+      .collection('orders')
+  }
+
+  return fire.collectionGroup('orders')
 }
 
 export async function orderStatusCount (payload: Payload, payloadStatus: StatusPayload): Promise<number> {

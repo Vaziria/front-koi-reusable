@@ -1,57 +1,27 @@
 <template>
   <div>
-    <h5
-      v-if="!isMobile"
-      class="tx-bold p-2 d-flex tx-16"
-    >Chat</h5>
-    <div class="d-flex">
-      <div
-        v-if="!isMobile"
-        class="input-group mx-2"
-      >
-        <input
-          v-model="q"
-          class="form-control tx-12 ht-30 rounded-5"
-          placeholder="Cari pengguna"
-        >
+    <div v-if="!isMobile">
+      <h5 class="tx-bold p-2 d-flex tx-16" >Chat</h5>
+      <div class="d-flex">
+        <div class="input-group mx-2">
+          <input
+            v-model="q"
+            class="form-control tx-12 ht-30 rounded-5"
+            placeholder="Cari pengguna"
+          >
+        </div>
       </div>
     </div>
     <div
       id="azChatList"
       class="az-chat-list mt-2 overflow-auto bg-white"
     >
-      <div
-        v-for="(chat, key) in userlist"
+      <ContactList
+        v-for="(contact, key) in userlist"
         :key="key"
-        :class="{
-          'media new py-2': true,
-          selected: !isMobile && user.id === chat.id
-        }"
-        @click="contactAction(chat)"
-      >
-        <div :class="`wd-30 ht-30 az-img-user ${ chat.state }`">
-          <img :src="chat.photoUrl || chat.profile_image || defaultImg" alt="">
-          <span v-if="chat.unread">{{ chat.unread }}</span>
-        </div>
-        <div class="media-body ellipsis">
-          <div class="media-contact-name mb-0">
-            <div class="tx-12 wd-80 ellipsis">
-              {{ chat.name || chat.displayName || chat.seller_name }}
-            </div>
-            <span class="d-md-none">
-              {{ parseInt(chat.last_msg.created) | fromNow }}
-            </span>
-          </div>
-          <div
-            v-if="isBuyer"
-            class="badge badge-info"
-          >Penjual</div>
-          <div
-            v-else-if="chat.last_msg.created"
-            class="tx-gray-500 tx-12 ellipsis"
-          >{{ chat.last_msg.text }}</div>
-        </div>
-      </div>
+        :contact="contact"
+        @click="contactAction(contact)"
+      />
       <InfiniteLoading ref="infiniteLoading" @infinite="infiniteHandler">
         <div slot="spinner"></div>
         <div slot="no-more"></div>
@@ -59,25 +29,11 @@
       </InfiniteLoading>
 
       <div v-if="showLoading">
-        <div v-for="i in 6" :key="i" class="d-flex my-3">
-          <div class="mx-3">
-            <div class="wd-35 ht-35 bg-loading rounded-circle"></div>
-          </div>
-          <div class="wd-100p mr-3">
-            <div class="wd-100p ht-15 bg-loading mb-1"></div>
-            <div class="wd-100p ht-10 bg-loading mb-2"></div>
-          </div>
-        </div>
+        <ContactLoading v-for="i in 6" :key="i" />
       </div>
 
-      <slot
-        v-if="noResult"
-        name="noresults"
-      >
-        <div class="p-2 tx-center">
-           <mdb-icon far icon="comments tx-gray-400 pos-relative" size=3x />
-          <p class="tx-12 tx-gray-400">tidak ada kontak ditemukan</p>
-        </div>
+      <slot v-if="noResult" name="noresults">
+        <NoResults />
       </slot>
     </div>
   </div>
@@ -87,9 +43,6 @@
     position: absolute;
     width: 100%;
     height: calc(100% - 81px) !important;
-  }
-  .form-control::placeholder {
-    font-size: 12px;
   }
   #azChatList::-webkit-scrollbar-track
   {
@@ -113,43 +66,32 @@
     }
   }
 </style>
-<style>
-  .chatlist div div .vs__selected {
-    color:  rgba(0,0,0,.4);
-    border-radius: 5px !important;
-    height: 20px;
-    width: 50px;
-    font-size: 12px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    position: absolute;
-    z-index: 50;
-  }
-  .chatlist, .chatlist .vs__dropdown-toggle {
-    border: 0;
-    height: 30px;
-    border-radius: 5px !important;
-  }
-</style>
 <script lang="ts">
 import { Component, Prop, Mixins } from 'vue-property-decorator'
 import InfiniteLoading, { StateChanger } from 'vue-infinite-loading'
 
-import { mdbIcon } from 'mdbvue'
-import { fromNow } from '../../filters/moment'
-
-import { UserChat } from '../../model/chat'
+import { UserChat, UserChatBasic } from '../../model/chat'
 import VueWithStore from '../../store/wrapper.vue'
 import { Namespaced, Store } from '../../store/types'
 import { ChatAction, ChatMutation, IChatState } from '../../store/chat'
 import { ISystemState } from '../../store/system'
 import WithNav from '../../navigation/WithNav.vue'
 import { BasicRoute } from '../../navigation/basicroute'
+import {
+  ChatBuyerContact, ChatSellerContact, DocData, initBuyerContacts,
+  initSellerContacts, StoreQuery, subscribeContact
+} from '../../api/fireChat'
+import { IUserState } from '../../store/user'
+
+import ContactList from './contacts/ContactList.vue'
+import NoResults from './contacts/NoResults.vue'
+import ContactLoading from './contacts/ContactLoading.vue'
+import { chatRead } from '../../api/chat'
 
 type State = {
-    'chat': IChatState
-    'system': ISystemState
+  'chat': IChatState
+  'system': ISystemState
+  'user': IUserState
 }
 
 type ChatStore = Store<State, Namespaced<ChatMutation, 'chat'>, Namespaced<ChatAction, 'chat'>>
@@ -162,88 +104,151 @@ class StoreMixins extends VueWithStore<ChatStore> {}
 
 @Component({
   components: {
-    mdbIcon,
-    InfiniteLoading
-  },
-  filters: {
-    fromNow
+    InfiniteLoading,
+    ContactList,
+    NoResults,
+    ContactLoading
   }
 })
 export default class ChatList extends Mixins(StoreMixins, NavMixins) {
   @Prop() readonly action!: (user: UserChat) => void|Promise<void>
 
-  filterActive = 'keyword'
+  chatContacts: UserChat[] = []
+  subContact: () => void = () => undefined
+  loading = false
+  endpage = false
   q = ''
-  defaultImg = require('../../../assets/img/avatar/user.png')
-
-  get isBuyer (): boolean {
-    return !this.tstore.state.system.isSeller
-  }
 
   get isMobile (): boolean {
     return this.tstore.state.system.isMobile
   }
 
-  get user (): UserChat {
+  get isSeller (): boolean {
+    return this.tstore.state.system.isSeller
+  }
+
+  get contactModel (): ChatBuyerContact {
+    const { uid, shopid } = this.tstore.state.user
+    if (this.isSeller) {
+      const csid = uid !== shopid ? uid : ''
+      return new ChatSellerContact(shopid, csid)
+    }
+
+    return new ChatBuyerContact(uid)
+  }
+
+  get initCollection (): StoreQuery<DocData> {
+    const { system, user } = this.tstore.state
+
+    if (system.isSeller) {
+      const isCs = user.uid !== user.shopid
+      const csid = isCs ? user.uid : ''
+      return initSellerContacts(user.shopid, csid)
+    }
+
+    return initBuyerContacts(user.uid)
+  }
+
+  get activeUser (): UserChatBasic {
     return this.tstore.state.chat.userActive
   }
 
   get showLoading (): boolean {
-    const { contactLoading, userlist } = this.tstore.state.chat
-    return userlist.length === 0 && contactLoading
+    return this.userlist.length === 0 && this.loading
   }
 
   get noResult (): boolean {
-    const { contactLoading, userlist } = this.tstore.state.chat
-    return userlist.length === 0 && !contactLoading
+    return this.userlist.length === 0 && !this.loading
   }
 
   get userlist (): UserChat[] {
     const userlist = this.tstore.state.chat.userlist
-    const data = userlist
-      .filter(user => {
-        if (this.q === '') {
-          return true
-        } else {
-          return user.name.toLowerCase().search(this.q.toLowerCase()) !== -1
-        }
-      })
-      .sort((currentUser, nextUser) => {
-        if (currentUser.last_chat < nextUser.last_chat) {
-          return 1
-        }
+    const filterByQuery = (user: UserChat): boolean => {
+      if (this.q) {
+        const searchUser = user.name
+          .toLowerCase()
+          .search(this.q.toLowerCase())
+        return searchUser !== 1
+      }
 
-        return -1
-      })
+      return true
+    }
+    const sortByLastChat = (currentUser: UserChat, nextUser: UserChat) => {
+      if (currentUser.last_chat < nextUser.last_chat) {
+        return 1
+      }
 
-    return data
+      return -1
+    }
+
+    return userlist
+      .filter(filterByQuery)
+      .sort(sortByLastChat)
+  }
+
+  mounted (): void {
+    this.subContact = subscribeContact(this.initCollection, async (type, contact) => {
+      if (contact.id === this.activeUser.id) {
+        this.readChat(contact)
+      }
+
+      if (type === 'added') {
+        const contactExist = !this.userlist
+          .find(user => user.id === contact.id)
+
+        if (contactExist) {
+          const userContact = await this.contactModel.contactUserInfo(contact)
+          this.tstore.commit('chat/push_user_list', userContact)
+        }
+      } else if (type === 'modified') {
+        this.tstore.commit('chat/update_user_list', contact)
+      }
+    })
+  }
+
+  beforeDestroy (): void {
+    this.subContact()
   }
 
   async infiniteHandler ($state: StateChanger): Promise<void> {
-    const { userlist, contactEndpage } = this.tstore.state.chat
+    this.loading = true
 
-    if (!contactEndpage && userlist.length) {
-      await this.tstore.dispatch('chat/paginateContact')
+    if (this.chatContacts.length) {
+      const contacts = await this.contactModel.paginateChat()
+      this.chatContacts = [...this.chatContacts, ...contacts]
     } else {
-      await this.tstore.dispatch('chat/openContact')
+      const contacts = await this.contactModel.getContact()
+      this.chatContacts = contacts
     }
 
-    if (contactEndpage) {
-      $state.complete()
-    } else {
+    this.tstore.commit('chat/set_user_list', this.chatContacts)
+    this.loading = false
+
+    if (this.contactModel.haveNext) {
       $state.loaded()
+    } else {
+      this.endpage = true
+      $state.complete()
     }
   }
 
-  async contactAction (user: UserChat): Promise<void> {
-    if (this.user.id !== user.id || this.isMobile) {
+  async readChat (contact: UserChat): Promise<void> {
+    if (contact.unread > 0) {
+      await chatRead(contact.id, this.isSeller)
+      this.tstore.commit('chat/add_unread', -contact.unread)
+    }
+  }
+
+  async contactAction (contact: UserChat): Promise<void> {
+    const userNotActive = this.activeUser.id !== contact.id
+    this.readChat(contact)
+
+    if (userNotActive || this.isMobile) {
       if (this.action) {
-        // await this.tstore.dispatch('chat/openChat', user)
-        // this.navigation.push('user_chat', {})
-        this.action(user)
+        this.action(contact)
       } else {
         this.tstore.commit('chat/clear_order_product')
-        await this.tstore.dispatch('chat/openChat', user)
+        await this.tstore.dispatch('chat/openChat', contact)
       }
     }
   }

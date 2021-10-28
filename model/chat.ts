@@ -1,3 +1,4 @@
+import { IIkan } from './ikan'
 import { Seller } from './seller'
 import { IUser } from './user'
 
@@ -16,6 +17,11 @@ export interface Chat {
     from_seller?: boolean
     send_process?: boolean
     send_error?: boolean
+}
+
+export interface ChatUI extends Chat {
+    show_product?: boolean
+    show_order?: boolean
 }
 
 export interface UserChatBasic {
@@ -52,12 +58,15 @@ export type ChatInfo = ChatInfoBuyer | ChatInfoSeller
 
 export interface ChatOrder {
     id: string
+    ikans: IIkan[]
+    total: number
 }
 
 export interface ChatProduct {
     id: string
     shopid: string
     name: string
+    price: number
     send_process: boolean
     gambar: string
 }

@@ -13,5 +13,9 @@ export interface BasicRoute {
     }
   }
   // eslint-disable-next-line camelcase
-  user_chat: undefined
+  user_chat: {
+    params: {
+      userid: string
+    }
+  }
 }
