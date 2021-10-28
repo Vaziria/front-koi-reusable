@@ -2,7 +2,7 @@
   <a
     :class="{
       'list-group-item px-3 bd-x-0 bd-gray-200 d-flex': true,
-      'bg-gray-100': notif.unread && haveNotifCount
+      'bg-gray-100': notif.unread
     }"
     @click="onAction()"
   >
@@ -33,19 +33,7 @@
 import { mdbIcon } from 'mdbvue'
 import { INotifOrder } from '../../model/notifs'
 import { fromNow } from '../../filters/moment'
-import { Component, Prop } from 'vue-property-decorator'
-import VueWithStore from '../../store/wrapper.vue'
-import { INotifState, NotifAction, NotifMutation } from '../../store/notif'
-import { Namespaced, Store } from '../../store/types'
-
-type State = {
-  'notif': INotifState
-}
-
-type NotifStore = Store<State, Namespaced<NotifMutation, 'notif'>, Namespaced<NotifAction, 'notif'>>
-
-@Component
-class StoreMixins extends VueWithStore<NotifStore> {}
+import { Component, Prop, Vue } from 'vue-property-decorator'
 
 @Component({
   components: {
@@ -55,13 +43,9 @@ class StoreMixins extends VueWithStore<NotifStore> {}
     fromNow
   }
 })
-class TransaksiCard extends StoreMixins {
+class TransaksiCard extends Vue {
   @Prop() notif!: INotifOrder
   @Prop() action!: (notif: INotifOrder) => void
-
-  get haveNotifCount (): boolean {
-    return this.tstore.state.notif.unreadCount > 0
-  }
 
   onAction (): void {
     if (this.action) {

@@ -1,7 +1,6 @@
 /* eslint-disable camelcase */
-import firebase from 'firebase'
 import { Notif, NotifType } from '../model/notif'
-import { BasicNotifType, BuyerNotifType, INotif, SellerNotifType } from '../model/notifs'
+import { BasicNotifType, INotif } from '../model/notifs'
 import client from './client'
 
 interface INotifPayload {
@@ -20,20 +19,6 @@ export interface NotifData {
   unread?: boolean
   orderid: string
   shop_id: string
-}
-
-function getNotifUser (userid: string): firebase.firestore.CollectionReference<firebase.firestore.DocumentData> {
-  return firebase
-    .firestore()
-    .collection('Users')
-    .doc(userid)
-    .collection('notifications')
-}
-
-function getNotifPublic (): firebase.firestore.CollectionReference<firebase.firestore.DocumentData> {
-  return firebase
-    .firestore()
-    .collection('NotifHist')
 }
 
 export async function pushIkan (id: string): Promise<unknown> {
@@ -82,49 +67,4 @@ export async function publicNotification (params: { tipe: BasicNotifType }): Pro
     params
   })
   return data.data.data
-}
-
-export class RequestNotif {
-  limit = 10
-
-  reqNotif: firebase.firestore.Query<firebase.firestore.DocumentData> | null = null
-  lastVisible: firebase.firestore.QueryDocumentSnapshot<firebase.firestore.DocumentData> | null = null
-
-  requestUser (userid: string, types: (SellerNotifType | BuyerNotifType)[]): void {
-    this.reqNotif = getNotifUser(userid)
-      .where('type', 'in', types)
-      .orderBy('created', 'desc')
-      .limit(this.limit)
-  }
-
-  requestPublic (types: (SellerNotifType | BuyerNotifType)[]): void {
-    this.reqNotif = getNotifPublic()
-      .where('type', 'in', types)
-      .orderBy('created', 'desc')
-      .limit(this.limit)
-  }
-
-  async getNotif (): Promise<NotifData[]> {
-    if (this.reqNotif) {
-      const notif = await this.reqNotif.get()
-      this.lastVisible = notif.docs[notif.docs.length - 1]
-
-      return notif.docs
-        .map(data => data.data() as NotifData)
-    }
-
-    return []
-  }
-
-  async nextNotif (): Promise<NotifData[]> {
-    if (this.reqNotif && this.lastVisible) {
-      const notif = await this.reqNotif.startAfter(this.lastVisible).get()
-      this.lastVisible = notif.docs[notif.docs.length - 1]
-
-      return notif.docs
-        .map(data => data.data() as NotifData)
-    }
-
-    return []
-  }
 }

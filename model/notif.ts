@@ -31,7 +31,7 @@ export interface NotifIkan extends NotifHist {
 
 export interface NotifOrder extends NotifHist {
   type: 'update_order' | 'new_order'
-  order_id: string
+  orderid: string
   shop_id: string
 }
 

@@ -2,45 +2,71 @@ import { readAll } from '../api/notification'
 import { Commit, Namespaced, Store } from '../store/types'
 import { Module } from 'vuex'
 import { INotif } from '../model/notifs'
+import { transaksiUnread, diskusiUnread, buyerTransaksiTypes, sellerTransaksiTypes } from '../api/fireNotif'
+import { IUserState } from './user'
+import { ISystemState } from './system'
 
 export interface INotifState {
-  unreadCount: number
+  transaksiCount: number
+  diskusiCount: number
   newNotif: INotif[]
 }
 const state: INotifState = {
-  unreadCount: 0,
+  transaksiCount: 0,
+  diskusiCount: 0,
   newNotif: []
 }
 
 const mutations = {
   reset_notif (state: INotifState): void {
-    state.unreadCount = 0
+    state.transaksiCount = 0
+    state.diskusiCount = 0
     state.newNotif = []
   },
 
-  set_unread (state: INotifState, data: number): void {
-    state.unreadCount = data
+  set_transaksi_unread (state: INotifState, unread: number): void {
+    state.transaksiCount = unread
   },
 
-  add_notif_unread (state: INotifState, add: number): void {
-    state.unreadCount += add
+  set_diskusi_unread (state: INotifState, unread: number): void {
+    state.diskusiCount = unread
   },
 
   push_new_notif (state: INotifState, notif: INotif): void {
     state.newNotif = [...state.newNotif, notif]
-    if (notif.type !== 'new_chat') {
-      state.unreadCount += 1
+
+    if (notif.type === 'diskusi') {
+      state.diskusiCount += 1
+    }
+
+    const transaksiTypes = [
+      ...sellerTransaksiTypes,
+      ...buyerTransaksiTypes
+    ]
+    if (transaksiTypes.includes(notif.type)) {
+      state.transaksiCount += 1
     }
   }
 }
 
 export type NotifMutation = typeof mutations
-type Context = Commit<NotifMutation> & { state: INotifState }
+type RootState = {
+  user: IUserState
+  system: ISystemState
+}
+type Context = Commit<NotifMutation> & { state: INotifState } & { rootState: RootState }
 
 const actions = {
-  async getUnread (state: Context, getUnread: () => Promise<number>): Promise<void> {
-    const unread = await getUnread()
-    state.commit('set_unread', unread)
+  async getTransaksiUnread (state: Context): Promise<void> {
+    const { user, system } = state.rootState
+    const unread = await transaksiUnread(user.uid, system.isSeller)
+    state.commit('set_transaksi_unread', unread)
+  },
+
+  async getDiskusiUnread (state: Context): Promise<void> {
+    const { user } = state.rootState
+    const unread = await diskusiUnread(user.uid)
+    state.commit('set_diskusi_unread', unread)
   },
 
   async readAll (state: Context): Promise<void> {
@@ -50,7 +76,7 @@ const actions = {
 }
 
 // eslint-disable-next-line @typescript-eslint/ban-types
-const Notif: Module<INotifState, {}> = {
+const Notif: Module<INotifState, RootState> = {
   namespaced: true,
   state,
   mutations,

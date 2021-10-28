@@ -1,6 +1,9 @@
 import firebase from 'firebase'
 
 export type FireReq = firebase.firestore.CollectionReference<firebase.firestore.DocumentData>
+export type DocData = firebase.firestore.DocumentData
+export type StoreQuery<T> = firebase.firestore.Query<T>
+
 const fire = firebase.firestore()
 
 // user & sellers
@@ -28,5 +31,18 @@ export function chatsSellerCol (sellerid: string): FireReq {
     .collection('Sellers')
     .doc(sellerid)
     .collection('seller_chats')
+}
+// ***
+
+// notifs
+// ***
+export function userNotifsCol (userid: string): FireReq {
+  return UserCol()
+    .doc(userid)
+    .collection('notifications')
+}
+
+export function publicNotifsCol (): FireReq {
+  return fire.collection('NotifHist')
 }
 // ***
