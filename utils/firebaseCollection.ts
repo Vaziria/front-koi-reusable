@@ -46,3 +46,12 @@ export function publicNotifsCol (): FireReq {
   return fire.collection('NotifHist')
 }
 // ***
+
+// diskusis
+// ***
+export function sellerDiskusisCol (shopid: string): StoreQuery<DocData> {
+  return fire
+    .collectionGroup('diskusi')
+    .where('shopid', '==', shopid)
+}
+// ***

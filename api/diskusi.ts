@@ -36,7 +36,10 @@ export async function getDiskusi (shopid: string, replied = false): Promise<Disk
   const key: DiskusiKey = 'shopid'
   const replied_key: DiskusiKey = 'replied'
   const orderType: DiskusiKey = 'created'
-  const snap = await db.collectionGroup('diskusi').where(key, '==', shopid).where(replied_key, '==', replied).orderBy(orderType, 'desc').get()
+  const snap = await db.collectionGroup('diskusi')
+    .where(key, '==', shopid)
+    // .where(replied_key, '==', replied)
+    .orderBy(orderType, 'desc').get()
 
   const hasil: Diskusi[] = []
   snap.forEach((doc) => {

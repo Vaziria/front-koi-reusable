@@ -82,9 +82,8 @@ export class NotifSubscribe<TNotif> extends RequestNotif {
 
   onNext (snap: QuerySnapshot<DocData>, callback: NotifCallback<TNotif>): void {
     snap.docChanges().forEach(change => {
-      const notif = change.doc.data() as TNotif & { id: string }
-      notif.id = change.doc.id
-      specialLog('getting notif from sub', notif)
+      const notif = change.doc.data() as TNotif
+      // specialLog('getting notif from sub', notif)
       callback(change.type, notif)
     })
   }

@@ -192,15 +192,15 @@ export default class ChatList extends Mixins(StoreMixins, NavMixins) {
         this.readChat(contact)
       }
 
-      if (type === 'added') {
-        const contactExist = !this.userlist
-          .find(user => user.id === contact.id)
+      const contactExist = this.userlist
+        .find(user => user.id === contact.id)
 
-        if (contactExist) {
-          const userContact = await this.contactModel.contactUserInfo(contact)
-          this.tstore.commit('chat/push_user_list', userContact)
-        }
-      } else if (type === 'modified') {
+      if (type === 'added' && !contactExist) {
+        const userContact = await this.contactModel.contactUserInfo(contact)
+        this.tstore.commit('chat/push_user_list', userContact)
+      }
+
+      if (type === 'modified' || contactExist) {
         this.tstore.commit('chat/update_user_list', contact)
       }
     })
