@@ -1,5 +1,5 @@
 <template>
-  <mdb-dropdown>
+  <mdb-dropdown :dropleft="dropleft ">
     <slot name="toggle" slot="toggle">
     </slot>
     <mdb-dropdown-menu class="bd rounded-5 tx-gray-800 shadow-base">
@@ -67,6 +67,7 @@ const dividerClass = 'dropdown-divider bd-t bd-gray-200 m-0'
 })
 class DropdownBasic extends Vue {
   @Prop({ default: [] }) readonly items!: IDropdown[]
+  @Prop({ default: false }) readonly dropleft!: boolean
 
   get dropdownItems (): DropdownItem[] {
     const dropdownItems = this.items.map(item => {

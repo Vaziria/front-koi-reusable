@@ -3,6 +3,9 @@ import firebase from 'firebase'
 export type FireReq = firebase.firestore.CollectionReference<firebase.firestore.DocumentData>
 export type DocData = firebase.firestore.DocumentData
 export type StoreQuery<T> = firebase.firestore.Query<T>
+export type QuerySnapshot<T> = firebase.firestore.QuerySnapshot<T>
+export type QueryCallback<T> = (type: firebase.firestore.DocumentChangeType, data: T) => void
+export type FireError = firebase.firestore.FirestoreError
 
 const fire = firebase.firestore()
 
@@ -52,6 +55,12 @@ export function publicNotifsCol (): FireReq {
 export function sellerDiskusisCol (shopid: string): StoreQuery<DocData> {
   return fire
     .collectionGroup('diskusi')
+    .where('shopid', '==', shopid)
+}
+
+export function sellerRepliessCol (shopid: string): StoreQuery<DocData> {
+  return fire
+    .collectionGroup('replies')
     .where('shopid', '==', shopid)
 }
 // ***
