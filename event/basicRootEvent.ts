@@ -8,5 +8,8 @@ export interface BasicRootEvent {
     show: boolean,
     text: string
   },
-  onChat: undefined
+  onChat: undefined,
+  showReply: {
+    replyid: string
+  }
 }

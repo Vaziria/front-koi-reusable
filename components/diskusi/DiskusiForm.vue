@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="pos-relative">
     <textarea
       v-model="text"
       :class="{
@@ -39,11 +39,13 @@ textarea {
 </style>
 <script lang="ts">
 import { sendDiskusi } from '../../api/diskusi'
-import { Component, Prop, Emit } from 'vue-property-decorator'
+import { Component, Mixins, Prop, Emit } from 'vue-property-decorator'
 import BasicButton from '../../components/button/BasicButton.vue'
 import { ISystemState } from '../../store/system'
 import { Store } from '../../store/types'
 import VueWithStore from '../../store/wrapper.vue'
+import WithRootEmit from '../../event/WithRootEmit.vue'
+import { BasicRootEvent } from '../../event/basicRootEvent'
 
 type State = {
   'system': ISystemState
@@ -55,12 +57,15 @@ type ChatStore = Store<State, {}, {}>
 @Component
 class StoreMixins extends VueWithStore<ChatStore> {}
 
+@Component
+class RootEmit extends WithRootEmit<BasicRootEvent> {}
+
 @Component({
   components: {
     BasicButton
   }
 })
-class DiskusiForm extends StoreMixins {
+class DiskusiForm extends Mixins(StoreMixins, RootEmit) {
   @Prop() readonly shopid!: string
   @Prop() readonly ikanid!: string
   @Prop() readonly replyid!: string
@@ -97,12 +102,25 @@ class DiskusiForm extends StoreMixins {
     const { shopid, ikanid, replyid, text } = this
     const { isSeller } = this.tstore.state.system
     this.resetFocus()
+    this.rootEmit('showReply', {
+      replyid
+    })
 
-    await sendDiskusi(shopid, ikanid, {
+    const reply = await sendDiskusi(shopid, ikanid, {
       reply_id: replyid,
       text
     }, isSeller)
     this.processSend = false
+
+    // scroll to reply
+    setTimeout(() => {
+      const replyElement = document.getElementById(reply.data.id)
+      if (replyElement) {
+        replyElement.scrollIntoView({
+          behavior: 'smooth'
+        })
+      }
+    }, 300)
   }
 
   @Emit('focus')

@@ -1,16 +1,16 @@
 <template>
-  <div class="card rounded-10 mb-3">
+  <div class="card rounded-10" @click="$emit('click')">
     <!-- loading -->
     <div v-if="loading" class="card-header">
       <div class="d-flex mt-2 bd-5 pl-3 py-2">
         <div class="mr-3">
-          <div class="wd-60 ht-15 bg-loading-200 mb-2"></div>
-          <div class="wd-60 ht-60 rounded-5 bg-loading-200"></div>
+          <div class="wd-40 wd-md-60 ht-10 ht-md-15 bg-loading-200 mb-2"></div>
+          <div class="wd-40 ht-40 wd-md-60 ht-md-60 rounded-5 bg-loading-200"></div>
         </div>
         <div class="align-self-center flex-fill">
-          <div class="wd-70p ht-15 bg-loading-200 mb-1"></div>
-          <div class="wd-100 ht-15 bg-loading-200 mb-1"></div>
-          <div class="wd-100 ht-15 bg-loading-200"></div>
+          <div class="wd-70p ht-10 ht-md-15 bg-loading-200 mb-1"></div>
+          <div class="wd-100 ht-10 ht-md-15 bg-loading-200 mb-1"></div>
+          <div class="wd-100 ht-10 ht-md-15 bg-loading-200"></div>
         </div>
       </div>
     </div>
@@ -31,13 +31,13 @@
 
           <img
             :src="product.gambar[0]"
-            class="wd-60 ht-60 img-fit-cover rounded-5 bg-gray-200"
+            class="wd-40 ht-40 wd-md-60 wd-ht-60 img-fit-cover rounded-5 bg-gray-200"
           >
         </div>
-        <div class="align-self-center flex-fill">
-          <h6 class="tx-bold mb-0 d-flex">{{ product.name }} </h6>
-          <p class="tx-orange tx-bold mb-0">{{ product.price | currency }}</p>
-          <p class="tx-12 mb-0">{{ product.kategori }}</p>
+        <div class="align-self-center flex-fill text-truncate mr-3">
+          <h6 class="tx-bold tx-12 tx-md-14 mb-0 text-truncate">{{ product.name }} </h6>
+          <p class="tx-orange tx-12 tx-md-14 tx-bold mb-0">{{ product.price | currency }}</p>
+          <p class="tx-10 tx-md-12 mb-0">{{ product.kategori }}</p>
           <div v-if="product.tags">
             <span
               v-for="tag in product.tags"
@@ -46,12 +46,15 @@
             >{{ tag }}</span>
           </div>
         </div>
-        <div class="align-self-center">
+        <div class="align-self-center" @click.prevent.stop>
           <DropdownAction
             :items="dropButtons"
             :dropleft="true"
           >
-            <BasicButton slot="toggle" type="light" class="py-2">
+            <BasicButton
+              slot="toggle"
+              type="light" class="py-2"
+            >
               <i class="fas fa-ellipsis-v"></i>
             </BasicButton>
           </DropdownAction>
@@ -62,8 +65,11 @@
   </div>
 </template>
 <style scoped>
-.ht-60 {
+.ht-md-60 {
   height: 60 !important;
+}
+.ht-40 {
+  height: 40 !important;
 }
 </style>
 <script lang="ts">

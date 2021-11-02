@@ -2,11 +2,16 @@ import { Diskusi } from '../model/diskusi'
 import { sellerDiskusisCol, QuerySnapshot, QueryCallback, DocData, FireError, sellerRepliessCol } from '../utils/firebaseCollection'
 import { errorLog } from '../utils/logger'
 
-export async function getSellerDiskusi (shopid: string): Promise<Diskusi[]> {
+export async function getSellerDiskusi (shopid: string, replied?: boolean): Promise<Diskusi[]> {
   const diskusis: Diskusi[] = []
-  const data = await sellerDiskusisCol(shopid)
+  let request = sellerDiskusisCol(shopid)
     .orderBy('last_reply', 'desc')
-    .get()
+
+  if (typeof replied === 'boolean') {
+    request = request.where('replied', '==', replied)
+  }
+
+  const data = await request.get()
 
   data.docs.forEach(diskusi => {
     if (diskusi.exists) {
@@ -41,10 +46,12 @@ export async function getReplies (shopid: string, diskusiid: string): Promise<Di
 }
 
 class SubDiskusi {
-  constructor (shopid: string) {
+  constructor (shopid: string, replied?: boolean) {
     this.shopid = shopid
+    this.replied = replied
   }
 
+  replied?: boolean
   shopid = ''
 
   onNext (snap: QuerySnapshot<DocData>, callback: QueryCallback<Diskusi>): void {
@@ -63,7 +70,13 @@ export class SubscribeDiskusi extends SubDiskusi {
   subDiskusi = (): void => undefined
 
   subscribe (callback: QueryCallback<Diskusi>): void {
-    this.subDiskusi = sellerDiskusisCol(this.shopid)
+    let request = sellerDiskusisCol(this.shopid)
+
+    if (typeof this.replied === 'boolean') {
+      request = request.where('replied', '==', this.replied)
+    }
+
+    this.subDiskusi = request
       .onSnapshot((snap) => this.onNext(snap, callback), this.onError)
   }
 
@@ -73,10 +86,23 @@ export class SubscribeDiskusi extends SubDiskusi {
 }
 
 export class SubscribeReply extends SubDiskusi {
+  constructor (shopid: string, ikanid = '') {
+    super(shopid)
+    this.ikanid = ikanid
+  }
+
+  ikanid = ''
+
   subReplies = (): void => undefined
 
   async subscribe (callback: QueryCallback<Diskusi>): Promise<void> {
-    this.subReplies = sellerRepliessCol(this.shopid)
+    let request = sellerRepliessCol(this.shopid)
+
+    if (this.ikanid) {
+      request = request.where('ikanid', '==', this.ikanid)
+    }
+
+    this.subReplies = request
       .onSnapshot((snap) => this.onNext(snap, callback), this.onError)
   }
 

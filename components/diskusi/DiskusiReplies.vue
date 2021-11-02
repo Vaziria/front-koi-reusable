@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div :class="{ 'py-3': diskusi.has_reply }">
     <BasicButton
       v-if="diskusi.has_reply && !showReply"
       type="info"
@@ -27,7 +27,8 @@
         v-for="diskusi in allReplies"
         :key="diskusi.id"
         :diskusi="diskusi"
-        class="mb-3"
+        :top-scroll-spacing="topScrollSpacing"
+        class="mb-3 bd-b"
       />
     </div>
 
@@ -41,14 +42,19 @@
 </template>
 <script lang="ts">
 import { Diskusi } from '../../model/diskusi'
-import { Component, Vue, Prop } from 'vue-property-decorator'
+import { Component, Prop } from 'vue-property-decorator'
 import DiskusiReply from './DiskusiReply.vue'
 import { getReplies } from '../../api/fireDikusi'
 import BasicButton from '../../components/button/BasicButton.vue'
+import WithRootEmit from '../../event/WithRootEmit.vue'
+import { BasicRootEvent } from '../../event/basicRootEvent'
 
 export type DiskusiWithReplies = Diskusi & {
   replies: Diskusi[]
 }
+
+@Component
+class RootEmit extends WithRootEmit<BasicRootEvent> {}
 
 @Component({
   components: {
@@ -56,8 +62,10 @@ export type DiskusiWithReplies = Diskusi & {
     BasicButton
   }
 })
-class DiskusiReplies extends Vue {
+class DiskusiReplies extends RootEmit {
   @Prop() readonly diskusi!: DiskusiWithReplies
+  @Prop() readonly dontLoad!: DiskusiWithReplies
+  @Prop() readonly topScrollSpacing!: number
 
   replies: Diskusi[] = []
   loadReply = false
@@ -82,11 +90,29 @@ class DiskusiReplies extends Vue {
       })
   }
 
+  mounted (): void {
+    this.rootOn('showReply', this.onShowReplies)
+  }
+
+  beforeDestroy (): void {
+    this.rootOff('showReply', this.onShowReplies)
+  }
+
+  onShowReplies (data: { replyid: string }): void {
+    if (data.replyid === this.diskusi.id) {
+      this.showReplies()
+    }
+  }
+
   async showReplies (): Promise<void> {
     this.showReply = true
 
     if (!this.loadReply) {
-      await this.getReplies()
+      if (this.dontLoad) {
+        this.loadReply = true
+      } else {
+        await this.getReplies()
+      }
     }
   }
 
