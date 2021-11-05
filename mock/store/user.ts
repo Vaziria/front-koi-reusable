@@ -1,14 +1,20 @@
 import { getId, getRandomNum, getRandomValue } from '../mock'
-import { IUserState } from '../../store/user'
-import { RoleKey } from '../../model/access'
+import userStore, { IUserState, UserMutation, UserAction } from '../../store/user'
 import { Wilayah } from '../../constant/wilayah'
 import { Module } from 'vuex'
+
+export {
+  IUserState,
+  UserMutation,
+  UserAction
+}
 
 const wilayah = getRandomValue(Wilayah)
 const names = ['Agile', 'Kanban', 'Todo']
 const name = getRandomValue(names)
 
 export const state: IUserState = {
+  ...userStore.state,
   uid: getId(11),
   token: getId(30),
   expiryToken: new Date().getTime() + (24 * 3600 * 1000),
@@ -23,21 +29,11 @@ export const state: IUserState = {
   unsetting: false
 }
 
-export const mutations = {
-  setRole (state: IUserState, roles: RoleKey[]): void {
-    state.role = roles
-  },
-
-  setShopid (state: IUserState, shopid: string): void {
-    state.shopid = shopid
-  }
-}
-export type UserMutation = typeof mutations
-
 // eslint-disable-next-line @typescript-eslint/ban-types
 const user: Module<IUserState, {}> = {
   namespaced: true,
-  mutations,
+  mutations: userStore.mutations,
+  actions: userStore.actions,
   state
 }
 

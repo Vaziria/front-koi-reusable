@@ -145,7 +145,7 @@ const mutations = {
 }
 
 export type ChatMutation = typeof mutations
-type RootState = {
+export type RootState = {
   user: IUserState
   system: ISystemState
 }

@@ -1,16 +1,16 @@
-import { shallowMount, Wrapper } from '@vue/test-utils'
+import { shallowMount } from '@vue/test-utils'
 import ContactList from './ContactList.vue'
 import { single } from '../../../mock/chat/contact'
 import store from '../../../mock/store'
+import { MockWrapper } from '../../../mock/types'
 
-const ContactLists = new ContactList()
 const contact = single()
 
-let component: Wrapper<typeof ContactLists>
+let wrapper: MockWrapper<ContactList>
 
 describe('ContactList.vue', () => {
   beforeEach(() => {
-    component = shallowMount<ContactList>(ContactList, {
+    wrapper = shallowMount<ContactList>(ContactList, {
       propsData: {
         contact
       },
@@ -19,18 +19,18 @@ describe('ContactList.vue', () => {
   })
 
   it('test contact unread ditampilkan', () => {
-    expect(component.vm.$el.querySelector('.az-img-user span')?.innerHTML)
+    expect(wrapper.vm.$el.querySelector('.az-img-user span')?.innerHTML)
       .toEqual(contact.unread.toString())
   })
 
   it('test contact unread disembunyikan', async () => {
-    await component.setProps({
+    await wrapper.setProps({
       contact: {
         ...contact,
         unread: 0
       }
     })
-    expect(component.vm.$el.querySelector('.az-img-user span')?.innerHTML)
+    expect(wrapper.vm.$el.querySelector('.az-img-user span')?.innerHTML)
       .toBeUndefined()
   })
 })

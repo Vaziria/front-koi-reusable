@@ -1,9 +1,17 @@
 import { Module } from 'vuex'
-import { IChatState } from '../../store/chat'
+import chatStore, { IChatState, ChatMutation, ChatAction, RootState } from '../../store/chat'
 import { single as singleContact, multiple as multipleContact } from '../chat/contact'
 import { getRandomNum } from '../mock'
 
-export const state:IChatState = {
+export {
+  IChatState,
+  ChatMutation,
+  ChatAction
+}
+
+export const state: IChatState = {
+  ...chatStore.state,
+
   // chat action
   showMini: false,
   showRecomend: false,
@@ -22,14 +30,10 @@ export const state:IChatState = {
   unread: getRandomNum(10)
 }
 
-export const mutations = {
-}
-export type ChatMutation = typeof mutations
-
-// eslint-disable-next-line @typescript-eslint/ban-types
-const chat: Module<IChatState, {}> = {
+const chat: Module<IChatState, RootState> = {
   namespaced: true,
-  mutations,
+  mutations: chatStore.mutations,
+  actions: chatStore.actions,
   state
 }
 
