@@ -33,4 +33,16 @@ describe('ContactList.vue', () => {
     expect(wrapper.vm.$el.querySelector('.az-img-user span')?.innerHTML)
       .toBeUndefined()
   })
+
+  it('test onclick emit click event', () => {
+    const clickEvent = jest.fn(() => wrapper.trigger('click'))
+
+    clickEvent()
+    expect(clickEvent).toBeCalled()
+
+    const eventEmit = wrapper.emitted('click')
+    expect(eventEmit)
+      .not
+      .toBeUndefined()
+  })
 })

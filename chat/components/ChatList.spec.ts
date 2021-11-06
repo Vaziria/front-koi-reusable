@@ -4,14 +4,14 @@ import ContactList from './contacts/ContactList.vue'
 import { single as singleContact } from '../../mock/chat/contact'
 import { single as singleChat } from '../../mock/chat/chat'
 import store, { MockStore } from '../../mock/store'
-import { MockWrapper } from '../../mock/types'
+import { MockWrapper, MockCommit } from '../../mock/types'
 import { UserChat } from '../../model/chat'
 
 const addUser = singleContact()
 
 let wrapper: MockWrapper<ChatList>
 let mockStore: MockStore
-let mockCommit: jest.Mock & MockStore['commit']
+let mockCommit: MockCommit
 let userlist: UserChat[]
 
 describe('ChatList.vue', () => {
@@ -85,6 +85,13 @@ describe('ChatList.vue', () => {
       firstContactComponent.trigger('click')
     })
 
+    // check contact list component ada
+    expect(firstContactComponent.exists())
+      .toBe(true)
+    expect(firstContactComponent.vm.$props.contact.unread)
+      .toEqual(userlist[0].unread)
+
+    // click contact
     contactClick()
     expect(contactClick)
       .toBeCalled()

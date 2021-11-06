@@ -3,12 +3,12 @@ import ChatBox from './ChatBox.vue'
 import { single as singleContact } from '../../mock/chat/contact'
 import { single as singleChat } from '../../mock/chat/chat'
 import store, { MockStore } from '../../mock/store'
-import { MockWrapper } from '../../mock/types'
+import { MockCommit, MockWrapper } from '../../mock/types'
 import { ChatUI } from '../../model/chat'
 
 let wrapper: MockWrapper<ChatBox>
 let mockStore: MockStore
-let mockCommit: jest.Mock & MockStore['commit']
+let mockCommit: MockCommit
 let messages: ChatUI[]
 let pushNewMsg: jest.Mock<void, [msg: ChatUI]>
 
