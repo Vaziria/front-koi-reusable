@@ -38,7 +38,7 @@ export async function getDiskusi (shopid: string, replied = false): Promise<Disk
   const orderType: DiskusiKey = 'created'
   const snap = await db.collectionGroup('diskusi')
     .where(key, '==', shopid)
-    // .where(replied_key, '==', replied)
+    .where(replied_key, '==', replied)
     .orderBy(orderType, 'desc').get()
 
   const hasil: Diskusi[] = []

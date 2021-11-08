@@ -19,7 +19,7 @@ export const state: IUserState = {
   token: getId(30),
   expiryToken: new Date().getTime() + (24 * 3600 * 1000),
   isLogin: true,
-  role: [],
+  role: ['seller'],
   displayName: name,
   email: `${name}.${getRandomNum(100)}@mail.com`,
   phoneNumber: `08${getRandomValue(['56', '53', '95'])}${getRandomValue(['8213214477', '1118219477', '5454321247'])}`,
