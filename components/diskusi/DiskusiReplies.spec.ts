@@ -4,7 +4,7 @@ import DiskusiReply from './DiskusiReply.vue'
 import BasicButton from '../../components/button/BasicButton.vue'
 import { single, multiple } from '../../mock/diskusi/withReplies'
 import { MockWrapper } from '../../mock/types'
-import { IDiskusi } from '../../model/diskusi'
+import { Diskusi } from '../../model/diskusi'
 
 let wrapper: MockWrapper<DiskusiReplies>
 const diskusi = single()
@@ -17,7 +17,7 @@ describe('DiskusiReplies.vue', () => {
       }
     })
 
-    wrapper.vm.getReplies = () => {
+    wrapper.vm.getReplies = async () => {
       wrapper.vm.loadReply = true
       wrapper.vm.replies = multiple()
       wrapper.vm.loading = false
@@ -61,7 +61,8 @@ describe('DiskusiReplies.vue', () => {
         .toBe(true)
 
       // check all diskusi reply show
-      expect(wrapper.vm.allReplies.map((reply: IDiskusi) => reply.id))
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      expect(wrapper.vm.allReplies.map((value: Diskusi, index: number, array: Diskusi[]) => value.id))
         .toStrictEqual(allReplyIds)
     })
 
