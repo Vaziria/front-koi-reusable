@@ -58,7 +58,7 @@ class StoreMixins extends VueWithStore<ChatStore> {}
 class ContactList extends StoreMixins {
   @Prop() readonly contact!: UserChat
 
-  defaultImg = require('../../../../assets/img/avatar/user.png')
+  defaultImg = require('../../../assets/img/avatar/user.png')
 
   get isSeller (): boolean {
     return this.tstore.state.system.isSeller

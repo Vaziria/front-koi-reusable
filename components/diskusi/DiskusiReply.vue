@@ -73,7 +73,7 @@ class DiskusiReply extends Vue {
   @Prop() readonly showBadge!: boolean
   @Prop({ default: 60 }) readonly topScrollSpacing!: number
 
-  defaultImg = require('@/assets/img/avatar/user.png')
+  defaultImg = require('../../assets/img/avatar/user.png')
 
   get scrollClass (): Record<string, string> {
     return {

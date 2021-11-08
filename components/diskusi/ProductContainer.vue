@@ -35,7 +35,7 @@
           >
         </div>
         <div class="align-self-center flex-fill text-truncate mr-3">
-          <h6 class="tx-bold tx-12 tx-md-14 mb-0 text-truncate">{{ product.name }} </h6>
+          <h6 class="tx-bold tx-12 tx-md-14 mb-0 text-truncate">{{ product.name }}</h6>
           <p class="tx-orange tx-12 tx-md-14 tx-bold mb-0">{{ product.price | currency }}</p>
           <p class="tx-10 tx-md-12 mb-0">{{ product.kategori }}</p>
           <div v-if="product.tags">

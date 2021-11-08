@@ -41,17 +41,13 @@
   </div>
 </template>
 <script lang="ts">
-import { Diskusi } from '../../model/diskusi'
+import { Diskusi, IDiskusi } from '../../model/diskusi'
 import { Component, Prop } from 'vue-property-decorator'
 import DiskusiReply from './DiskusiReply.vue'
 import { getReplies } from '../../api/fireDikusi'
 import BasicButton from '../../components/button/BasicButton.vue'
 import WithRootEmit from '../../event/WithRootEmit.vue'
 import { BasicRootEvent } from '../../event/basicRootEvent'
-
-export type DiskusiWithReplies = Diskusi & {
-  replies: Diskusi[]
-}
 
 @Component
 class RootEmit extends WithRootEmit<BasicRootEvent> {}
@@ -63,8 +59,8 @@ class RootEmit extends WithRootEmit<BasicRootEvent> {}
   }
 })
 class DiskusiReplies extends RootEmit {
-  @Prop() readonly diskusi!: DiskusiWithReplies
-  @Prop() readonly dontLoad!: DiskusiWithReplies
+  @Prop() readonly diskusi!: IDiskusi
+  @Prop() readonly dontLoad!: boolean
   @Prop() readonly topScrollSpacing!: number
 
   replies: Diskusi[] = []
