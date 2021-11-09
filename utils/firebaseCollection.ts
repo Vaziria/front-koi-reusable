@@ -63,4 +63,10 @@ export function sellerRepliessCol (shopid: string): StoreQuery<DocData> {
     .collectionGroup('replies')
     .where('shopid', '==', shopid)
 }
+
+export function buyerDiskusisCol (userid: string): StoreQuery<DocData> {
+  return fire
+    .collectionGroup('diskusi')
+    .where('userid', '==', userid)
+}
 // ***

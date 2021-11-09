@@ -7,7 +7,13 @@
       >
       <div class="align-self-center flex-fill d-flex">
         <div class="flex-fill lh-3">
-          <p class="mb-0">{{ diskusi.name }}</p>
+          <p class="mb-0 tx-bold">
+            {{ diskusi.name }}
+            <span
+              v-if="diskusi.userid === shopid"
+              class="badge badge-info"
+            >Penjual</span>
+          </p>
           <p class="tx-10 tx-gray-500 mb-0">{{ diskusi | diskusiDate }}</p>
         </div>
         <div v-if="showBadge" class="align-self-center">
@@ -70,6 +76,7 @@ import date from '../../filters/date'
 })
 class DiskusiReply extends Vue {
   @Prop() readonly diskusi!: Diskusi
+  @Prop() readonly shopid!: string
   @Prop() readonly showBadge!: boolean
   @Prop({ default: 60 }) readonly topScrollSpacing!: number
 

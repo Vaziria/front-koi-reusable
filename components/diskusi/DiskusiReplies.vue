@@ -27,6 +27,7 @@
         v-for="diskusi in allReplies"
         :key="diskusi.id"
         :diskusi="diskusi"
+        :shopid="shopid"
         :top-scroll-spacing="topScrollSpacing"
         class="mb-3 bd-b"
       />
@@ -60,6 +61,7 @@ class RootEmit extends WithRootEmit<BasicRootEvent> {}
 })
 class DiskusiReplies extends RootEmit {
   @Prop() readonly diskusi!: IDiskusi
+  @Prop() readonly shopid!: string
   @Prop() readonly dontLoad!: boolean
   @Prop() readonly topScrollSpacing!: number
 
@@ -114,6 +116,14 @@ class DiskusiReplies extends RootEmit {
 
   hideReplies (): void {
     this.showReply = false
+    setTimeout(() => {
+      const replyElement = document.getElementById(this.diskusi.id)
+      if (replyElement) {
+        replyElement.scrollIntoView({
+          behavior: 'smooth'
+        })
+      }
+    }, 300)
   }
 
   async getReplies (): Promise<void> {

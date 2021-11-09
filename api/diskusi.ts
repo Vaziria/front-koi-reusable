@@ -95,8 +95,11 @@ export async function sendDiskusi (shopid: string, ikanid: string, data: Diskusi
     seller?: boolean
   } = {
     shopid,
-    ikanid,
-    seller
+    ikanid
+  }
+
+  if (seller) {
+    params.seller = seller
   }
 
   const res = await client.post('/diskusi', data, {

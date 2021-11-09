@@ -6,7 +6,7 @@
         'form-control rounded-5 tx-12 mb-3': true,
         'bd-info': focus || isFocus
       }"
-      placeholder="Balas diskusi di sini..."
+      :placeholder="placeholder"
       :rows="rows"
       :disabled="processSend"
       @blur="onFocus(false)"
@@ -51,6 +51,11 @@ type State = {
   'system': ISystemState
 }
 
+export type SendType = {
+  text: string
+  replyid: string
+}
+
 // eslint-disable-next-line @typescript-eslint/ban-types
 type ChatStore = Store<State, {}, {}>
 
@@ -70,6 +75,8 @@ class DiskusiForm extends Mixins(StoreMixins, RootEmit) {
   @Prop() readonly ikanid!: string
   @Prop() readonly replyid!: string
   @Prop() readonly focus!: boolean
+  @Prop({ default: 1 }) readonly unactiveRows!: number
+  @Prop({ default: 'Balas diskusi di sini...' }) readonly placeholder!: string
 
   isFocus = false
   text = ''
@@ -85,7 +92,7 @@ class DiskusiForm extends Mixins(StoreMixins, RootEmit) {
 
   get rows (): number {
     if (!this.isFocus && !this.focus) {
-      return 1
+      return this.unactiveRows
     }
 
     const defaultRows = 4
@@ -97,7 +104,8 @@ class DiskusiForm extends Mixins(StoreMixins, RootEmit) {
     return defaultRows
   }
 
-  async sendReply (): Promise<void> {
+  @Emit('send')
+  async sendReply (): Promise<SendType> {
     this.processSend = true
     const { shopid, ikanid, replyid, text } = this
     const { isSeller } = this.tstore.state.system
@@ -121,6 +129,11 @@ class DiskusiForm extends Mixins(StoreMixins, RootEmit) {
         })
       }
     }, 300)
+
+    return {
+      text,
+      replyid
+    }
   }
 
   @Emit('focus')

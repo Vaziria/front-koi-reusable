@@ -31,7 +31,7 @@
 
           <img
             :src="product.gambar[0]"
-            class="wd-40 ht-40 wd-md-60 wd-ht-60 img-fit-cover rounded-5 bg-gray-200"
+            class="wd-40 ht-40 wd-md-60 ht-md-60 img-fit-cover rounded-5 bg-gray-200"
           >
         </div>
         <div class="align-self-center flex-fill text-truncate mr-3">
@@ -66,10 +66,12 @@
 </template>
 <style scoped>
 .ht-md-60 {
-  height: 60 !important;
+  height: 60px !important;
 }
-.ht-40 {
-  height: 40 !important;
+@media (max-width: 768px) {
+  .ht-40 {
+    height: 40px !important;
+  }
 }
 </style>
 <script lang="ts">

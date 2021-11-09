@@ -1,10 +1,30 @@
 import { Diskusi } from '../model/diskusi'
-import { sellerDiskusisCol, QuerySnapshot, QueryCallback, DocData, FireError, sellerRepliessCol } from '../utils/firebaseCollection'
+import { sellerDiskusisCol, QuerySnapshot, QueryCallback, DocData, FireError, sellerRepliessCol, buyerDiskusisCol } from '../utils/firebaseCollection'
 import { errorLog } from '../utils/logger'
 
 export async function getSellerDiskusi (shopid: string, replied?: boolean): Promise<Diskusi[]> {
   const diskusis: Diskusi[] = []
   let request = sellerDiskusisCol(shopid)
+    .orderBy('last_reply', 'desc')
+
+  if (typeof replied === 'boolean') {
+    request = request.where('replied', '==', replied)
+  }
+
+  const data = await request.get()
+
+  data.docs.forEach(diskusi => {
+    if (diskusi.exists) {
+      diskusis.push(diskusi.data() as Diskusi)
+    }
+  })
+
+  return diskusis
+}
+
+export async function getBuyerDiskusi (userid: string, replied?: boolean): Promise<Diskusi[]> {
+  const diskusis: Diskusi[] = []
+  let request = buyerDiskusisCol(userid)
     .orderBy('last_reply', 'desc')
 
   if (typeof replied === 'boolean') {
@@ -71,6 +91,33 @@ export class SubscribeDiskusi extends SubDiskusi {
 
   subscribe (callback: QueryCallback<Diskusi>): void {
     let request = sellerDiskusisCol(this.shopid)
+
+    if (typeof this.replied === 'boolean') {
+      request = request.where('replied', '==', this.replied)
+    }
+
+    this.subDiskusi = request
+      .onSnapshot((snap) => this.onNext(snap, callback), this.onError)
+  }
+
+  unsubscribe (): void {
+    this.subDiskusi()
+  }
+}
+
+export class SubscribeDiskusiIkan extends SubDiskusi {
+  constructor (shopid: string, ikanid: string) {
+    super(shopid)
+    this.ikanid = ikanid
+  }
+
+  ikanid = ''
+
+  subDiskusi = (): void => undefined
+
+  subscribe (callback: QueryCallback<Diskusi>): void {
+    let request = sellerDiskusisCol(this.shopid)
+      .where('ikanid', '==', this.ikanid)
 
     if (typeof this.replied === 'boolean') {
       request = request.where('replied', '==', this.replied)
