@@ -17,7 +17,7 @@ describe('DiskusiReply.vue', () => {
 
   it('check data tampilan sesuai', () => {
     // user name
-    expect(wrapper.vm.$el.querySelector('p.mb-0')?.innerHTML)
+    expect(wrapper.vm.$el.querySelector('span.tx-bold')?.innerHTML)
       .toBe(diskusi.name)
 
     // diskusi date

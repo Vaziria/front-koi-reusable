@@ -7,8 +7,8 @@
       >
       <div class="align-self-center flex-fill d-flex">
         <div class="flex-fill lh-3">
-          <p class="mb-0 tx-bold">
-            {{ diskusi.name }}
+          <p class="mb-0">
+            <span class="tx-bold">{{ diskusi.name }}</span>
             <span
               v-if="diskusi.userid === shopid"
               class="badge badge-info"
